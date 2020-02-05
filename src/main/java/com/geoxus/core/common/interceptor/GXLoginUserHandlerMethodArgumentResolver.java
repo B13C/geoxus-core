@@ -1,0 +1,37 @@
+package com.geoxus.core.common.interceptor;
+
+import com.geoxus.core.common.annotation.GXLoginUserAnnotation;
+import com.geoxus.core.common.entity.GXUUserEntity;
+import com.geoxus.core.common.oauth.GXTokenManager;
+import com.geoxus.core.common.service.GXUUserService;
+import com.geoxus.core.common.util.GXSpringContextUtils;
+import org.springframework.core.MethodParameter;
+import org.springframework.stereotype.Component;
+import org.springframework.web.bind.support.WebDataBinderFactory;
+import org.springframework.web.context.request.NativeWebRequest;
+import org.springframework.web.context.request.RequestAttributes;
+import org.springframework.web.method.support.HandlerMethodArgumentResolver;
+import org.springframework.web.method.support.ModelAndViewContainer;
+
+/**
+ * 有@LoginUserAnnotation注解的方法参数，注入当前登录用户
+ */
+@Component
+public class GXLoginUserHandlerMethodArgumentResolver implements HandlerMethodArgumentResolver {
+    @Override
+    public boolean supportsParameter(MethodParameter parameter) {
+        return parameter.getParameterType().getSuperclass().isAssignableFrom(GXUUserEntity.class) && parameter.hasParameterAnnotation(GXLoginUserAnnotation.class);
+    }
+
+    @Override
+    public Object resolveArgument(MethodParameter parameter, ModelAndViewContainer container,
+                                  NativeWebRequest request, WebDataBinderFactory factory) throws Exception {
+        //获取用户ID
+        Object object = request.getAttribute(GXTokenManager.USER_ID, RequestAttributes.SCOPE_REQUEST);
+        if (object == null) {
+            return null;
+        }
+        //获取用户信息
+        return GXSpringContextUtils.getBean(GXUUserService.class).getById((Long) object);
+    }
+}

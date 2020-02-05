@@ -1,0 +1,8 @@
+.idea
+geoxus-core.iml
+target
+*.log
+/src/main/resources/application-local.yml
+/src/main/resources/ymls/local/
+/src/main/resources/rebel.xml
+/src/test/

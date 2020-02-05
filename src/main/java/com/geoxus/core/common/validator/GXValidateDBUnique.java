@@ -1,0 +1,19 @@
+package com.geoxus.core.common.validator;
+
+/**
+ * 验证数据是否唯一
+ *
+ * @author zj chen <britton@126.com>
+ */
+public interface GXValidateDBUnique {
+    /**
+     * Checks whether or not a given value unique
+     * for a given field
+     *
+     * @param value The value to check for
+     * @param field The name of the field for which to check if the value exists
+     * @return True if the value exists for the field; false otherwise
+     * @throws UnsupportedOperationException
+     */
+    boolean validateUnique(Object value, String field) throws UnsupportedOperationException;
+}
