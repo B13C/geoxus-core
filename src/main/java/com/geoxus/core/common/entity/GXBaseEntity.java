@@ -5,8 +5,10 @@ import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.extension.activerecord.Model;
 import com.geoxus.core.common.annotation.GXFieldCommentAnnotation;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 @Data
+@EqualsAndHashCode(callSuper = true)
 public class GXBaseEntity extends Model {
     @TableField(fill = FieldFill.INSERT)
     private Integer createdAt;

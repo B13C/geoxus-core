@@ -25,11 +25,6 @@ public class CoreModelAttributePermissionEntity {
     private int attributeId;
 
     /**
-     * 扩展信息
-     */
-    private String ext;
-
-    /**
      * 模型ID
      */
     private int coreModelId;

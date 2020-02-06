@@ -25,8 +25,6 @@ public class CoreModelAttributeGroupEntity extends Model implements Serializable
 
     private int required;
 
-    private String ext;
-
     private String showName;
 
     private String validationExpression;

@@ -7,8 +7,9 @@ import cn.hutool.json.JSONUtil;
 import com.alibaba.fastjson.JSONException;
 import com.geoxus.core.framework.entity.CoreAttributesEntity;
 import com.geoxus.core.framework.service.GXAlterTableService;
+import com.geoxus.core.framework.service.GXCoreAttributesService;
 import com.geoxus.core.framework.service.GXCoreModelService;
-import com.geoxus.core.framework.util.GXDBSchemaUtils;
+import com.geoxus.core.framework.service.GXDBSchemaService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -26,20 +27,24 @@ import java.util.Set;
 @Slf4j
 public class GXAlterTableServiceImpl implements GXAlterTableService {
     private static final String ALTER_TABLE_HEADER = "ALTER TABLE `%s`\n";
+
     private static final String ADD_COLUMN_SQL = "ADD COLUMN `%s`%s AS (ext->>\"$.%s\") STORED NULL AFTER `%s`\n";
+
     private static final String DROP_COLUMN_SQL = "DROP COLUMN `%s`\n";
+
     private static final String CREATE_INDEX_SQL = "ADD INDEX `idx_%s`(%s) USING BTREE;";
+
+    @Autowired
     private DataSource dataSource;
-    private GXCoreAttributesServiceImpl coreAttributesService;
+
+    @Autowired
+    private GXCoreAttributesService coreAttributesService;
+
+    @Autowired
     private GXCoreModelService coreModelService;
 
-    public GXAlterTableServiceImpl(@Autowired DataSource dataSource,
-                                   @Autowired GXCoreAttributesServiceImpl coreAttributesService,
-                                   @Autowired GXCoreModelService coreModelService) {
-        this.dataSource = dataSource;
-        this.coreAttributesService = coreAttributesService;
-        this.coreModelService = coreModelService;
-    }
+    @Autowired
+    private GXDBSchemaService gxdbSchemaService;
 
     @Override
     @Transactional
@@ -92,23 +97,23 @@ public class GXAlterTableServiceImpl implements GXAlterTableService {
     }
 
     @Override
-    public List<GXDBSchemaUtils.TableField> getTableColumns(String tableName) {
-        return GXDBSchemaUtils.getTableColumn(tableName);
+    public List<GXDBSchemaService.TableField> getTableColumns(String tableName) {
+        return gxdbSchemaService.getTableColumn(tableName);
     }
 
     @Override
-    public List<GXDBSchemaUtils.TableIndexData> getTableIndexes(String tableName) throws SQLException {
-        return GXDBSchemaUtils.listTableIndex(tableName);
+    public List<GXDBSchemaService.TableIndexData> getTableIndexes(String tableName) throws SQLException {
+        return gxdbSchemaService.listTableIndex(tableName);
     }
 
     @Override
     public boolean tableDropIndex(String tableName, String indexName) {
-        return GXDBSchemaUtils.dropTableIndex(tableName, indexName);
+        return gxdbSchemaService.dropTableIndex(tableName, indexName);
     }
 
     @Override
     public boolean tableCheckIndexExists(String tableName, String indexName) {
-        return GXDBSchemaUtils.checkTableIndexExists(tableName, indexName);
+        return gxdbSchemaService.checkTableIndexExists(tableName, indexName);
     }
 
     /**
@@ -125,7 +130,7 @@ public class GXAlterTableServiceImpl implements GXAlterTableService {
         for (String key : keySet) {
             final String field = MapUtil.getStr(conditionMap, key);
             final CoreAttributesEntity attribute = coreAttributesService.getAttributeByFieldName(field);
-            if (coreModelService.checkModelIsHasField(coreModelId, field) && !GXDBSchemaUtils.checkTableFieldExists(tableName, field)) {
+            if (coreModelService.checkModelIsHasField(coreModelId, field) && !gxdbSchemaService.checkTableFieldExists(tableName, field)) {
                 sql.append(String.format(ADD_COLUMN_SQL, field, attribute.getDataType(), field, "ext")).append(",");
             }
         }
@@ -147,7 +152,7 @@ public class GXAlterTableServiceImpl implements GXAlterTableService {
         final Set<String> keySet = conditionMap.keySet();
         for (String key : keySet) {
             final String field = MapUtil.getStr(conditionMap, key);
-            if (GXDBSchemaUtils.checkTableFieldExists(tableName, field)) {
+            if (gxdbSchemaService.checkTableFieldExists(tableName, field)) {
                 sql.append(String.format(DROP_COLUMN_SQL, field)).append(",");
             }
         }

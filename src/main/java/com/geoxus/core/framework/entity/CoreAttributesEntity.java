@@ -1,10 +1,8 @@
 package com.geoxus.core.framework.entity;
 
-import com.baomidou.mybatisplus.annotation.FieldFill;
-import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
-import com.baomidou.mybatisplus.extension.activerecord.Model;
+import com.geoxus.core.common.entity.GXBaseEntity;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
@@ -13,7 +11,7 @@ import java.io.Serializable;
 @TableName("core_attributes")
 @EqualsAndHashCode(callSuper = false)
 @Data
-public class CoreAttributesEntity extends Model implements Serializable {
+public class CoreAttributesEntity extends GXBaseEntity implements Serializable {
     @TableId
     private int attributeId;
 
@@ -36,7 +34,4 @@ public class CoreAttributesEntity extends Model implements Serializable {
     private String columnType;
 
     private String frontType;
-
-    @TableField(fill = FieldFill.INSERT)
-    private int createdAt;
 }

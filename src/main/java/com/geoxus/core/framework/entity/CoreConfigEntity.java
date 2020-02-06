@@ -5,7 +5,6 @@ import com.baomidou.mybatisplus.annotation.TableName;
 import com.geoxus.core.common.annotation.GXValidateDBExistsAnnotation;
 import com.geoxus.core.common.annotation.GXValidateExtDataAnnotation;
 import com.geoxus.core.common.entity.GXBaseEntity;
-import com.geoxus.core.framework.service.GXCoreModelService;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
@@ -17,7 +16,7 @@ import javax.validation.constraints.Pattern;
 @EqualsAndHashCode(callSuper = false)
 public class CoreConfigEntity extends GXBaseEntity {
     @TableId
-    private int id;
+    private int configId;
 
     @NotBlank()
     @Pattern(regexp = "^[a-zA-Z0-9]+$")
@@ -28,10 +27,10 @@ public class CoreConfigEntity extends GXBaseEntity {
 
     private String type;
 
-    @GXValidateDBExistsAnnotation(service = GXCoreModelService.class, fieldName = "model_id")
+    @GXValidateDBExistsAnnotation
     private int coreModelId;
 
-    @GXValidateExtDataAnnotation(tableName = "core_config", fieldName = "ext")
+    @GXValidateExtDataAnnotation(tableName = "core_config")
     private String ext;
 
     private int status;

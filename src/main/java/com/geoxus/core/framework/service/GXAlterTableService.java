@@ -1,7 +1,5 @@
 package com.geoxus.core.framework.service;
 
-import com.geoxus.core.framework.util.GXDBSchemaUtils;
-
 import java.sql.SQLException;
 import java.util.List;
 
@@ -33,7 +31,7 @@ public interface GXAlterTableService {
      * @param tableName 表名
      * @return
      */
-    List<GXDBSchemaUtils.TableField> getTableColumns(String tableName) throws SQLException;
+    List<GXDBSchemaService.TableField> getTableColumns(String tableName) throws SQLException;
 
     /**
      * 列出数据表的索引
@@ -41,7 +39,7 @@ public interface GXAlterTableService {
      * @param tableName 表名
      * @return
      */
-    List<GXDBSchemaUtils.TableIndexData> getTableIndexes(String tableName) throws SQLException;
+    List<GXDBSchemaService.TableIndexData> getTableIndexes(String tableName) throws SQLException;
 
     /**
      * 删除数据表的索引

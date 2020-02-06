@@ -1,15 +1,14 @@
 package com.geoxus.core.framework.entity;
 
-import cn.hutool.core.lang.Dict;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
+import com.geoxus.core.common.annotation.GXFieldCommentAnnotation;
 import com.geoxus.core.common.entity.GXBaseEntity;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
 import java.io.Serializable;
-import java.util.List;
 
 @Data
 @TableName("core_media_library")
@@ -17,89 +16,54 @@ import java.util.List;
 public class CoreMediaLibraryEntity extends GXBaseEntity implements Serializable {
     private static final long serialVersionUID = 1L;
 
-    /**
-     * 主键ID
-     */
     @TableId
+    @GXFieldCommentAnnotation(zh = "主键ID")
     private int id;
 
-    /**
-     * 模型类型
-     */
+    @GXFieldCommentAnnotation(zh = "模型类型")
     private String modelType;
 
-    /**
-     * 系统模型ID
-     */
+    @GXFieldCommentAnnotation(zh = "系统模型ID")
     private long coreModelId;
 
-    /**
-     * 模型ID
-     */
+    @GXFieldCommentAnnotation(zh = "模型ID")
     private long modelId;
 
-    /**
-     * 集合名字
-     */
+    @GXFieldCommentAnnotation(zh = "集合名字")
     private String collectionName;
 
-    /**
-     * 文件名字
-     */
+    @GXFieldCommentAnnotation(zh = "文件名字")
     private String name;
 
-    /**
-     * 带后缀的文件名字
-     */
+    @GXFieldCommentAnnotation(zh = "带后缀的文件名字")
     private String fileName;
 
-    /**
-     * 文件mime
-     */
+    @GXFieldCommentAnnotation(zh = "文件MIME")
     private String mimeType;
 
-    /**
-     * 存储方式
-     */
     @TableField(select = false)
+    @GXFieldCommentAnnotation(zh = "存储方式")
     private String disk;
 
-    /**
-     * 文件大小
-     */
+    @GXFieldCommentAnnotation(zh = "文件大小")
     private long size;
 
-    /**
-     * 维护者
-     */
+    @GXFieldCommentAnnotation(zh = "维护者")
     private String manipulations = "[]";
 
-    /**
-     * 自定义属性
-     */
+    @GXFieldCommentAnnotation(zh = "自定义属性")
     private String customProperties = "{}";
 
-    /**
-     * 响应式图片
-     */
+    @GXFieldCommentAnnotation(zh = "响应式图片")
     private String responsiveImages = "{}";
 
-    /**
-     * 排序
-     */
+    @GXFieldCommentAnnotation(zh = "排序")
     private int orderColumn;
 
-    /**
-     * 资源类型
-     */
+    @GXFieldCommentAnnotation(zh = "资源类型")
     private String resourceType = "";
 
-    /**
-     * 文件存放物理地址
-     */
     @TableField(exist = false)
-    private String filePath;
-
-    @TableField(exist = false)
-    private List<Dict> media;
+    @GXFieldCommentAnnotation(zh = "文件存放物理地址")
+    private String filePath = "";
 }

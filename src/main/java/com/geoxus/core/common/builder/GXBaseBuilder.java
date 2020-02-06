@@ -10,7 +10,7 @@ import com.geoxus.core.common.constant.GXBaseBuilderConstants;
 import com.geoxus.core.common.entity.GXBaseEntity;
 import com.geoxus.core.common.util.GXSpringContextUtils;
 import com.geoxus.core.framework.service.GXCoreModelService;
-import com.geoxus.core.framework.util.GXDBSchemaUtils;
+import com.geoxus.core.framework.service.GXDBSchemaService;
 import com.google.common.collect.Table;
 import org.apache.ibatis.jdbc.SQL;
 
@@ -19,8 +19,6 @@ import java.util.Optional;
 import java.util.Set;
 
 public interface GXBaseBuilder {
-    GXCoreModelService coreModelService = GXSpringContextUtils.getBean(GXCoreModelService.class);
-
     /**
      * 更新实体字段和虚拟字段
      * <pre>
@@ -132,7 +130,7 @@ public interface GXBaseBuilder {
      * @return
      */
     default Dict mergeSearchConditionToSQL(SQL sql, Dict requestParam) {
-        Dict searchField = coreModelService.getSearchCondition(Dict.create().set(GXBaseBuilderConstants.MODEL_IDENTIFICATION_NAME, GXBaseBuilderConstants.SEARCH_CONDITION_NAME));
+        Dict searchField = GXSpringContextUtils.getBean(GXCoreModelService.class).getSearchCondition(Dict.create().set(GXBaseBuilderConstants.MODEL_IDENTIFICATION_NAME, GXBaseBuilderConstants.SEARCH_CONDITION_NAME));
         searchField.putAll(getDefaultSearchField());
         Dict searchCondition = getRequestSearchCondition(requestParam);
         Set<String> keySet = searchCondition.keySet();
@@ -162,7 +160,7 @@ public interface GXBaseBuilder {
      * @return
      */
     default String getSelectFieldStr(String tableName, Set<String> targetSet, String tableAlias, boolean remove) {
-        return GXDBSchemaUtils.getSqlFieldStr(tableName, targetSet, tableAlias, remove);
+        return GXSpringContextUtils.getBean(GXDBSchemaService.class).getSqlFieldStr(tableName, targetSet, tableAlias, remove);
     }
 
     /**
@@ -174,7 +172,7 @@ public interface GXBaseBuilder {
      * @return
      */
     default String getSelectFieldStr(String tableName, Set<String> targetSet, boolean remove) {
-        return GXDBSchemaUtils.getSqlFieldStr(tableName, targetSet, remove);
+        return GXSpringContextUtils.getBean(GXDBSchemaService.class).getSqlFieldStr(tableName, targetSet, remove);
     }
 
     default Dict getDefaultSearchField() {

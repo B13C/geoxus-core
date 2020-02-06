@@ -14,13 +14,13 @@ public class GXCoreConfigServiceImpl extends ServiceImpl<GXCoreConfigMapper, Cor
     @Override
     public long create(CoreConfigEntity target, Dict param) {
         save(target);
-        return target.getId();
+        return target.getConfigId();
     }
 
     @Override
     public long update(CoreConfigEntity target, Dict param) {
         updateById(target);
-        return target.getId();
+        return target.getConfigId();
     }
 
     @Override

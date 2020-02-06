@@ -28,8 +28,6 @@ public class CoreModelEntity extends Model implements Serializable {
 
     private String searchCondition;
 
-    private String ext;
-
     private String modelType;
 
     @TableField(fill = FieldFill.INSERT)
