@@ -13,7 +13,7 @@ import java.io.Serializable;
 @Data
 @TableName("core_media_library")
 @EqualsAndHashCode(callSuper = false)
-public class CoreMediaLibraryEntity extends GXBaseEntity implements Serializable {
+public class GXCoreMediaLibraryEntity extends GXBaseEntity implements Serializable {
     private static final long serialVersionUID = 1L;
 
     @TableId

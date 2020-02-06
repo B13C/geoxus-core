@@ -1,11 +1,11 @@
 package com.geoxus.core.framework.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
-import com.geoxus.core.framework.entity.CoreModelAttributePermissionEntity;
+import com.geoxus.core.framework.entity.GXCoreModelAttributePermissionEntity;
 
 import java.util.List;
 
-public interface GXCoreModelAttributePermissionService extends IService<CoreModelAttributePermissionEntity> {
+public interface GXCoreModelAttributePermissionService extends IService<GXCoreModelAttributePermissionEntity> {
     /**
      * 通过核心模型Id获取模型属性的权限
      *

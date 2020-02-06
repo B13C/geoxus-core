@@ -14,7 +14,7 @@ import javax.validation.constraints.Pattern;
 @Data
 @TableName("core_config")
 @EqualsAndHashCode(callSuper = false)
-public class CoreConfigEntity extends GXBaseEntity {
+public class GXCoreConfigEntity extends GXBaseEntity {
     @TableId
     private int configId;
 

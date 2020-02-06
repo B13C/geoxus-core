@@ -11,7 +11,7 @@ import java.io.Serializable;
 @TableName("core_attributes")
 @EqualsAndHashCode(callSuper = false)
 @Data
-public class CoreAttributesEntity extends GXBaseEntity implements Serializable {
+public class GXCoreAttributesEntity extends GXBaseEntity implements Serializable {
     @TableId
     private int attributeId;
 

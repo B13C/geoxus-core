@@ -3,11 +3,11 @@ package com.geoxus.core.framework.service;
 import cn.hutool.core.lang.Dict;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.geoxus.core.common.validator.GXValidateDBExists;
-import com.geoxus.core.framework.entity.CoreAttributesEnumsEntity;
+import com.geoxus.core.framework.entity.GXCoreAttributesEnumsEntity;
 
 import java.util.List;
 
-public interface GXCoreAttributeEnumsService extends IService<CoreAttributesEnumsEntity>, GXValidateDBExists {
+public interface GXCoreAttributeEnumsService extends IService<GXCoreAttributesEnumsEntity>, GXValidateDBExists {
     /**
      * 检测属性的值是否存在
      *

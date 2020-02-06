@@ -8,8 +8,8 @@ import cn.hutool.json.JSONUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.geoxus.core.common.constant.GXBaseBuilderConstants;
-import com.geoxus.core.framework.entity.CoreModelAttributeGroupEntity;
-import com.geoxus.core.framework.entity.CoreModelEntity;
+import com.geoxus.core.framework.entity.GXCoreModelAttributeGroupEntity;
+import com.geoxus.core.framework.entity.GXCoreModelEntity;
 import com.geoxus.core.framework.mapper.GXCoreModelMapper;
 import com.geoxus.core.framework.service.GXCoreModelAttributeGroupService;
 import com.geoxus.core.framework.service.GXCoreModelService;
@@ -33,14 +33,14 @@ import static org.mybatis.dynamic.sql.SqlBuilder.*;
 
 @Service
 @Slf4j
-public class GXCoreModelServiceImpl extends ServiceImpl<GXCoreModelMapper, CoreModelEntity> implements GXCoreModelService {
+public class GXCoreModelServiceImpl extends ServiceImpl<GXCoreModelMapper, GXCoreModelEntity> implements GXCoreModelService {
     @Autowired
     private GXCoreModelAttributeGroupService coreModelAttributeGroupService;
 
     @Override
     @Cacheable(value = "core_model", key = "targetClass + methodName + #modelId + #subField")
-    public CoreModelEntity getModelDetailByModelId(int modelId, String subField) {
-        final CoreModelEntity entity = getById(modelId);
+    public GXCoreModelEntity getModelDetailByModelId(int modelId, String subField) {
+        final GXCoreModelEntity entity = getById(modelId);
         if (null == entity) {
             return null;
         }
@@ -66,19 +66,19 @@ public class GXCoreModelServiceImpl extends ServiceImpl<GXCoreModelMapper, CoreM
                 .and(coreModelAttributeGroupTable.modelAttributeGroupInnerName, isEqualToWhenPresent(subField))
                 .build()
                 .render(RenderingStrategies.MYBATIS3);
-        final List<CoreModelAttributeGroupEntity> attributes = coreModelAttributeGroupService.getModelAttributeByModelId(selectStatementProvider);
+        final List<GXCoreModelAttributeGroupEntity> attributes = coreModelAttributeGroupService.getModelAttributeByModelId(selectStatementProvider);
         entity.setCoreAttributesEntities(attributes);
         return entity;
     }
 
     @Override
     public boolean checkModelIsHasField(int modelId, String field) {
-        final CoreModelEntity entity = getModelDetailByModelId(modelId, null);
+        final GXCoreModelEntity entity = getModelDetailByModelId(modelId, null);
         if (null == entity) {
             return false;
         }
-        final List<CoreModelAttributeGroupEntity> attributesEntities = entity.getCoreAttributesEntities();
-        for (CoreModelAttributeGroupEntity attribute : attributesEntities) {
+        final List<GXCoreModelAttributeGroupEntity> attributesEntities = entity.getCoreAttributesEntities();
+        for (GXCoreModelAttributeGroupEntity attribute : attributesEntities) {
             if (field.equals(attribute.getFieldName())) {
                 return true;
             }
@@ -88,13 +88,13 @@ public class GXCoreModelServiceImpl extends ServiceImpl<GXCoreModelMapper, CoreM
 
     @Override
     public boolean checkFormKeyMatch(Set<String> keySet, String modelName) {
-        final CoreModelEntity modelEntity = getModelDetailByModelId(getModelIdByModelIdentification(modelName), null);
+        final GXCoreModelEntity modelEntity = getModelDetailByModelId(getModelIdByModelIdentification(modelName), null);
         if (null == modelEntity) {
             return false;
         }
-        final List<CoreModelAttributeGroupEntity> attributesEntities = modelEntity.getCoreAttributesEntities();
+        final List<GXCoreModelAttributeGroupEntity> attributesEntities = modelEntity.getCoreAttributesEntities();
         final Set<String> keys = new HashSet<>();
-        for (CoreModelAttributeGroupEntity attribute : attributesEntities) {
+        for (GXCoreModelAttributeGroupEntity attribute : attributesEntities) {
             keys.add(attribute.getFieldName());
         }
         return keys.retainAll(keySet);
@@ -103,14 +103,14 @@ public class GXCoreModelServiceImpl extends ServiceImpl<GXCoreModelMapper, CoreM
     @Override
     @Cacheable(value = "core_model", key = "targetClass + methodName + #p0")
     public int getModelIdByModelIdentification(String modelName) {
-        final CoreModelEntity entity = getOne(new QueryWrapper<CoreModelEntity>().select("model_id").eq("model_identification", modelName));
+        final GXCoreModelEntity entity = getOne(new QueryWrapper<GXCoreModelEntity>().select("model_id").eq("model_identification", modelName));
         return null == entity ? 0 : entity.getModelId();
     }
 
     @Override
     @Cacheable(value = "core_model", key = "targetClass + methodName + #p0")
     public String getModelTypeByModelId(long coreModelId, String defaultValue) {
-        final CoreModelEntity entity = getOne(new QueryWrapper<CoreModelEntity>().select("model_type").eq("model_id", coreModelId));
+        final GXCoreModelEntity entity = getOne(new QueryWrapper<GXCoreModelEntity>().select("model_type").eq("model_id", coreModelId));
         if (null == entity) {
             return defaultValue + "Type";
         }

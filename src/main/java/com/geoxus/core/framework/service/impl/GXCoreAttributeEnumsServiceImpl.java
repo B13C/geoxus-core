@@ -7,8 +7,8 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.geoxus.core.common.annotation.GXFieldCommentAnnotation;
-import com.geoxus.core.framework.entity.CoreAttributesEntity;
-import com.geoxus.core.framework.entity.CoreAttributesEnumsEntity;
+import com.geoxus.core.framework.entity.GXCoreAttributesEntity;
+import com.geoxus.core.framework.entity.GXCoreAttributesEnumsEntity;
 import com.geoxus.core.framework.mapper.GXCoreAttributeEnumsMapper;
 import com.geoxus.core.framework.service.GXCoreAttributeEnumsService;
 import com.geoxus.core.framework.service.GXCoreAttributesService;
@@ -21,7 +21,7 @@ import javax.validation.ConstraintValidatorContext;
 import java.util.List;
 
 @Service
-public class GXCoreAttributeEnumsServiceImpl extends ServiceImpl<GXCoreAttributeEnumsMapper, CoreAttributesEnumsEntity> implements GXCoreAttributeEnumsService {
+public class GXCoreAttributeEnumsServiceImpl extends ServiceImpl<GXCoreAttributeEnumsMapper, GXCoreAttributesEnumsEntity> implements GXCoreAttributeEnumsService {
     @GXFieldCommentAnnotation(zh = "字段不存在的提示")
     private static final String FIELD_VALUE_NOT_EXISTS = "{}属性不存在值{}";
 
@@ -37,7 +37,7 @@ public class GXCoreAttributeEnumsServiceImpl extends ServiceImpl<GXCoreAttribute
         condition.set("attribute_id", attributeId);
         condition.set(CORE_MODEL_PRIMARY_NAME, coreModelId);
         condition.set("value_enum", value);
-        CoreAttributesEnumsEntity entity = getOne(new QueryWrapper<CoreAttributesEnumsEntity>().allEq(condition));
+        GXCoreAttributesEnumsEntity entity = getOne(new QueryWrapper<GXCoreAttributesEnumsEntity>().allEq(condition));
         return entity != null;
     }
 
@@ -60,7 +60,7 @@ public class GXCoreAttributeEnumsServiceImpl extends ServiceImpl<GXCoreAttribute
         Dict dict = JSONUtil.toBean(JSONUtil.toJsonStr(value), Dict.class);
         String attributeValue = dict.getStr(field);
         if (null != attributeValue) {
-            CoreAttributesEntity attributesEntity = coreAttributesService.getAttributeByFieldName(field);
+            GXCoreAttributesEntity attributesEntity = coreAttributesService.getAttributeByFieldName(field);
             if (null != attributesEntity) {
                 final int coreModelId = param.getInt("core_model_id");
                 boolean exists = isExistsAttributeValue(attributesEntity.getAttributeId(), attributeValue, coreModelId);

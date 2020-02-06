@@ -9,30 +9,35 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 
 import java.io.Serializable;
-import java.util.List;
 
 @Data
-@TableName("core_model")
+@TableName("core_model_attribute_group")
 @EqualsAndHashCode(callSuper = false)
-public class CoreModelEntity extends Model implements Serializable {
-    @TableId
+public class GXCoreModelAttributeGroupEntity extends Model implements Serializable {
+    @TableId("model_attribute_group_id")
+    private int modelAttributeGroupId;
+
+    private String modelAttributeGroupInnerName;
+
     private int modelId;
 
-    private int moduleId;
+    private int attributeId;
 
-    private String modelName;
+    private int required;
 
-    private String modelShow;
+    private String showName;
 
-    private String modelIdentification;
+    private String validationExpression;
 
-    private String searchCondition;
+    private int forceValidation;
 
-    private String modelType;
+    private String fieldName;
+
+    private String defaultValue;
 
     @TableField(fill = FieldFill.INSERT)
     private int createdAt;
 
-    @TableField(exist = false)
-    private List<CoreModelAttributeGroupEntity> coreAttributesEntities;
+    @TableField(fill = FieldFill.UPDATE)
+    private int updatedAt;
 }

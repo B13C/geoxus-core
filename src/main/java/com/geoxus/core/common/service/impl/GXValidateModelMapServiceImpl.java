@@ -4,7 +4,7 @@ import cn.hutool.core.lang.Dict;
 import com.geoxus.core.common.exception.GXException;
 import com.geoxus.core.common.vo.GXResultCode;
 import com.geoxus.core.common.validator.GXValidateModelMap;
-import com.geoxus.core.framework.entity.CoreAttributesEntity;
+import com.geoxus.core.framework.entity.GXCoreAttributesEntity;
 import com.geoxus.core.framework.service.GXCoreAttributesService;
 import com.geoxus.core.framework.service.GXCoreModelService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,7 +28,7 @@ public class GXValidateModelMapServiceImpl implements GXValidateModelMap {
             return false;
         }
         for (String key : keySet) {
-            final CoreAttributesEntity attributesEntity = coreAttributesService.getAttributeByFieldName(map.getStr(key));
+            final GXCoreAttributesEntity attributesEntity = coreAttributesService.getAttributeByFieldName(map.getStr(key));
             final boolean matches = Pattern.matches(attributesEntity.getValidationExpression(), map.get(key).toString());
             if (!matches) {
                 throw new GXException(GXResultCode.PARAMETER_VALIDATION_ERROR);

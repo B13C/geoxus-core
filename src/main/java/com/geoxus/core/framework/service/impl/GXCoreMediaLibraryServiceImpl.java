@@ -8,7 +8,7 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.geoxus.core.common.exception.GXException;
 import com.geoxus.core.common.util.GXUploadUtils;
-import com.geoxus.core.framework.entity.CoreMediaLibraryEntity;
+import com.geoxus.core.framework.entity.GXCoreMediaLibraryEntity;
 import com.geoxus.core.framework.mapper.GXCoreMediaLibraryMapper;
 import com.geoxus.core.framework.service.GXCoreMediaLibraryService;
 import com.geoxus.core.framework.service.GXCoreModelService;
@@ -28,7 +28,7 @@ import java.util.Optional;
 
 @Slf4j
 @Service(value = "coreMediaLibraryService")
-public class GXCoreMediaLibraryServiceImpl extends ServiceImpl<GXCoreMediaLibraryMapper, CoreMediaLibraryEntity> implements GXCoreMediaLibraryService {
+public class GXCoreMediaLibraryServiceImpl extends ServiceImpl<GXCoreMediaLibraryMapper, GXCoreMediaLibraryEntity> implements GXCoreMediaLibraryService {
     @Autowired
     private UploadConfig uploadConfig;
 
@@ -38,7 +38,7 @@ public class GXCoreMediaLibraryServiceImpl extends ServiceImpl<GXCoreMediaLibrar
     @Override
     @Transactional(rollbackFor = Exception.class)
     public int save(Dict dict) {
-        final CoreMediaLibraryEntity entity = dict.toBean(CoreMediaLibraryEntity.class);
+        final GXCoreMediaLibraryEntity entity = dict.toBean(GXCoreMediaLibraryEntity.class);
         save(entity);
         return entity.getId();
     }
@@ -49,13 +49,13 @@ public class GXCoreMediaLibraryServiceImpl extends ServiceImpl<GXCoreMediaLibrar
         if (param.isEmpty()) {
             return true;
         }
-        final ArrayList<CoreMediaLibraryEntity> newMediaList = new ArrayList<>();
-        final List<CoreMediaLibraryEntity> oldMediaList = list(new QueryWrapper<CoreMediaLibraryEntity>().allEq(Dict.create().set("model_id", modelId).set("core_model_id", coreModelId)));
+        final ArrayList<GXCoreMediaLibraryEntity> newMediaList = new ArrayList<>();
+        final List<GXCoreMediaLibraryEntity> oldMediaList = list(new QueryWrapper<GXCoreMediaLibraryEntity>().allEq(Dict.create().set("model_id", modelId).set("core_model_id", coreModelId)));
         for (JSONObject dict : param) {
             if (null != dict.getLong("id")) {
                 final long targetModelId = Optional.ofNullable(dict.getLong("model_id")).orElse(modelId);
                 final long itemCoreModelId = Optional.ofNullable(dict.getLong("core_model_id")).orElse(coreModelId);
-                final CoreMediaLibraryEntity entity = getOne(new QueryWrapper<CoreMediaLibraryEntity>().eq("id", dict.getLong("id")));
+                final GXCoreMediaLibraryEntity entity = getOne(new QueryWrapper<GXCoreMediaLibraryEntity>().eq("id", dict.getLong("id")));
                 final String customProperties = StrUtil.format("[{}]", Optional.ofNullable(dict.getStr("custom_properties")).orElse(""));
                 if (null != entity) {
                     entity.setModelId(targetModelId);
@@ -66,8 +66,8 @@ public class GXCoreMediaLibraryServiceImpl extends ServiceImpl<GXCoreMediaLibrar
                 }
             }
         }
-        final LinkedHashSet<CoreMediaLibraryEntity> newListHashSet = Sets.newLinkedHashSet(newMediaList);
-        final LinkedHashSet<CoreMediaLibraryEntity> oldListHashSet = Sets.newLinkedHashSet(oldMediaList);
+        final LinkedHashSet<GXCoreMediaLibraryEntity> newListHashSet = Sets.newLinkedHashSet(newMediaList);
+        final LinkedHashSet<GXCoreMediaLibraryEntity> oldListHashSet = Sets.newLinkedHashSet(oldMediaList);
         final ArrayList<Integer> deleteMediaIds = new ArrayList<>();
         Sets.difference(oldListHashSet, newListHashSet).forEach(item -> deleteMediaIds.add(item.getId()));
         if (!newListHashSet.isEmpty()) {
@@ -84,11 +84,11 @@ public class GXCoreMediaLibraryServiceImpl extends ServiceImpl<GXCoreMediaLibrar
     }
 
     @Override
-    public CoreMediaLibraryEntity saveFileInfo(MultipartFile file) {
+    public GXCoreMediaLibraryEntity saveFileInfo(MultipartFile file) {
         String filePath = uploadConfig.getDepositPath().trim();
         try {
             String fileName = GXUploadUtils.singleUpload(file, filePath);
-            CoreMediaLibraryEntity entity = new CoreMediaLibraryEntity();
+            GXCoreMediaLibraryEntity entity = new GXCoreMediaLibraryEntity();
             entity.setSize(file.getSize());
             entity.setFileName(fileName);
             entity.setDisk(filePath);

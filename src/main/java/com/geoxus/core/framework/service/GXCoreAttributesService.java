@@ -1,18 +1,18 @@
 package com.geoxus.core.framework.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
-import com.geoxus.core.framework.entity.CoreAttributesEntity;
+import com.geoxus.core.framework.entity.GXCoreAttributesEntity;
 
 import java.util.List;
 
-public interface GXCoreAttributesService extends IService<CoreAttributesEntity> {
+public interface GXCoreAttributesService extends IService<GXCoreAttributesEntity> {
     /**
      * 通过类型获取属性的列表
      *
      * @param category
      * @return
      */
-    List<CoreAttributesEntity> getAttributesByCategory(String category);
+    List<GXCoreAttributesEntity> getAttributesByCategory(String category);
 
     /**
      * 通过字段名字获取属性
@@ -20,7 +20,7 @@ public interface GXCoreAttributesService extends IService<CoreAttributesEntity> 
      * @param fieldName
      * @return
      */
-    CoreAttributesEntity getAttributeByFieldName(String fieldName);
+    GXCoreAttributesEntity getAttributeByFieldName(String fieldName);
 
     /**
      * 检测字段是否存在

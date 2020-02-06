@@ -9,13 +9,17 @@ import lombok.EqualsAndHashCode;
 import java.io.Serializable;
 
 @Data
-@TableName("core_modules")
+@TableName("core_attributes_enums")
 @EqualsAndHashCode(callSuper = false)
-public class CoreModulesEntity extends GXBaseEntity implements Serializable {
+public class GXCoreAttributesEnumsEntity extends GXBaseEntity implements Serializable {
     @TableId
-    private int moduleId;
+    private int attributeEnumId;
 
-    private int parentId;
+    private int attributeId;
 
-    private String moduleName;
+    private int coreModelId;
+
+    private String valueEnum;
+
+    private String showName;
 }

@@ -5,7 +5,7 @@ import cn.hutool.core.map.MapUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.json.JSONUtil;
 import com.alibaba.fastjson.JSONException;
-import com.geoxus.core.framework.entity.CoreAttributesEntity;
+import com.geoxus.core.framework.entity.GXCoreAttributesEntity;
 import com.geoxus.core.framework.service.GXAlterTableService;
 import com.geoxus.core.framework.service.GXCoreAttributesService;
 import com.geoxus.core.framework.service.GXCoreModelService;
@@ -129,7 +129,7 @@ public class GXAlterTableServiceImpl implements GXAlterTableService {
         final Set<String> keySet = conditionMap.keySet();
         for (String key : keySet) {
             final String field = MapUtil.getStr(conditionMap, key);
-            final CoreAttributesEntity attribute = coreAttributesService.getAttributeByFieldName(field);
+            final GXCoreAttributesEntity attribute = coreAttributesService.getAttributeByFieldName(field);
             if (coreModelService.checkModelIsHasField(coreModelId, field) && !gxdbSchemaService.checkTableFieldExists(tableName, field)) {
                 sql.append(String.format(ADD_COLUMN_SQL, field, attribute.getDataType(), field, "ext")).append(",");
             }

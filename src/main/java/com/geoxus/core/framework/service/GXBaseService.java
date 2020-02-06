@@ -19,7 +19,7 @@ import com.geoxus.core.common.util.GXHttpContextUtils;
 import com.geoxus.core.common.util.GXSpringContextUtils;
 import com.geoxus.core.common.util.GXSyncEventBusCenterUtils;
 import com.geoxus.core.common.validator.impl.GXValidatorUtils;
-import com.geoxus.core.framework.entity.CoreMediaLibraryEntity;
+import com.geoxus.core.framework.entity.GXCoreMediaLibraryEntity;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.transaction.annotation.Transactional;
@@ -164,7 +164,7 @@ public interface GXBaseService<T> extends IService<T> {
      * @param param       其他参数
      * @return
      */
-    default Collection<CoreMediaLibraryEntity> getMedia(int modelId, int coreModelId, Dict param) {
+    default Collection<GXCoreMediaLibraryEntity> getMedia(int modelId, int coreModelId, Dict param) {
         final GXCoreMediaLibraryService mediaLibraryService = GXSpringContextUtils.getBean(GXCoreMediaLibraryService.class);
         return mediaLibraryService.listByMap(param.set("model_id", modelId).set("core_model_id", coreModelId));
     }

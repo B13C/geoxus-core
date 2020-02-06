@@ -4,18 +4,18 @@ import cn.hutool.core.lang.Dict;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.geoxus.core.common.exception.GXException;
 import com.geoxus.core.common.validator.GXValidateDBExists;
-import com.geoxus.core.framework.entity.CoreModelEntity;
+import com.geoxus.core.framework.entity.GXCoreModelEntity;
 
 import java.util.Set;
 
-public interface GXCoreModelService extends IService<CoreModelEntity>, GXValidateDBExists {
+public interface GXCoreModelService extends IService<GXCoreModelEntity>, GXValidateDBExists {
     /**
      * 通过模型ID获取模型的相关信息
      *
      * @param modelId
      * @return
      */
-    CoreModelEntity getModelDetailByModelId(int modelId, String subField);
+    GXCoreModelEntity getModelDetailByModelId(int modelId, String subField);
 
     /**
      * 检测模型是否拥有制定的字段

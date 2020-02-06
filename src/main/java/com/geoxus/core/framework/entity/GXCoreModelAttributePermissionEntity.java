@@ -10,7 +10,7 @@ import lombok.EqualsAndHashCode;
 @Data
 @TableName("core_model_attribute_permission")
 @EqualsAndHashCode(callSuper = false)
-public class CoreModelAttributePermissionEntity {
+public class GXCoreModelAttributePermissionEntity {
     @TableId
     private int attributePermissionId;
 

@@ -7,9 +7,9 @@ import cn.hutool.json.JSONArray;
 import cn.hutool.json.JSONUtil;
 import com.geoxus.core.common.exception.GXException;
 import com.geoxus.core.common.validator.GXValidateExtDataService;
-import com.geoxus.core.framework.entity.CoreAttributesEntity;
-import com.geoxus.core.framework.entity.CoreModelAttributeGroupEntity;
-import com.geoxus.core.framework.entity.CoreModelEntity;
+import com.geoxus.core.framework.entity.GXCoreAttributesEntity;
+import com.geoxus.core.framework.entity.GXCoreModelAttributeGroupEntity;
+import com.geoxus.core.framework.entity.GXCoreModelEntity;
 import com.geoxus.core.framework.service.GXCoreAttributeEnumsService;
 import com.geoxus.core.framework.service.GXCoreAttributesService;
 import com.geoxus.core.framework.service.GXCoreModelAttributeGroupService;
@@ -58,10 +58,10 @@ public class GXValidateModelExtDataServiceServiceImpl implements GXValidateExtDa
         if (modelId <= 0) {
             throw new GXException(StrUtil.format(MODEL_SETTING_NOT_EXISTS, model));
         }
-        final CoreModelEntity modelDetail = coreModelService.getModelDetailByModelId(modelId, subFiled);
-        final List<CoreModelAttributeGroupEntity> attributesList = modelDetail.getCoreAttributesEntities();
+        final GXCoreModelEntity modelDetail = coreModelService.getModelDetailByModelId(modelId, subFiled);
+        final List<GXCoreModelAttributeGroupEntity> attributesList = modelDetail.getCoreAttributesEntities();
         final Dict validateRule = Dict.create();
-        for (CoreModelAttributeGroupEntity entity : attributesList) {
+        for (GXCoreModelAttributeGroupEntity entity : attributesList) {
             validateRule.set(entity.getFieldName(), entity.getValidationExpression());
         }
         if (JSONUtil.isJsonObj(jsonStr)) {
@@ -99,8 +99,8 @@ public class GXValidateModelExtDataServiceServiceImpl implements GXValidateExtDa
                 context.buildConstraintViolationWithTemplate(StrUtil.format(FIELD_NOT_EXISTS, model, field)).addPropertyNode(errorInfo).addConstraintViolation();
                 return true;
             }
-            final CoreAttributesEntity attribute = coreAttributesService.getAttributeByFieldName(field);
-            CoreModelAttributeGroupEntity modelAttributeGroupEntity = coreModelAttributeGroupService.getAttributeGroupByAttributeIdAndModelId(modelId, attribute.getAttributeId());
+            final GXCoreAttributesEntity attribute = coreAttributesService.getAttributeByFieldName(field);
+            GXCoreModelAttributeGroupEntity modelAttributeGroupEntity = coreModelAttributeGroupService.getAttributeGroupByAttributeIdAndModelId(modelId, attribute.getAttributeId());
             final String rule = Convert.toStr(validateRule.get(field));
             if (StrUtil.isBlank(rule) && modelAttributeGroupEntity.getForceValidation() == 0) {
                 // 不验证当前数据

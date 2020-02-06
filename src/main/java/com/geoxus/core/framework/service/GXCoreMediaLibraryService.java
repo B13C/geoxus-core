@@ -2,12 +2,12 @@ package com.geoxus.core.framework.service;
 
 import cn.hutool.core.lang.Dict;
 import cn.hutool.json.JSONObject;
-import com.geoxus.core.framework.entity.CoreMediaLibraryEntity;
+import com.geoxus.core.framework.entity.GXCoreMediaLibraryEntity;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
-public interface GXCoreMediaLibraryService extends GXBaseService<CoreMediaLibraryEntity> {
+public interface GXCoreMediaLibraryService extends GXBaseService<GXCoreMediaLibraryEntity> {
     /**
      * 保存数据
      *
@@ -32,7 +32,7 @@ public interface GXCoreMediaLibraryService extends GXBaseService<CoreMediaLibrar
      * @param file
      * @return
      */
-    CoreMediaLibraryEntity saveFileInfo(MultipartFile file);
+    GXCoreMediaLibraryEntity saveFileInfo(MultipartFile file);
 
     /**
      * 通过条件删除media
