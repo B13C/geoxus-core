@@ -2,8 +2,8 @@ package com.geoxus.core.framework.service.impl;
 
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.geoxus.core.framework.entity.GXCoreAttributesEntity;
-import com.geoxus.core.framework.entity.GXCoreModelAttributePermissionEntity;
-import com.geoxus.core.framework.mapper.GXCoreModelAttributePermissionMapper;
+import com.geoxus.core.framework.entity.GXCoreModelAttributesPermissionEntity;
+import com.geoxus.core.framework.mapper.GXCoreModelAttributesPermissionMapper;
 import com.geoxus.core.framework.service.GXCoreModelAttributePermissionService;
 import org.mybatis.dynamic.sql.render.RenderingStrategies;
 import org.mybatis.dynamic.sql.select.render.SelectStatementProvider;
@@ -14,11 +14,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static com.geoxus.core.framework.support.GXCoreAttributesTableDynamicSqlSupport.coreAttributesTable;
-import static com.geoxus.core.framework.support.GXCoreModelAttributePermissionSqlSupport.coreModelAttributePermissionTable;
+import static com.geoxus.core.framework.support.GXCoreModelAttributesPermissionDynamicSqlSupport.coreModelAttributePermissionTable;
 import static org.mybatis.dynamic.sql.SqlBuilder.*;
 
 @Service
-public class GXCoreModelAttributePermissionServiceImpl extends ServiceImpl<GXCoreModelAttributePermissionMapper, GXCoreModelAttributePermissionEntity> implements GXCoreModelAttributePermissionService {
+public class GXCoreModelAttributePermissionServiceImpl extends ServiceImpl<GXCoreModelAttributesPermissionMapper, GXCoreModelAttributesPermissionEntity> implements GXCoreModelAttributePermissionService {
     @Override
     @Cacheable(value = "attribute_permission", key = "targetClass + methodName + #coreModelId")
     public List<String> getModelAttributePermissionByCoreModelId(int coreModelId) {

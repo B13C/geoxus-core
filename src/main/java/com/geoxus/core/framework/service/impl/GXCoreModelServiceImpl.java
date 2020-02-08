@@ -8,7 +8,7 @@ import cn.hutool.json.JSONUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.geoxus.core.common.constant.GXBaseBuilderConstants;
-import com.geoxus.core.framework.entity.GXCoreModelAttributeGroupEntity;
+import com.geoxus.core.framework.entity.GXCoreModelAttributesEntity;
 import com.geoxus.core.framework.entity.GXCoreModelEntity;
 import com.geoxus.core.framework.mapper.GXCoreModelMapper;
 import com.geoxus.core.framework.service.GXCoreModelAttributeGroupService;
@@ -27,7 +27,7 @@ import java.util.Optional;
 import java.util.Set;
 
 import static com.geoxus.core.framework.support.GXCoreAttributesTableDynamicSqlSupport.coreAttributesTable;
-import static com.geoxus.core.framework.support.GXCoreModelAttributeGroupDynamicSqlSupport.coreModelAttributeGroupTable;
+import static com.geoxus.core.framework.support.GXCoreModelAttributesDynamicSqlSupport.coreModelAttributeGroupTable;
 import static com.geoxus.core.framework.support.GXCoreModelTableDynamicSqlSupport.coreModelTable;
 import static org.mybatis.dynamic.sql.SqlBuilder.*;
 
@@ -56,17 +56,17 @@ public class GXCoreModelServiceImpl extends ServiceImpl<GXCoreModelMapper, GXCor
                 coreAttributesTable.frontType,
                 coreAttributesTable.validationDesc,
                 coreAttributesTable.validationExpression,
-                coreModelAttributeGroupTable.modelAttributeGroupInnerName,
+                coreModelAttributeGroupTable.modelAttributeField,
                 coreModelAttributeGroupTable.required
         )
                 .from(coreModelTable)
                 .join(coreModelAttributeGroupTable).on(coreModelAttributeGroupTable.modelId, equalTo(coreModelTable.modelId))
                 .join(coreAttributesTable).on(coreModelAttributeGroupTable.attributeId, equalTo(coreAttributesTable.attributeId))
                 .where(coreModelTable.modelId, isEqualTo(modelId))
-                .and(coreModelAttributeGroupTable.modelAttributeGroupInnerName, isEqualToWhenPresent(subField))
+                .and(coreModelAttributeGroupTable.modelAttributeField, isEqualToWhenPresent(subField))
                 .build()
                 .render(RenderingStrategies.MYBATIS3);
-        final List<GXCoreModelAttributeGroupEntity> attributes = coreModelAttributeGroupService.getModelAttributeByModelId(selectStatementProvider);
+        final List<GXCoreModelAttributesEntity> attributes = coreModelAttributeGroupService.getModelAttributeByModelId(selectStatementProvider);
         entity.setCoreAttributesEntities(attributes);
         return entity;
     }
@@ -77,8 +77,8 @@ public class GXCoreModelServiceImpl extends ServiceImpl<GXCoreModelMapper, GXCor
         if (null == entity) {
             return false;
         }
-        final List<GXCoreModelAttributeGroupEntity> attributesEntities = entity.getCoreAttributesEntities();
-        for (GXCoreModelAttributeGroupEntity attribute : attributesEntities) {
+        final List<GXCoreModelAttributesEntity> attributesEntities = entity.getCoreAttributesEntities();
+        for (GXCoreModelAttributesEntity attribute : attributesEntities) {
             if (field.equals(attribute.getFieldName())) {
                 return true;
             }
@@ -92,9 +92,9 @@ public class GXCoreModelServiceImpl extends ServiceImpl<GXCoreModelMapper, GXCor
         if (null == modelEntity) {
             return false;
         }
-        final List<GXCoreModelAttributeGroupEntity> attributesEntities = modelEntity.getCoreAttributesEntities();
+        final List<GXCoreModelAttributesEntity> attributesEntities = modelEntity.getCoreAttributesEntities();
         final Set<String> keys = new HashSet<>();
-        for (GXCoreModelAttributeGroupEntity attribute : attributesEntities) {
+        for (GXCoreModelAttributesEntity attribute : attributesEntities) {
             keys.add(attribute.getFieldName());
         }
         return keys.retainAll(keySet);

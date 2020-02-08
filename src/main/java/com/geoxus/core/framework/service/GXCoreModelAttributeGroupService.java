@@ -1,19 +1,19 @@
 package com.geoxus.core.framework.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
-import com.geoxus.core.framework.entity.GXCoreModelAttributeGroupEntity;
+import com.geoxus.core.framework.entity.GXCoreModelAttributesEntity;
 import org.mybatis.dynamic.sql.select.render.SelectStatementProvider;
 
 import java.util.List;
 
-public interface GXCoreModelAttributeGroupService extends IService<GXCoreModelAttributeGroupEntity> {
+public interface GXCoreModelAttributeGroupService extends IService<GXCoreModelAttributesEntity> {
     /**
      * 通过模型ID获取模型的属性
      *
      * @param selectStatementProvider
      * @return
      */
-    List<GXCoreModelAttributeGroupEntity> getModelAttributeByModelId(SelectStatementProvider selectStatementProvider);
+    List<GXCoreModelAttributesEntity> getModelAttributeByModelId(SelectStatementProvider selectStatementProvider);
 
     /**
      * 通过模型Id和属性Id获取模型的属性组
@@ -22,5 +22,5 @@ public interface GXCoreModelAttributeGroupService extends IService<GXCoreModelAt
      * @param attributeId
      * @return
      */
-    GXCoreModelAttributeGroupEntity getAttributeGroupByAttributeIdAndModelId(int modelId, int attributeId);
+    GXCoreModelAttributesEntity getAttributeGroupByAttributeIdAndModelId(int modelId, int attributeId);
 }

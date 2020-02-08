@@ -5,10 +5,10 @@ import org.mybatis.dynamic.sql.SqlTable;
 
 import java.sql.JDBCType;
 
-public final class GXCoreModelAttributePermissionSqlSupport {
+public final class GXCoreModelAttributesPermissionDynamicSqlSupport {
     public static final CoreModelAttributePermissionTable coreModelAttributePermissionTable = new CoreModelAttributePermissionTable();
     public static final SqlColumn<Integer> attributePermissionId = coreModelAttributePermissionTable.attributePermissionId;
-    public static final SqlColumn<Integer> modelAttributeGroupId = coreModelAttributePermissionTable.modelAttributeGroupId;
+    public static final SqlColumn<Integer> modelAttributesId = coreModelAttributePermissionTable.modelAttributesId;
     public static final SqlColumn<Integer> attributeId = coreModelAttributePermissionTable.attributeId;
     public static final SqlColumn<String> ext = coreModelAttributePermissionTable.ext;
     public static final SqlColumn<Integer> coreModelId = coreModelAttributePermissionTable.coreModelId;
@@ -19,7 +19,7 @@ public final class GXCoreModelAttributePermissionSqlSupport {
 
     public static final class CoreModelAttributePermissionTable extends SqlTable {
         public final SqlColumn<Integer> attributePermissionId = column("attribute_permission_id", JDBCType.INTEGER);
-        public final SqlColumn<Integer> modelAttributeGroupId = column("model_attribute_group_id", JDBCType.INTEGER);
+        public final SqlColumn<Integer> modelAttributesId = column("model_attributes_id", JDBCType.INTEGER);
         public final SqlColumn<Integer> attributeId = column("attribute_id", JDBCType.INTEGER);
         public final SqlColumn<String> ext = column("ext", JDBCType.VARCHAR);
         public final SqlColumn<Integer> coreModelId = column("core_model_id", JDBCType.INTEGER);
@@ -29,7 +29,7 @@ public final class GXCoreModelAttributePermissionSqlSupport {
         public final SqlColumn<Integer> updatedAt = column("updated_at", JDBCType.INTEGER);
 
         public CoreModelAttributePermissionTable() {
-            super("core_model_attribute_permission");
+            super("core_model_attributes_permission");
         }
     }
 }

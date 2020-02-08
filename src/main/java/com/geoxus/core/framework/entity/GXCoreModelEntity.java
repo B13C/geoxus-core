@@ -34,5 +34,5 @@ public class GXCoreModelEntity extends Model implements Serializable {
     private int createdAt;
 
     @TableField(exist = false)
-    private List<GXCoreModelAttributeGroupEntity> coreAttributesEntities;
+    private List<GXCoreModelAttributesEntity> coreAttributesEntities;
 }

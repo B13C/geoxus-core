@@ -8,7 +8,7 @@ import cn.hutool.json.JSONUtil;
 import com.geoxus.core.common.exception.GXException;
 import com.geoxus.core.common.validator.GXValidateExtDataService;
 import com.geoxus.core.framework.entity.GXCoreAttributesEntity;
-import com.geoxus.core.framework.entity.GXCoreModelAttributeGroupEntity;
+import com.geoxus.core.framework.entity.GXCoreModelAttributesEntity;
 import com.geoxus.core.framework.entity.GXCoreModelEntity;
 import com.geoxus.core.framework.service.GXCoreAttributeEnumsService;
 import com.geoxus.core.framework.service.GXCoreAttributesService;
@@ -30,11 +30,11 @@ public class GXValidateModelExtDataServiceServiceImpl implements GXValidateExtDa
 
     private static final String FIELD_NOT_EXISTS = "{}模型中不存在{}属性";
 
-    private static final String FIELD_NOT_MATCH = "{}模型中{}属性格式错误({})";
+    private static final String FIELD_NOT_MATCH = "{}模型中{}属性格式错误({})......";
 
-    private static final String FIELD_VALUE_NOT_EXISTS = "{}模型中{}属性枚举值{}不存在";
+    private static final String FIELD_VALUE_NOT_EXISTS = "{}模型中{}属性枚举值{}不存在......";
 
-    private static final String MODEL_SETTING_NOT_EXISTS = "{}不存在 , 请先在模型配置中配置";
+    private static final String MODEL_SETTING_NOT_EXISTS = "{}不存在,请先配置模型......";
 
     @Autowired
     private GXCoreModelService coreModelService;
@@ -59,9 +59,9 @@ public class GXValidateModelExtDataServiceServiceImpl implements GXValidateExtDa
             throw new GXException(StrUtil.format(MODEL_SETTING_NOT_EXISTS, model));
         }
         final GXCoreModelEntity modelDetail = coreModelService.getModelDetailByModelId(modelId, subFiled);
-        final List<GXCoreModelAttributeGroupEntity> attributesList = modelDetail.getCoreAttributesEntities();
+        final List<GXCoreModelAttributesEntity> attributesList = modelDetail.getCoreAttributesEntities();
         final Dict validateRule = Dict.create();
-        for (GXCoreModelAttributeGroupEntity entity : attributesList) {
+        for (GXCoreModelAttributesEntity entity : attributesList) {
             validateRule.set(entity.getFieldName(), entity.getValidationExpression());
         }
         if (JSONUtil.isJsonObj(jsonStr)) {
@@ -100,7 +100,7 @@ public class GXValidateModelExtDataServiceServiceImpl implements GXValidateExtDa
                 return true;
             }
             final GXCoreAttributesEntity attribute = coreAttributesService.getAttributeByFieldName(field);
-            GXCoreModelAttributeGroupEntity modelAttributeGroupEntity = coreModelAttributeGroupService.getAttributeGroupByAttributeIdAndModelId(modelId, attribute.getAttributeId());
+            GXCoreModelAttributesEntity modelAttributeGroupEntity = coreModelAttributeGroupService.getAttributeGroupByAttributeIdAndModelId(modelId, attribute.getAttributeId());
             final String rule = Convert.toStr(validateRule.get(field));
             if (StrUtil.isBlank(rule) && modelAttributeGroupEntity.getForceValidation() == 0) {
                 // 不验证当前数据

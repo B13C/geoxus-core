@@ -8,9 +8,9 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 
 @Data
-@TableName("core_model_attribute_permission")
+@TableName("core_model_attributes_permission")
 @EqualsAndHashCode(callSuper = false)
-public class GXCoreModelAttributePermissionEntity {
+public class GXCoreModelAttributesPermissionEntity {
     @TableId
     private int attributePermissionId;
 
