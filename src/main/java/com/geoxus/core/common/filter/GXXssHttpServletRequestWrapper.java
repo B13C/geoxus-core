@@ -1,6 +1,7 @@
 package com.geoxus.core.common.filter;
 
 import cn.hutool.core.util.StrUtil;
+import com.geoxus.core.common.annotation.GXFieldCommentAnnotation;
 import org.apache.commons.io.IOUtils;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
@@ -11,6 +12,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletRequestWrapper;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
@@ -18,15 +20,25 @@ import java.util.Map;
  * XSS过滤处理
  */
 public class GXXssHttpServletRequestWrapper extends HttpServletRequestWrapper {
-    //没被包装过的HttpServletRequest（特殊场景，需要自己过滤）
-    HttpServletRequest orgRequest;
+    @GXFieldCommentAnnotation(zh = "html过滤")
+    private static final GXHTMLFilter htmlFilter = new GXHTMLFilter();
 
-    //html过滤
-    private final static GXHTMLFilter htmlFilter = new GXHTMLFilter();
+    @GXFieldCommentAnnotation(zh = "没被包装过的HttpServletRequest(特殊场景，需要自己过滤)")
+    HttpServletRequest orgRequest;
 
     public GXXssHttpServletRequestWrapper(HttpServletRequest request) {
         super(request);
         orgRequest = request;
+    }
+
+    /**
+     * 获取最原始的request
+     */
+    public static HttpServletRequest getOrgRequest(HttpServletRequest request) {
+        if (request instanceof GXXssHttpServletRequestWrapper) {
+            return ((GXXssHttpServletRequestWrapper) request).getOrgRequest();
+        }
+        return request;
     }
 
     @Override
@@ -44,7 +56,7 @@ public class GXXssHttpServletRequestWrapper extends HttpServletRequestWrapper {
 
         //xss过滤
         json = xssEncode(json);
-        final ByteArrayInputStream bis = new ByteArrayInputStream(json.getBytes("utf-8"));
+        final ByteArrayInputStream bis = new ByteArrayInputStream(json.getBytes(StandardCharsets.UTF_8));
         return new ServletInputStream() {
             @Override
             public boolean isFinished() {
@@ -122,15 +134,5 @@ public class GXXssHttpServletRequestWrapper extends HttpServletRequestWrapper {
      */
     public HttpServletRequest getOrgRequest() {
         return orgRequest;
-    }
-
-    /**
-     * 获取最原始的request
-     */
-    public static HttpServletRequest getOrgRequest(HttpServletRequest request) {
-        if (request instanceof GXXssHttpServletRequestWrapper) {
-            return ((GXXssHttpServletRequestWrapper) request).getOrgRequest();
-        }
-        return request;
     }
 }

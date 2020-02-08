@@ -12,8 +12,8 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
 @EnableTransactionManagement
 @EnableRabbit
 @EnableAspectJAutoProxy
-public class GXApplication {
+public class GXCoreApplication {
     public static void main(String[] args) {
-        SpringApplication.run(GXApplication.class, args);
+        SpringApplication.run(GXCoreApplication.class, args);
     }
 }

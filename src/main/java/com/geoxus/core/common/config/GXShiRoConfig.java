@@ -4,6 +4,7 @@ import com.geoxus.core.common.factory.GXYamlPropertySourceFactory;
 import com.geoxus.core.common.oauth.GXOAuth2Filter;
 import com.geoxus.core.common.oauth.GXOAuth2Realm;
 import lombok.Data;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.shiro.cache.AbstractCacheManager;
 import org.apache.shiro.cache.MemoryConstrainedCacheManager;
 import org.apache.shiro.mgt.SecurityManager;
@@ -16,18 +17,17 @@ import org.apache.shiro.web.session.mgt.DefaultWebSessionManager;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.stereotype.Component;
 
 import javax.servlet.Filter;
 import java.util.*;
 
-@Configuration
+@Component
+@Slf4j
 public class GXShiRoConfig {
-
     public GXShiRoConfig() {
-        System.out.println("ShiRoConfig init .....");
+        log.info("ShiRoConfig init ......");
     }
 
     @Bean("sessionManager")
@@ -64,7 +64,7 @@ public class GXShiRoConfig {
      */
     @Bean("shiroFilter")
     public ShiroFilterFactoryBean shiroFilter(SecurityManager securityManager, @Autowired ShiroCustomerConfig shiroCustomerConfig) {
-        System.out.println("ShiRoConfiguration.shiRoFilter()");
+        log.info("ShiRoConfiguration.shiRoFilter() ......");
         ShiroFilterFactoryBean shiroFilterFactoryBean = new ShiroFilterFactoryBean();
         shiroFilterFactoryBean.setSecurityManager(securityManager);
         //oauth过滤

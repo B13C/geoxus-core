@@ -35,9 +35,7 @@ import java.util.*;
  * @email <britton@126.com>
  */
 public interface GXBaseService<T> extends IService<T> {
-    /**
-     * 日志对象
-     */
+    @GXFieldCommentAnnotation(zh = "日志对象")
     Logger log = LoggerFactory.getLogger(GXBaseService.class);
 
     @GXFieldCommentAnnotation(zh = "模型标识")

@@ -11,7 +11,7 @@ public interface GXShiroService {
      * @param userId 用户ID
      * @return Set
      */
-    Set<String> getUserPermissions(long userId);
+    Set<String> getAdminPermissions(long userId);
 
     /**
      * 获取用户角色列表
@@ -19,7 +19,7 @@ public interface GXShiroService {
      * @param userId 用户ID
      * @return Set
      */
-    Set<String> getUserRoles(long userId);
+    Set<String> getAdminRoles(long userId);
 
     /**
      * 查询admin

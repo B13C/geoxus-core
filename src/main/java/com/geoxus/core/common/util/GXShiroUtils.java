@@ -10,6 +10,8 @@ import org.apache.shiro.subject.Subject;
 import java.util.Optional;
 
 public class GXShiroUtils {
+    private GXShiroUtils() {
+    }
 
     public static Session getSession() {
         return SecurityUtils.getSubject().getSession();

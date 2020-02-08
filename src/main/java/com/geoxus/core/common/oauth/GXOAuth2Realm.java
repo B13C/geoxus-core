@@ -36,9 +36,9 @@ public class GXOAuth2Realm extends AuthorizingRealm {
         Dict dict = (Dict) principals.getPrimaryPrincipal();
         long adminId = Optional.ofNullable(dict.getLong(GXTokenManager.ADMIN_ID)).orElse(dict.getLong(StrUtil.toCamelCase(GXTokenManager.ADMIN_ID)));
         //用户权限列表
-        Set<String> permsSet = shiroService.getUserPermissions(adminId);
+        Set<String> permsSet = shiroService.getAdminPermissions(adminId);
         //用户角色
-        Set<String> rolesSet = shiroService.getUserRoles(adminId);
+        Set<String> rolesSet = shiroService.getAdminRoles(adminId);
         SimpleAuthorizationInfo info = new SimpleAuthorizationInfo();
         info.setStringPermissions(permsSet);
         info.addRoles(rolesSet);

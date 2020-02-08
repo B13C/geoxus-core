@@ -2,6 +2,7 @@ package com.geoxus.core.common.service.impl;
 
 import cn.hutool.core.lang.Dict;
 import com.geoxus.core.common.entity.GXSAdminEntity;
+import com.geoxus.core.common.service.GXSAdminHasRolesService;
 import com.geoxus.core.common.service.GXSAdminService;
 import com.geoxus.core.common.service.GXSPermissionsService;
 import com.geoxus.core.common.service.GXShiroService;
@@ -10,7 +11,6 @@ import com.geoxus.core.common.util.GXSpringContextUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
-import java.util.HashSet;
 import java.util.Set;
 
 @Service
@@ -21,15 +21,15 @@ public class GXShiroServiceImpl implements GXShiroService {
      *
      * @param userId
      */
-    public Set<String> getUserPermissions(long userId) {
+    public Set<String> getAdminPermissions(long userId) {
         return GXSpringContextUtils.getBean(GXSPermissionsService.class).getAdminPermissions(userId);
     }
 
     /**
      * 获取用户角色列表
      */
-    public Set<String> getUserRoles(long userId) {
-        Set<String> set = new HashSet<>();
+    public Set<String> getAdminRoles(long userId) {
+        Set<String> set = GXSpringContextUtils.getBean(GXSAdminHasRolesService.class).getAdminRoles(userId);
         return set;
     }
 

@@ -12,34 +12,34 @@ import com.baomidou.mybatisplus.annotation.TableName;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.geoxus.core.common.annotation.GXFieldCommentAnnotation;
 import com.geoxus.core.common.mapper.GXBaseMapper;
-import com.geoxus.core.common.vo.GXBusinessStatusCode;
 import com.geoxus.core.common.util.GXSpringContextUtils;
 import com.geoxus.core.common.validator.GXValidateDBExists;
+import com.geoxus.core.common.vo.GXBusinessStatusCode;
 import com.geoxus.core.common.vo.response.GXPagination;
-import com.geoxus.core.framework.service.GXCoreMediaLibraryService;
 import com.geoxus.core.framework.service.GXBaseService;
+import com.geoxus.core.framework.service.GXCoreMediaLibraryService;
 
 import javax.validation.ConstraintValidatorContext;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
 public interface GXBusinessService<T> extends GXBaseService<T>, GXValidateDBExists {
-    /**
-     * 核心模型的字段名字
-     */
+    @GXFieldCommentAnnotation(zh = "核心模型的字段名字")
     String CORE_MODEL_ID_NAME = "core_model_id";
 
-    /**
-     * 日志核心模型ID
-     */
+    @GXFieldCommentAnnotation(zh = "日志核心模型ID")
     int CORE_MODEL_ID = 0;
 
     /**
      * 创建数据
      */
-    long create(T target, Dict param);
+    default long create(T target, Dict param) {
+        return 0;
+    }
 
     /**
      * 更新数据
@@ -48,7 +48,9 @@ public interface GXBusinessService<T> extends GXBaseService<T>, GXValidateDBExis
      * @param param
      * @return
      */
-    long update(T target, Dict param);
+    default long update(T target, Dict param) {
+        return 0;
+    }
 
     /**
      * 删除数据
@@ -60,12 +62,16 @@ public interface GXBusinessService<T> extends GXBaseService<T>, GXValidateDBExis
     /**
      * 列表或者搜索
      */
-    GXPagination listOrSearch(Dict param);
+    default GXPagination listOrSearch(Dict param) {
+        return new GXPagination(Collections.emptyList());
+    }
 
     /**
      * 内容详情
      */
-    Dict detail(Dict param);
+    default Dict detail(Dict param) {
+        return Dict.create();
+    }
 
     /**
      * 批量删除
