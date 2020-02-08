@@ -2,7 +2,7 @@
 geoxus-core.iml
 target
 *.log
-pom.xml
+!/pom.xml
 /src/main/resources/application-local.yml
 /src/main/resources/ymls/local/
 /src/main/resources/rebel.xml
