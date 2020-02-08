@@ -8,16 +8,9 @@ import sun.misc.Unsafe;
 import java.lang.reflect.Field;
 
 public final class GXUnsafeUtils {
-    private static final Logger log = LoggerFactory.getLogger(GXHttpContextUtils.class);
+    private static final Logger log = LoggerFactory.getLogger(GXUnsafeUtils.class);
 
     private static final Unsafe unsafe;
-
-    private GXUnsafeUtils() {
-    }
-
-    public static Unsafe getUnsafe() {
-        return unsafe;
-    }
 
     static {
         Field f;
@@ -36,5 +29,12 @@ public final class GXUnsafeUtils {
             log.error(e.getMessage(), e);
             throw new GXException(e.getMessage());
         }
+    }
+
+    private GXUnsafeUtils() {
+    }
+
+    public static Unsafe getUnsafe() {
+        return unsafe;
     }
 }
