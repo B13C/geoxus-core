@@ -7,9 +7,11 @@ import com.geoxus.core.common.annotation.GXFieldCommentAnnotation;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
+import java.io.Serializable;
+
 @Data
 @EqualsAndHashCode(callSuper = true)
-public class GXBaseEntity extends Model {
+public class GXBaseEntity extends Model implements Serializable {
     @TableField(fill = FieldFill.INSERT)
     private Integer createdAt;
 
