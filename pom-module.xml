@@ -12,11 +12,6 @@
     <artifactId>geoxus-core</artifactId>
 
     <dependencies>
-        <dependency>
-            <groupId>com.geoxus</groupId>
-            <artifactId>geoxus-core</artifactId>
-            <version>1.0.0.RELEASE</version>
-        </dependency>
     </dependencies>
 
     <build>
