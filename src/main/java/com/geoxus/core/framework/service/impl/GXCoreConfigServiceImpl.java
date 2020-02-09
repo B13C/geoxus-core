@@ -2,6 +2,7 @@ package com.geoxus.core.framework.service.impl;
 
 import cn.hutool.core.lang.Dict;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.geoxus.core.common.util.GXCommonUtils;
 import com.geoxus.core.common.vo.GXBusinessStatusCode;
 import com.geoxus.core.common.vo.response.GXPagination;
 import com.geoxus.core.framework.entity.GXCoreConfigEntity;
@@ -40,5 +41,16 @@ public class GXCoreConfigServiceImpl extends ServiceImpl<GXCoreConfigMapper, GXC
     @Override
     public Dict detail(Dict param) {
         return baseMapper.detail(param);
+    }
+
+    @Override
+    public <T> T getConfigObject(String key, Class<T> clazz) {
+        return GXCommonUtils.getClassDefaultValue(clazz);
+    }
+
+    @Override
+    public boolean updateValueByParamKey(String key, String value) {
+        Dict condition = Dict.create().set("param_key", key);
+        return updateFieldByCondition(condition, "param_value", value);
     }
 }

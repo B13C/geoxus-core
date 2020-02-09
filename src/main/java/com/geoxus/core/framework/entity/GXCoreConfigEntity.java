@@ -18,20 +18,20 @@ public class GXCoreConfigEntity extends GXBaseEntity {
     @TableId
     private int configId;
 
-    @NotBlank()
-    @Pattern(regexp = "^[a-zA-Z0-9]+$")
-    private String name;
-
-    @NotBlank()
-    private String showName;
-
-    private String type;
-
     @GXValidateDBExistsAnnotation
     private int coreModelId;
+
+    @NotBlank()
+    @Pattern(regexp = "^[a-zA-Z0-9]+$")
+    private String paramKey;
+
+    @NotBlank()
+    private String paramValue;
 
     @GXValidateExtDataAnnotation(tableName = "core_config")
     private String ext;
 
     private int status;
+
+    private String remark;
 }
