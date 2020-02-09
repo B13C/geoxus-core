@@ -47,9 +47,9 @@ public class GXSwagger2Config implements WebMvcConfigurer {
 
     private ApiInfo apiInfo() {
         return new ApiInfoBuilder()
-                .title("GeoXus")
-                .description("GeoXus文档")
-                .termsOfServiceUrl("https://github.com/B13C/geoxus")
+                .title("Geoxus")
+                .description("Geoxus文档")
+                .termsOfServiceUrl("https://github.com/B13C/geoxus-core")
                 .version("0.0.1")
                 .build();
     }

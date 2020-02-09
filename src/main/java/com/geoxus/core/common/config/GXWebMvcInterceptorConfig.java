@@ -15,6 +15,7 @@ import org.springframework.http.CacheControl;
 import org.springframework.stereotype.Component;
 import org.springframework.util.ResourceUtils;
 import org.springframework.web.method.support.HandlerMethodArgumentResolver;
+import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
@@ -46,6 +47,15 @@ public class GXWebMvcInterceptorConfig implements WebMvcConfigurer {
 
     @Autowired
     private GXEditorProperties properties;
+
+    @Override
+    public void addCorsMappings(CorsRegistry registry) {
+        registry.addMapping("/**")
+                .allowedOrigins("*")
+                .allowCredentials(true)
+                .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
+                .maxAge(3600);
+    }
 
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
@@ -86,8 +96,9 @@ public class GXWebMvcInterceptorConfig implements WebMvcConfigurer {
     @Component
     @ConfigurationProperties(prefix = "web-mvc")
     @PropertySource(value = {"classpath:/ymls/${spring.profiles.active}/web-mvc.yml"}, factory = GXYamlPropertySourceFactory.class, encoding = "utf-8")
-    private static class WebMvcConfig {
+    static class WebMvcConfig {
         private List<String> urlPatterns;
+
         private List<String> resourcePatterns;
     }
 }

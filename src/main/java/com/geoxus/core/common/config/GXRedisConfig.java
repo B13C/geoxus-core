@@ -53,9 +53,8 @@ public class GXRedisConfig {
 
     @Bean
     public RedisCacheConfiguration cacheConfiguration() {
-        RedisCacheConfiguration cacheConfig = RedisCacheConfiguration.defaultCacheConfig()
+        return RedisCacheConfiguration.defaultCacheConfig()
                 .entryTtl(Duration.ofSeconds(600))
                 .disableCachingNullValues();
-        return cacheConfig;
     }
 }
