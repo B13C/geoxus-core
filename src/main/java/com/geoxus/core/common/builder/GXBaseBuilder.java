@@ -3,6 +3,7 @@ package com.geoxus.core.common.builder;
 import cn.hutool.core.convert.Convert;
 import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.lang.Dict;
+import cn.hutool.core.lang.TypeReference;
 import cn.hutool.core.util.ClassUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.json.JSONUtil;
@@ -44,7 +45,8 @@ public interface GXBaseBuilder {
         for (String dataKey : dataKeys) {
             final Object value = data.getObj(dataKey);
             if (value instanceof Table) {
-                Table<String, String, Object> table = (Table<String, String, Object>) value;
+                Table<String, String, Object> table = Convert.convert(new TypeReference<Table<String, String, Object>>() {
+                }, value);
                 final Map<String, Object> row = table.row(dataKey);
                 for (Map.Entry<String, Object> entry : row.entrySet()) {
                     final String entryKey = entry.getKey();
@@ -76,6 +78,36 @@ public interface GXBaseBuilder {
             sql.WHERE(StrUtil.format(template, conditionKey, value));
         }
         sql.SET(StrUtil.format("updated_at = {}", DateUtil.currentSeconds()));
+        return sql.toString();
+    }
+
+    /**
+     * 单独更新记录状态
+     *
+     * @param tableName 数据表明
+     * @param status    状态值
+     * @param operator  操作
+     * @param condition 更新条件
+     * @return
+     */
+    static String updateStatus(String tableName, int status, String operator, Dict condition) {
+        final SQL sql = new SQL().UPDATE(tableName);
+        if (GXBaseBuilderConstants.OR_OPERATOR.equals(operator)) {
+            sql.SET(StrUtil.format("`status` = `status` | {}", status));
+        } else if (GXBaseBuilderConstants.NEGATION_OPERATOR.equals(operator)) {
+            sql.SET(StrUtil.format("`status` = `status` & ~{}", status));
+        } else {
+            sql.SET(StrUtil.format("`status` = {}", status));
+        }
+        final Set<String> conditionKeys = condition.keySet();
+        for (String conditionKey : conditionKeys) {
+            String template = "{} = '{}'";
+            final Object value = condition.getObj(conditionKey);
+            if (value instanceof Number) {
+                template = "{} = {}";
+            }
+            sql.WHERE(StrUtil.format(template, conditionKey, value));
+        }
         return sql.toString();
     }
 

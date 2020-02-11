@@ -129,6 +129,19 @@ public interface GXBusinessService<T> extends GXBaseService<T>, GXValidateDBExis
     }
 
     /**
+     * 通过SQL更新表中的数据
+     *
+     * @param clazz
+     * @param status
+     * @param condition
+     * @return
+     */
+    default boolean updateStatusBySQL(Class<T> clazz, int status, String operator, Dict condition) {
+        GXBaseMapper<T> baseMapper = (GXBaseMapper<T>) getBaseMapper();
+        return baseMapper.updateStatusByCondition(getTableName(clazz), status, operator, condition);
+    }
+
+    /**
      * 更新实体JSON的多个字段
      *
      * @param target

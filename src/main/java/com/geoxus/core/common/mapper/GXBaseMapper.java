@@ -17,4 +17,7 @@ public interface GXBaseMapper<T> extends BaseMapper<T> {
 
     @SelectProvider(type = GXBaseBuilder.class, method = "listOrSearch")
     List<Dict> listOrSearch(IPage<Dict> page, Dict param);
+
+    @UpdateProvider(type = GXBaseBuilder.class, method = "updateStatus")
+    boolean updateStatusByCondition(String tableName, int status, String operator, Dict condition);
 }
