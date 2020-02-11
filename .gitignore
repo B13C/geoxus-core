@@ -6,4 +6,5 @@ target
 /src/main/resources/application-local.yml
 /src/main/resources/ymls/local/
 /src/main/resources/rebel.xml
+/src/main/resources/mail.setting
 /src/test/

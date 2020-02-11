@@ -7,3 +7,4 @@ redis-key:
     - request.api.idempotent: request:api-idempotent
     - eth.transaction: eth:transaction
     - prevent.resubmit: prevent:resubmit
+    - sys.email.verify.code: sys:email:verify-code

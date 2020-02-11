@@ -12,9 +12,6 @@ import org.springframework.stereotype.Component;
 import java.util.List;
 import java.util.Map;
 
-/**
- * Redis所有Keys
- */
 @Component
 @Slf4j
 public class GXRedisKeysUtils {
@@ -77,7 +74,7 @@ public class GXRedisKeysUtils {
                 return s + ":" + key;
             }
         }
-        return "default:key";
+        return "geoxus:default:key";
     }
 
     @Data
@@ -85,7 +82,7 @@ public class GXRedisKeysUtils {
     @Configuration
     @PropertySource(value = {"classpath:/ymls/${spring.profiles.active}/redis-key.yml"}, factory = GXYamlPropertySourceFactory.class, encoding = "UTF-8")
     @ConfigurationProperties(prefix = "redis-key")
-    private static class RedisKeysConfig {
+    static class RedisKeysConfig {
         private List<Map<String, String>> keys;
     }
 }

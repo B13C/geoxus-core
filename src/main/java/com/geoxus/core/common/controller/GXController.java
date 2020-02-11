@@ -2,10 +2,11 @@ package com.geoxus.core.common.controller;
 
 import cn.hutool.core.lang.Dict;
 import com.geoxus.core.common.constant.GXControllerConstants;
+import com.geoxus.core.common.entity.GXBaseEntity;
 import com.geoxus.core.common.util.GXHttpContextUtils;
 import com.geoxus.core.common.util.GXResultUtils;
 
-public interface GXController<T> {
+public interface GXController<T extends GXBaseEntity> {
     /**
      * 创建数据
      */
