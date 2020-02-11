@@ -61,6 +61,9 @@ public class GXBaseBuilderConstants {
     @GXFieldCommentAnnotation(zh = "数据库操作的取反操作符")
     public static final String NEGATION_OPERATOR = "~";
 
+    @GXFieldCommentAnnotation(zh = "直接修改数据的status值")
+    public static final String NON_OPERATOR = "";
+
     @GXFieldCommentAnnotation(zh = "时间字段")
     public static final Dict TIME_FIELDS = Dict.create()
             .set("created_at", "created_at")

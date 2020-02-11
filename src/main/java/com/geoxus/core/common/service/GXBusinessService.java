@@ -22,6 +22,8 @@ import com.geoxus.core.framework.service.GXBaseService;
 import com.geoxus.core.framework.service.GXCoreMediaLibraryService;
 
 import javax.validation.ConstraintValidatorContext;
+import java.lang.reflect.ParameterizedType;
+import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -94,25 +96,16 @@ public interface GXBusinessService<T> extends GXBaseService<T>, GXValidateDBExis
     /**
      * 修改状态
      *
-     * @param condition
-     * @param status
+     * @param status    状态
+     * @param operator  操作
+     * @param condition 条件
      * @return
      */
-    default boolean modifyStatus(Class<T> clazz, Dict condition, int status) {
-        GXBaseMapper<T> baseMapper = (GXBaseMapper<T>) getBaseMapper();
-        return baseMapper.updateFieldByCondition(getTableName(clazz), Dict.create().set("status", status), condition);
-    }
-
-    /**
-     * 修改状态
-     *
-     * @param condition
-     * @param status
-     * @return
-     */
-    default boolean modifyStatus(Dict condition, int status) {
-        final T entity = getOne(new QueryWrapper<T>().allEq(condition));
-        return updateJSONFieldSingleValue(entity, "ext.status", status);
+    default boolean modifyStatus(int status, String operator, Dict condition) {
+        final Type type = ((ParameterizedType) getClass().getGenericSuperclass()).getActualTypeArguments()[1];
+        Class<T> clazz = Convert.convert(new TypeReference<Class<T>>() {
+        }, type);
+        return updateStatusBySQL(clazz, status, operator, condition);
     }
 
     /**
