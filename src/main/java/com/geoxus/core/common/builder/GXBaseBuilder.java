@@ -90,7 +90,7 @@ public interface GXBaseBuilder {
      * @param condition 更新条件
      * @return
      */
-    static String updateStatus(String tableName, int status, String operator, Dict condition) {
+    static String updateStatus(String tableName, int status, Dict condition, String operator) {
         final SQL sql = new SQL().UPDATE(tableName);
         if (GXBaseBuilderConstants.OR_OPERATOR.equals(operator)) {
             sql.SET(StrUtil.format("`status` = `status` | {}", status));

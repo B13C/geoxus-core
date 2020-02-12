@@ -105,7 +105,7 @@ public interface GXBusinessService<T> extends GXBaseService<T>, GXValidateDBExis
         final Type type = ((ParameterizedType) getClass().getGenericSuperclass()).getActualTypeArguments()[1];
         Class<T> clazz = Convert.convert(new TypeReference<Class<T>>() {
         }, type);
-        return updateStatusBySQL(clazz, status, operator, condition);
+        return updateStatusBySQL(clazz, status, condition, operator);
     }
 
     /**
@@ -129,9 +129,9 @@ public interface GXBusinessService<T> extends GXBaseService<T>, GXValidateDBExis
      * @param condition
      * @return
      */
-    default boolean updateStatusBySQL(Class<T> clazz, int status, String operator, Dict condition) {
+    default boolean updateStatusBySQL(Class<T> clazz, int status, Dict condition, String operator) {
         GXBaseMapper<T> baseMapper = (GXBaseMapper<T>) getBaseMapper();
-        return baseMapper.updateStatusByCondition(getTableName(clazz), status, operator, condition);
+        return baseMapper.updateStatusByCondition(getTableName(clazz), status, condition, operator);
     }
 
     /**
