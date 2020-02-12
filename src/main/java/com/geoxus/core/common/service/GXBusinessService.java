@@ -97,11 +97,11 @@ public interface GXBusinessService<T> extends GXBaseService<T>, GXValidateDBExis
      * 修改状态
      *
      * @param status    状态
-     * @param operator  操作
      * @param condition 条件
+     * @param operator  操作
      * @return
      */
-    default boolean modifyStatus(int status, String operator, Dict condition) {
+    default boolean modifyStatus(int status, Dict condition, String operator) {
         final Type type = ((ParameterizedType) getClass().getGenericSuperclass()).getActualTypeArguments()[1];
         Class<T> clazz = Convert.convert(new TypeReference<Class<T>>() {
         }, type);
