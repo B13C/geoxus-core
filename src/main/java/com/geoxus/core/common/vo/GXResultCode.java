@@ -10,7 +10,7 @@ public enum GXResultCode {
     HAS_BAN_WORD(1004, "输入有违禁词"),
     INPUT_TOO_SHORT(1005, "输入为空，或者输入字数不够"),
     TARGET_NOT_FOUND(1006, "相关的对象不存在"),
-    NEED_CAPTCHA(1007, "需要验证码，验证码有误"),
+    NEED_CAPTCHA(1007, "需要验证码或者验证码错误"),
     IMAGE_UNKNOWN(1008, "不支持的图片格式"),
     IMAGE_WRONG_FORMAT(1009, "照片格式有误(仅支持JPG,JPEG,GIF,PNG或BMP)"),
     IMAGE_WRONG_CK(1010, "访问私有图片ck验证错误"),
