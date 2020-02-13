@@ -66,10 +66,10 @@ public class GXBaseBuilderConstants {
 
     @GXFieldCommentAnnotation(zh = "时间字段")
     public static final Dict TIME_FIELDS = Dict.create()
-            .set("created_at", "created_at")
-            .set("updated_at", "updated_at")
-            .set("cancel_at", "cancel_at")
-            .set("complete_at", "complete_at");
+            .set("created_at", GXBaseBuilderConstants.TIME_RANGE_WITH_EQ)
+            .set("updated_at", GXBaseBuilderConstants.TIME_RANGE_WITH_EQ)
+            .set("cancel_at", GXBaseBuilderConstants.TIME_RANGE_WITH_EQ)
+            .set("complete_at", GXBaseBuilderConstants.TIME_RANGE_WITH_EQ);
 
     private GXBaseBuilderConstants() {
     }

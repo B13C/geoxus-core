@@ -7,6 +7,7 @@ import cn.hutool.core.lang.TypeReference;
 import cn.hutool.core.util.ClassUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.json.JSONUtil;
+import com.geoxus.core.common.annotation.GXFieldCommentAnnotation;
 import com.geoxus.core.common.constant.GXBaseBuilderConstants;
 import com.geoxus.core.common.entity.GXBaseEntity;
 import com.geoxus.core.common.util.GXSpringContextUtils;
@@ -20,6 +21,9 @@ import java.util.Optional;
 import java.util.Set;
 
 public interface GXBaseBuilder {
+    @GXFieldCommentAnnotation(zh = "模型的值")
+    String MODEL_IDENTIFICATION_VALUE = "";
+
     /**
      * 更新实体字段和虚拟字段
      * <pre>
@@ -162,21 +166,25 @@ public interface GXBaseBuilder {
      * @return
      */
     default Dict mergeSearchConditionToSQL(SQL sql, Dict requestParam) {
-        Dict searchField = GXSpringContextUtils.getBean(GXCoreModelService.class).getSearchCondition(Dict.create().set(GXBaseBuilderConstants.MODEL_IDENTIFICATION_NAME, GXBaseBuilderConstants.SEARCH_CONDITION_NAME));
+        final Dict condition = Dict.create().set(GXBaseBuilderConstants.MODEL_IDENTIFICATION_NAME, getModelIdentificationValue());
+        Dict searchField = GXSpringContextUtils.getBean(GXCoreModelService.class).getSearchCondition(condition);
         searchField.putAll(getDefaultSearchField());
         Dict searchCondition = getRequestSearchCondition(requestParam);
         Set<String> keySet = searchCondition.keySet();
         for (String key : keySet) {
             if (null != searchCondition.getObj(key)) {
-                final String operator = searchField.getStr(key);
+                String operator = searchField.getStr(key);
                 if (StrUtil.isNotBlank(GXBaseBuilderConstants.TIME_FIELDS.getStr(key))) {
+                    if (null == operator) {
+                        operator = GXBaseBuilderConstants.TIME_FIELDS.getStr(key);
+                    }
                     final String s = processTimeField(key, operator, searchCondition.getObj(key));
                     if (null != s) {
                         sql.WHERE(s);
                     }
                     continue;
                 }
-                sql.WHERE(StrUtil.format(StrUtil.concat(true, "{} ", operator), key, searchCondition.getObj(key)));
+                sql.WHERE(StrUtil.format("{} ".concat(operator), key, searchCondition.getObj(key)));
             }
         }
         return Dict.create();
@@ -209,5 +217,9 @@ public interface GXBaseBuilder {
 
     default Dict getDefaultSearchField() {
         return Dict.create();
+    }
+
+    default String getModelIdentificationValue() {
+        return MODEL_IDENTIFICATION_VALUE;
     }
 }
