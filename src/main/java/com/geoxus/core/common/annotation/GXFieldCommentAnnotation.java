@@ -5,7 +5,7 @@ import java.lang.annotation.*;
 /**
  * 用于反射读取接口/类中定义的属性信息
  */
-@Target({ElementType.FIELD})
+@Target({ElementType.FIELD, ElementType.METHOD})
 @Retention(RetentionPolicy.RUNTIME)
 @Documented
 public @interface GXFieldCommentAnnotation {

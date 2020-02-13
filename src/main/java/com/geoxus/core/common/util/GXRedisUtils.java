@@ -1,6 +1,8 @@
 package com.geoxus.core.common.util;
 
 import cn.hutool.json.JSONUtil;
+import com.geoxus.core.common.annotation.GXFieldCommentAnnotation;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.*;
 import org.springframework.stereotype.Component;
@@ -8,7 +10,14 @@ import org.springframework.stereotype.Component;
 import java.util.concurrent.TimeUnit;
 
 @Component
+@Slf4j
 public class GXRedisUtils {
+    @GXFieldCommentAnnotation(zh = "默认过期时长,单位: 秒")
+    private static final long DEFAULT_EXPIRE = 86400;
+
+    @GXFieldCommentAnnotation(zh = "不设置过期时长")
+    private static final long NOT_EXPIRE = -1;
+
     @Autowired
     private RedisTemplate<String, Object> redisTemplate;
 
@@ -26,14 +35,6 @@ public class GXRedisUtils {
 
     @Autowired
     private ZSetOperations<String, Object> zSetOperations;
-    /**
-     * 默认过期时长，单位：秒
-     */
-    private static final long DEFAULT_EXPIRE = 86400;
-    /**
-     * 不设置过期时长
-     */
-    private static final long NOT_EXPIRE = -1;
 
     public void set(String key, Object value, long expire) {
         valueOperations.set(key, toJson(value));
@@ -101,5 +102,13 @@ public class GXRedisUtils {
      */
     public Long push(String key, Object v) {
         return redisTemplate.opsForList().rightPush(key, v);
+    }
+
+    public Long increment(String key) {
+        return valueOperations.increment(key);
+    }
+
+    public Long increment(String key, long v) {
+        return valueOperations.increment(key, v);
     }
 }
