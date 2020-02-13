@@ -40,7 +40,8 @@ public enum GXResultCode {
     REQUEST_JSON_NOT_BODY(1034, "请求的JSON参数出错为空"),
     FREEZE(1035, "账号被冻结"),
     PASSWORD_ERROR(1036, "账号或密码错误"),
-    USER_NOT_EXISTS(1037, "用户不存在");
+    USER_NOT_EXISTS(1037, "用户不存在"),
+    STATUS_ERROR(1038, "当前状态不正确");
     private final String msg;
     private final Integer code;
 
