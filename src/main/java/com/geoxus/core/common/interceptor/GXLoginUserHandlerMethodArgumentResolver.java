@@ -1,5 +1,6 @@
 package com.geoxus.core.common.interceptor;
 
+import cn.hutool.core.lang.Dict;
 import com.geoxus.core.common.annotation.GXLoginUserAnnotation;
 import com.geoxus.core.common.entity.GXUUserEntity;
 import com.geoxus.core.common.oauth.GXTokenManager;
@@ -29,7 +30,15 @@ public class GXLoginUserHandlerMethodArgumentResolver implements HandlerMethodAr
         //获取用户ID
         Object object = request.getAttribute(GXTokenManager.USER_ID, RequestAttributes.SCOPE_REQUEST);
         if (object == null) {
-            return null;
+            final String header = request.getHeader(GXTokenManager.USER_TOKEN);
+            if (null == header) {
+                return null;
+            }
+            final Dict tokenData = GXTokenManager.decodeUserToken(header);
+            object = tokenData.getObj(GXTokenManager.USER_ID);
+            if (null == object) {
+                return null;
+            }
         }
         //获取用户信息
         return GXSpringContextUtils.getBean(GXUUserService.class).getById((Long) object);
