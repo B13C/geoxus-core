@@ -2,7 +2,7 @@ shiro:
   config:
     - key: /backend/login
       value: anon
-    - key: /generate/**
+    - key: /general/**
       value: anon
     - key: /ws/**
       value: anon
