@@ -6,13 +6,13 @@ import cn.hutool.json.JSONObject;
 import cn.hutool.json.JSONUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.geoxus.core.common.config.UploadConfig;
 import com.geoxus.core.common.exception.GXException;
 import com.geoxus.core.common.util.GXUploadUtils;
 import com.geoxus.core.framework.entity.GXCoreMediaLibraryEntity;
 import com.geoxus.core.framework.mapper.GXCoreMediaLibraryMapper;
 import com.geoxus.core.framework.service.GXCoreMediaLibraryService;
 import com.geoxus.core.framework.service.GXCoreModelService;
-import com.geoxus.core.common.config.UploadConfig;
 import com.google.common.collect.Sets;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -45,7 +45,7 @@ public class GXCoreMediaLibraryServiceImpl extends ServiceImpl<GXCoreMediaLibrar
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public boolean updateOwner(long modelId, long coreModelId, String modelType, List<JSONObject> param) {
+    public boolean updateOwner(long modelId, long coreModelId, List<JSONObject> param) {
         if (param.isEmpty()) {
             return true;
         }
@@ -55,13 +55,15 @@ public class GXCoreMediaLibraryServiceImpl extends ServiceImpl<GXCoreMediaLibrar
             if (null != dict.getLong("id")) {
                 final long targetModelId = Optional.ofNullable(dict.getLong("model_id")).orElse(modelId);
                 final long itemCoreModelId = Optional.ofNullable(dict.getLong("core_model_id")).orElse(coreModelId);
+                final String resourceType = Optional.ofNullable(dict.getStr("resource_type")).orElse("");
                 final GXCoreMediaLibraryEntity entity = getOne(new QueryWrapper<GXCoreMediaLibraryEntity>().eq("id", dict.getLong("id")));
                 final String customProperties = StrUtil.format("[{}]", Optional.ofNullable(dict.getStr("custom_properties")).orElse(""));
                 if (null != entity) {
                     entity.setModelId(targetModelId);
-                    entity.setModelType(coreModelService.getModelTypeByModelId(itemCoreModelId, modelType));
+                    entity.setModelType(coreModelService.getModelTypeByModelId(itemCoreModelId, "defaultModelType"));
                     entity.setCoreModelId(itemCoreModelId);
                     entity.setCustomProperties(JSONUtil.toJsonStr(customProperties));
+                    entity.setResourceType(resourceType);
                     newMediaList.add(entity);
                 }
             }

@@ -24,6 +24,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.validation.constraints.NotNull;
 import java.lang.reflect.Field;
 import java.util.*;
 
@@ -344,19 +345,14 @@ public interface GXBaseService<T> extends IService<T> {
      *
      * @param target
      * @param modelId
-     * @param modelType
      * @param param
      */
-    default void handleMedia(T target, long modelId, String modelType, Dict param) {
+    default void handleMedia(T target, long modelId, @NotNull Dict param) {
         final List media = GXHttpContextUtils.getHttpParam("media_info", List.class);
         if (null != media) {
-            if (null != param) {
-                param.set("media", media);
-            } else {
-                param = Dict.create().set("media", media);
-            }
+            param.set("media", media);
             param.set("model_id", modelId);
-            final GXMediaLibraryEvent<T> event = new GXMediaLibraryEvent<>(modelType, target, param);
+            final GXMediaLibraryEvent<T> event = new GXMediaLibraryEvent<>(target, param);
             GXSyncEventBusCenterUtils.getInstance().post(event);
         }
     }

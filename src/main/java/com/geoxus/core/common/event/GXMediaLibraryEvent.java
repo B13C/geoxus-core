@@ -5,12 +5,11 @@ import lombok.Data;
 
 @Data
 public class GXMediaLibraryEvent<T> {
-    private String modelType;
     private T target;
+
     private Dict param;
 
-    public GXMediaLibraryEvent(String modelType, T target, Dict param) {
-        this.modelType = modelType;
+    public GXMediaLibraryEvent(T target, Dict param) {
         this.target = target;
         this.param = param;
     }

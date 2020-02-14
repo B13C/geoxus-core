@@ -25,13 +25,12 @@ public class GXMediaLibraryListener extends GXSyncBaseListener {
     @Subscribe
     public void updateMediaOwner(GXMediaLibraryEvent<?> event) {
         final Dict param = event.getParam();
-        final String modelType = event.getModelType();
         final Object o = event.getTarget();
         final long coreModelId = Convert.convert(Long.class, Optional.ofNullable(param.getInt("core_model_id"))
                 .orElse(ReflectUtil.invoke(o, "getCoreModelId")));
         final long modelId = Optional.ofNullable(param.getLong("model_id")).orElse(0L);
         if (modelId > 0) {
-            coreMediaLibraryService.updateOwner(modelId, coreModelId, modelType, Convert.convert(new TypeReference<List<JSONObject>>() {
+            coreMediaLibraryService.updateOwner(modelId, coreModelId, Convert.convert(new TypeReference<List<JSONObject>>() {
             }, param.getObj("media")));
         }
     }
