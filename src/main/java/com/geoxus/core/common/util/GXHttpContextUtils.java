@@ -72,11 +72,17 @@ public class GXHttpContextUtils {
             jsonRequestBody = Optional.ofNullable(httpServletRequest.getAttribute("JSON_REQUEST_BODY")).orElse("{}");
         }
         final JSONObject jsonObject = JSONUtil.toBean(jsonRequestBody.toString(), JSONObject.class);
-        final T byPath = jsonObject.getByPath(paramName, resultType);
-        if (null == byPath) {
+        final T value;
+        if (!jsonObject.isEmpty()) {
+            value = jsonObject.getByPath(paramName, resultType);
+        } else {
+            assert httpServletRequest != null;
+            value = Convert.convert(resultType, httpServletRequest.getParameter(paramName));
+        }
+        if (null == value) {
             return ReflectUtil.newInstanceIfPossible(resultType);
         }
-        return byPath;
+        return value;
     }
 
     /**

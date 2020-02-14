@@ -23,9 +23,9 @@ public class GXUploadFileLegalAspect {
     public Object around(ProceedingJoinPoint point) throws Throwable {
         HttpServletRequest request = GXHttpContextUtils.getHttpServletRequest();
         assert request != null;
-        if (null == request.getHeader(GXTokenManager.ADMIN_TOKEN) || null == request.getHeader(GXTokenManager.USER_TOKEN)) {
-            return GXResultUtils.error(GXResultCode.NEED_PERMISSION);
+        if (null != request.getHeader(GXTokenManager.ADMIN_TOKEN) || null != request.getHeader(GXTokenManager.USER_TOKEN)) {
+            return point.proceed();
         }
-        return point.proceed();
+        return GXResultUtils.error(GXResultCode.NEED_PERMISSION);
     }
 }

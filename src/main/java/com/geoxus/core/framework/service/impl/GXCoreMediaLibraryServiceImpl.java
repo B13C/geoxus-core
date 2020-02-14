@@ -86,7 +86,7 @@ public class GXCoreMediaLibraryServiceImpl extends ServiceImpl<GXCoreMediaLibrar
     }
 
     @Override
-    public GXCoreMediaLibraryEntity saveFileInfo(MultipartFile file) {
+    public GXCoreMediaLibraryEntity saveFileInfo(MultipartFile file, Dict param) {
         String filePath = uploadConfig.getDepositPath().trim();
         try {
             String fileName = GXUploadUtils.singleUpload(file, filePath);
@@ -97,7 +97,11 @@ public class GXCoreMediaLibraryServiceImpl extends ServiceImpl<GXCoreMediaLibrar
             entity.setMimeType(file.getContentType());
             entity.setName(file.getOriginalFilename());
             entity.setFilePath(fileName);
-            entity.setCollectionName("default");
+            entity.setCollectionName(Optional.ofNullable(param.getStr("collection_name")).orElse("default"));
+            entity.setResourceType(Optional.ofNullable(param.getStr("resource_type")).orElse("defaultResourceType"));
+            entity.setModelType(Optional.ofNullable(param.getStr("model_type")).orElse("defaultModelType"));
+            entity.setModelId(Optional.ofNullable(param.getLong("model_id")).orElse(0L));
+            entity.setCoreModelId(Optional.ofNullable(param.getLong("core_model_id")).orElse(0L));
             save(entity);
             return entity;
         } catch (IOException e) {

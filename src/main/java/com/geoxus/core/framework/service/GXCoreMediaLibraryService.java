@@ -29,9 +29,10 @@ public interface GXCoreMediaLibraryService extends GXBaseService<GXCoreMediaLibr
      * 保存文件
      *
      * @param file
+     * @param param
      * @return
      */
-    GXCoreMediaLibraryEntity saveFileInfo(MultipartFile file);
+    GXCoreMediaLibraryEntity saveFileInfo(MultipartFile file, Dict param);
 
     /**
      * 通过条件删除media
