@@ -16,6 +16,16 @@ public class GXCoreModelBuilder implements GXBaseBuilder {
         return null;
     }
 
+    @Override
+    public Dict getDefaultSearchField() {
+        return Dict.create();
+    }
+
+    @Override
+    public String getModelIdentificationValue() {
+        return "core_model";
+    }
+
     public String getSearchCondition(Dict param) {
         final SQL sql = new SQL().SELECT("model_id , search_condition").FROM("core_model");
         if (null != param.getInt("model_id")) {

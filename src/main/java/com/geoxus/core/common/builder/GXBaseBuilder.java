@@ -7,7 +7,6 @@ import cn.hutool.core.lang.TypeReference;
 import cn.hutool.core.util.ClassUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.json.JSONUtil;
-import com.geoxus.core.common.annotation.GXFieldCommentAnnotation;
 import com.geoxus.core.common.constant.GXBaseBuilderConstants;
 import com.geoxus.core.common.entity.GXBaseEntity;
 import com.geoxus.core.common.util.GXSpringContextUtils;
@@ -21,9 +20,6 @@ import java.util.Optional;
 import java.util.Set;
 
 public interface GXBaseBuilder {
-    @GXFieldCommentAnnotation(zh = "模型的值")
-    String MODEL_IDENTIFICATION_VALUE = "";
-
     /**
      * 更新实体字段和虚拟字段
      * <pre>
@@ -215,11 +211,17 @@ public interface GXBaseBuilder {
         return GXSpringContextUtils.getBean(GXDBSchemaService.class).getSqlFieldStr(tableName, targetSet, remove);
     }
 
-    default Dict getDefaultSearchField() {
-        return Dict.create();
-    }
+    /**
+     * 默认的搜索条件
+     *
+     * @return
+     */
+    Dict getDefaultSearchField();
 
-    default String getModelIdentificationValue() {
-        return MODEL_IDENTIFICATION_VALUE;
-    }
+    /**
+     * 数据配置的模型标识
+     *
+     * @return
+     */
+    String getModelIdentificationValue();
 }

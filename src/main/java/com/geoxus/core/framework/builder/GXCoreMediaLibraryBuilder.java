@@ -19,6 +19,16 @@ public class GXCoreMediaLibraryBuilder implements GXBaseBuilder {
                 .toString();
     }
 
+    @Override
+    public Dict getDefaultSearchField() {
+        return Dict.create();
+    }
+
+    @Override
+    public String getModelIdentificationValue() {
+        return "core_media_library";
+    }
+
     public String deleteByCondition(Dict param) {
         final SQL sql = new SQL().DELETE_FROM("core_media_library").WHERE(StrUtil.format("model_id = {} and core_model_id = {}", param.getLong("model_id"), param.getLong("core_model_id")));
         return sql.toString();
