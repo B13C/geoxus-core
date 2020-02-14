@@ -12,13 +12,12 @@ import com.geoxus.core.framework.entity.GXCoreModelAttributesEntity;
 import com.geoxus.core.framework.entity.GXCoreModelEntity;
 import com.geoxus.core.framework.service.GXCoreAttributeEnumsService;
 import com.geoxus.core.framework.service.GXCoreAttributesService;
-import com.geoxus.core.framework.service.GXCoreModelAttributeGroupService;
+import com.geoxus.core.framework.service.GXCoreModelAttributesService;
 import com.geoxus.core.framework.service.GXCoreModelService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.validation.ConstraintValidatorContext;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -46,7 +45,7 @@ public class GXValidateModelExtDataServiceServiceImpl implements GXValidateExtDa
     private GXCoreAttributeEnumsService coreAttributeEnumsService;
 
     @Autowired
-    private GXCoreModelAttributeGroupService coreModelAttributeGroupService;
+    private GXCoreModelAttributesService coreModelAttributeService;
 
     @Override
     public boolean validateExtData(Object o, String model, String subFiled, ConstraintValidatorContext context) throws UnsupportedOperationException {
@@ -58,14 +57,14 @@ public class GXValidateModelExtDataServiceServiceImpl implements GXValidateExtDa
         if (modelId <= 0) {
             throw new GXException(StrUtil.format(MODEL_SETTING_NOT_EXISTS, model));
         }
-        final GXCoreModelEntity modelDetail = coreModelService.getModelDetailByModelId(modelId, subFiled);
-        final List<GXCoreModelAttributesEntity> attributesList = modelDetail.getCoreAttributesEntities();
+        final GXCoreModelEntity modelEntity = coreModelService.getModelDetailByModelId(modelId, subFiled);
+        final List<GXCoreModelAttributesEntity> attributesList = modelEntity.getCoreAttributesEntities();
         final Dict validateRule = Dict.create();
-        for (GXCoreModelAttributesEntity entity : attributesList) {
-            validateRule.set(entity.getFieldName(), entity.getValidationExpression());
+        for (GXCoreModelAttributesEntity defaultAttributeEntity : attributesList) {
+            validateRule.set(defaultAttributeEntity.getFieldName(), defaultAttributeEntity.getValidationExpression());
         }
         if (JSONUtil.isJsonObj(jsonStr)) {
-            final HashMap<String, Object> validateDataMap = Convert.convert(Dict.class, JSONUtil.toBean(jsonStr, Dict.class));
+            final Dict validateDataMap = Convert.convert(Dict.class, JSONUtil.toBean(jsonStr, Dict.class));
             return !dataValidation(model, modelId, validateRule, validateDataMap, context, -1);
         } else {
             final JSONArray jsonArray = JSONUtil.parseArray(jsonStr);
@@ -100,13 +99,19 @@ public class GXValidateModelExtDataServiceServiceImpl implements GXValidateExtDa
                 return true;
             }
             final GXCoreAttributesEntity attribute = coreAttributesService.getAttributeByFieldName(field);
-            GXCoreModelAttributesEntity modelAttributeGroupEntity = coreModelAttributeGroupService.getAttributeGroupByAttributeIdAndModelId(modelId, attribute.getAttributeId());
-            final String rule = Convert.toStr(validateRule.get(field));
+            GXCoreModelAttributesEntity modelAttributeGroupEntity = coreModelAttributeService.getModelAttributeByModelIdAndAttributeId(modelId, attribute.getAttributeId());
+            String rule = modelAttributeGroupEntity.getValidationExpression();
+            if (StrUtil.isBlank(rule)) {
+                rule = Convert.toStr(validateRule.get(field));
+            }
             if (StrUtil.isBlank(rule) && modelAttributeGroupEntity.getForceValidation() == 0) {
                 // 不验证当前数据
                 return false;
             }
             final String value = Convert.toStr(validateDataMap.get(field));
+            if (StrUtil.isBlank(rule)) {
+                return true;
+            }
             final boolean isMatch = Pattern.matches(rule, value);
             if (modelAttributeGroupEntity.getRequired() == VERIFY_VALUE && !isMatch) {
                 context.buildConstraintViolationWithTemplate(StrUtil.format(FIELD_NOT_MATCH, model, field, rule)).addPropertyNode(errorInfo).addConstraintViolation();

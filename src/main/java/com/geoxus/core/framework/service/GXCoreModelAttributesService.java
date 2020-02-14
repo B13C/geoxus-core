@@ -6,7 +6,7 @@ import org.mybatis.dynamic.sql.select.render.SelectStatementProvider;
 
 import java.util.List;
 
-public interface GXCoreModelAttributeGroupService extends IService<GXCoreModelAttributesEntity> {
+public interface GXCoreModelAttributesService extends IService<GXCoreModelAttributesEntity> {
     /**
      * 通过模型ID获取模型的属性
      *
@@ -22,5 +22,5 @@ public interface GXCoreModelAttributeGroupService extends IService<GXCoreModelAt
      * @param attributeId
      * @return
      */
-    GXCoreModelAttributesEntity getAttributeGroupByAttributeIdAndModelId(int modelId, int attributeId);
+    GXCoreModelAttributesEntity getModelAttributeByModelIdAndAttributeId(int modelId, int attributeId);
 }

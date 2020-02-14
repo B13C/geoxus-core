@@ -18,7 +18,7 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
 @Constraint(validatedBy = GXValidateExtDataValidator.class)
 @Documented
 public @interface GXValidateExtDataAnnotation {
-    String message() default "数据验证出错";
+    String message() default "{fieldName}数据验证出错";
 
     Class<?>[] groups() default {};
 

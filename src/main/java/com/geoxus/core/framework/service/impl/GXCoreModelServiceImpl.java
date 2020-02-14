@@ -11,7 +11,7 @@ import com.geoxus.core.common.constant.GXBaseBuilderConstants;
 import com.geoxus.core.framework.entity.GXCoreModelAttributesEntity;
 import com.geoxus.core.framework.entity.GXCoreModelEntity;
 import com.geoxus.core.framework.mapper.GXCoreModelMapper;
-import com.geoxus.core.framework.service.GXCoreModelAttributeGroupService;
+import com.geoxus.core.framework.service.GXCoreModelAttributesService;
 import com.geoxus.core.framework.service.GXCoreModelService;
 import lombok.extern.slf4j.Slf4j;
 import org.mybatis.dynamic.sql.render.RenderingStrategies;
@@ -35,7 +35,7 @@ import static org.mybatis.dynamic.sql.SqlBuilder.*;
 @Slf4j
 public class GXCoreModelServiceImpl extends ServiceImpl<GXCoreModelMapper, GXCoreModelEntity> implements GXCoreModelService {
     @Autowired
-    private GXCoreModelAttributeGroupService coreModelAttributeGroupService;
+    private GXCoreModelAttributesService coreModelAttributeGroupService;
 
     @Override
     @Cacheable(value = "core_model", key = "targetClass + methodName + #modelId + #subField")
