@@ -16,7 +16,7 @@ public class GXXssFilter implements Filter {
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException, ServletException {
         GXXssHttpServletRequestWrapper xssRequest = new GXXssHttpServletRequestWrapper((HttpServletRequest) request);
         final String uri = xssRequest.getRequestURI();
-        if (uri.contains("contents")) {
+        if (uri.contains("contents") || uri.contains("/activiti/editor/model") || uri.contains("save-model.html")) {
             chain.doFilter(request, response);
         } else {
             chain.doFilter(xssRequest, response);
