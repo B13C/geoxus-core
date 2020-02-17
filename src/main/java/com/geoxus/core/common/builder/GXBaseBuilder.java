@@ -8,6 +8,7 @@ import cn.hutool.core.lang.TypeReference;
 import cn.hutool.core.util.ClassUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.json.JSONUtil;
+import com.geoxus.core.common.annotation.GXFieldCommentAnnotation;
 import com.geoxus.core.common.constant.GXBaseBuilderConstants;
 import com.geoxus.core.common.entity.GXBaseEntity;
 import com.geoxus.core.common.util.GXSpringContextUtils;
@@ -15,12 +16,17 @@ import com.geoxus.core.framework.service.GXCoreModelService;
 import com.geoxus.core.framework.service.GXDBSchemaService;
 import com.google.common.collect.Table;
 import org.apache.ibatis.jdbc.SQL;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 
 public interface GXBaseBuilder {
+    @GXFieldCommentAnnotation(zh = "LOG对象")
+    Logger LOG = LoggerFactory.getLogger(GXBaseBuilder.class);
+
     /**
      * 更新实体字段和虚拟字段
      * <pre>
@@ -215,6 +221,10 @@ public interface GXBaseBuilder {
                     }
                     continue;
                 }
+                if (null == operator) {
+                    LOG.warn(StrUtil.format("{}字段没有配置搜索条件", key));
+                    continue;
+                }
                 sql.WHERE(StrUtil.format("{} ".concat(operator), key, searchCondition.getObj(key)));
             }
         }
@@ -244,6 +254,41 @@ public interface GXBaseBuilder {
      */
     default String getSelectFieldStr(String tableName, Set<String> targetSet, boolean remove) {
         return GXSpringContextUtils.getBean(GXDBSchemaService.class).getSqlFieldStr(tableName, targetSet, remove);
+    }
+
+    /**
+     * 给现有查询条件新增查询条件
+     *
+     * @param requestParam
+     * @param key
+     * @param value
+     * @return
+     */
+    default Dict putConditionToSearchCondition(Dict requestParam, String key, Object value) {
+        final Object obj = requestParam.getObj(GXBaseBuilderConstants.SEARCH_CONDITION_NAME);
+        if (null == obj) {
+            return requestParam;
+        }
+        final Dict data = Convert.convert(Dict.class, obj);
+        data.set(key, value);
+        return data;
+    }
+
+    /**
+     * 给现有查询条件新增查询条件
+     *
+     * @param requestParam
+     * @param sourceData
+     * @return
+     */
+    default Dict putConditionToSearchCondition(Dict requestParam, Dict sourceData) {
+        final Object obj = requestParam.getObj(GXBaseBuilderConstants.SEARCH_CONDITION_NAME);
+        if (null == obj) {
+            return requestParam;
+        }
+        final Dict data = Convert.convert(Dict.class, obj);
+        data.putAll(sourceData);
+        return data;
     }
 
     /**
