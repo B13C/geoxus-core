@@ -76,12 +76,6 @@ public class GXRequestToBeanHandlerMethodArgumentResolver implements HandlerMeth
             final Class<?>[] classes = Objects.requireNonNull(parameter.getParameterAnnotation(Validated.class)).value();
             GXValidatorUtils.validateEntity(bean, value, classes);
         }
-        if (null != ReflectUtil.getFieldValue(bean, "ext")) {
-            ReflectUtil.setFieldValue(bean, "ext", Optional.ofNullable(ReflectUtil.getFieldValue(bean, "ext")).orElse("{}"));
-        }
-        if (null != ReflectUtil.getFieldValue(bean, "items")) {
-            ReflectUtil.setFieldValue(bean, "items", Optional.ofNullable(ReflectUtil.getFieldValue(bean, "items")).orElse("[{}]"));
-        }
         return bean;
     }
 

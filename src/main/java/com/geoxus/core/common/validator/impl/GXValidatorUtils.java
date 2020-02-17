@@ -61,7 +61,12 @@ public class GXValidatorUtils {
                 if (StrUtil.isNotBlank(jsonName)) {
                     currentFormName = jsonName + "." + currentFormName;
                 }
-                dict.set(currentFormName, constraint.getMessage());
+                String message = constraint.getMessage();
+                if (constraint.getMessageTemplate().contains("{fieldName}")) {
+                    final Dict param = Dict.create().set("fieldName", StrUtil.toSymbolCase(currentFormName, '_'));
+                    message = StrUtil.format(constraint.getMessageTemplate(), param);
+                }
+                dict.putIfAbsent(currentFormName, message);
             }
             throw new GXBeanValidateException("数据验证错误", HttpStatus.HTTP_INTERNAL_ERROR, dict);
         }
