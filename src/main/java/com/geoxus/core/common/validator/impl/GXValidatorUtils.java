@@ -50,7 +50,7 @@ public class GXValidatorUtils {
      * @param object   待校验对象
      * @param jsonName json的名字
      * @param groups   待校验的组
-     * @throws GXBeanValidateException 校验不通过，则报RRException异常
+     * @throws GXBeanValidateException 校验不通过，则报GXBeanValidateException异常
      */
     public static void validateEntity(Object object, String jsonName, Class<?>... groups) {
         Set<ConstraintViolation<Object>> constraintViolations = validator.validate(object, groups);
