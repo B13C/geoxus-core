@@ -12,7 +12,6 @@ import com.baomidou.mybatisplus.annotation.TableName;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.geoxus.core.common.annotation.GXFieldCommentAnnotation;
 import com.geoxus.core.common.constant.GXCommonConstant;
 import com.geoxus.core.common.mapper.GXBaseMapper;
 import com.geoxus.core.common.util.GXSpringContextUtils;
@@ -28,12 +27,6 @@ import java.lang.reflect.Type;
 import java.util.*;
 
 public interface GXBusinessService<T> extends GXBaseService<T>, GXValidateDBExists {
-    @GXFieldCommentAnnotation(zh = "核心模型的字段名字")
-    String CORE_MODEL_ID_NAME = "core_model_id";
-
-    @GXFieldCommentAnnotation(zh = "日志核心模型ID")
-    int CORE_MODEL_ID = 0;
-
     /**
      * 创建数据
      */

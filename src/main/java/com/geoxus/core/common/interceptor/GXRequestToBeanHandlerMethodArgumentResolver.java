@@ -49,7 +49,8 @@ public class GXRequestToBeanHandlerMethodArgumentResolver implements HandlerMeth
             throw new GXException(GXResultCode.REQUEST_JSON_NOT_BODY);
         }
         final Class<?> parameterType = parameter.getParameterType();
-        final String value = Objects.requireNonNull(parameter.getParameterAnnotation(GXRequestBodyToBeanAnnotation.class)).value();
+        final GXRequestBodyToBeanAnnotation gxRequestBodyToBeanAnnotation = parameter.getParameterAnnotation(GXRequestBodyToBeanAnnotation.class);
+        final String value = Objects.requireNonNull(gxRequestBodyToBeanAnnotation).value();
         Object bean;
         if (StrUtil.isNotBlank(value)) {
             final Object o = JSONUtil.getByPath(JSONUtil.parseObj(body), value);
@@ -69,12 +70,13 @@ public class GXRequestToBeanHandlerMethodArgumentResolver implements HandlerMeth
             bean = Convert.convert(parameterType, dict);
         }
         final boolean enableValidateEntity = (boolean) Optional.ofNullable(ReflectUtil.getFieldValue(bean, "enableValidateEntity")).orElse(true);
+        Class<?>[] groups = gxRequestBodyToBeanAnnotation.groups();
         if (parameter.hasParameterAnnotation(Valid.class) && enableValidateEntity) {
-            GXValidatorUtils.validateEntity(bean, value);
+            GXValidatorUtils.validateEntity(bean, value, groups);
         }
         if (parameter.hasParameterAnnotation(Validated.class) && enableValidateEntity) {
-            final Class<?>[] classes = Objects.requireNonNull(parameter.getParameterAnnotation(Validated.class)).value();
-            GXValidatorUtils.validateEntity(bean, value, classes);
+            groups = Objects.requireNonNull(parameter.getParameterAnnotation(Validated.class)).value();
+            GXValidatorUtils.validateEntity(bean, value, groups);
         }
         return bean;
     }
