@@ -130,6 +130,7 @@ public class GXCoreModelServiceImpl extends ServiceImpl<GXCoreModelMapper, GXCor
     @Override
     public boolean validateExists(Object value, String field, ConstraintValidatorContext constraintValidatorContext, Dict param) throws UnsupportedOperationException {
         log.info("validateExists : {} , field : {}", value, field);
-        return null != getById(Convert.toInt(value));
+        final Integer coreModelId = Convert.toInt(value);
+        return coreModelId == null || null != getById(coreModelId);
     }
 }

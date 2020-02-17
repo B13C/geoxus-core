@@ -13,6 +13,7 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.geoxus.core.common.annotation.GXFieldCommentAnnotation;
+import com.geoxus.core.common.constant.GXCommonConstant;
 import com.geoxus.core.common.mapper.GXBaseMapper;
 import com.geoxus.core.common.util.GXSpringContextUtils;
 import com.geoxus.core.common.validator.GXValidateDBExists;
@@ -80,7 +81,7 @@ public interface GXBusinessService<T> extends GXBaseService<T>, GXValidateDBExis
      */
     default boolean batchDelete(Dict param) {
         final List<Long> ids = Optional.ofNullable(Convert.convert(new TypeReference<List<Long>>() {
-        }, param.getObj(PRIMARY_KEY))).orElse(new ArrayList<>());
+        }, param.getObj(getPrimaryKey()))).orElse(new ArrayList<>());
         final ArrayList<T> updateMessageEntities = new ArrayList<>();
         for (Long id : ids) {
             T entity = getById(id);
@@ -230,7 +231,7 @@ public interface GXBusinessService<T> extends GXBaseService<T>, GXValidateDBExis
      * @return
      */
     default GXPagination mergePaginationCoreMediaLibrary(GXPagination pagination) {
-        String modelIdKey = getPrimaryKey(true);
+        String modelIdKey = getPrimaryKey();
         final GXCoreMediaLibraryService coreMediaLibraryService = GXSpringContextUtils.getBean(GXCoreMediaLibraryService.class);
         final List<?> records = pagination.getRecords();
         for (int i = 0; i < records.size(); i++) {
@@ -258,8 +259,8 @@ public interface GXBusinessService<T> extends GXBaseService<T>, GXValidateDBExis
      * @return
      */
     default Dict getPageInfoFromParam(Dict param) {
-        int currentPage = DEFAULT_CURRENT_PAGE;
-        int pageSize = DEFAULT_PAGE_SIZE;
+        int currentPage = GXCommonConstant.DEFAULT_CURRENT_PAGE;
+        int pageSize = GXCommonConstant.DEFAULT_PAGE_SIZE;
         final Dict pagingInfo = Convert.convert(Dict.class, param.getObj("paging_info"));
         if (null != pagingInfo) {
             if (null != pagingInfo.getInt("current")) {

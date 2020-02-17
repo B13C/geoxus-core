@@ -62,8 +62,9 @@ public class GXValidatorUtils {
                     currentFormName = jsonName + "." + currentFormName;
                 }
                 String message = constraint.getMessage();
+                currentFormName = StrUtil.toSymbolCase(currentFormName, '_');
                 if (constraint.getMessageTemplate().contains("{fieldName}")) {
-                    final Dict param = Dict.create().set("fieldName", StrUtil.toSymbolCase(currentFormName, '_'));
+                    final Dict param = Dict.create().set("fieldName", currentFormName);
                     message = StrUtil.format(constraint.getMessageTemplate(), param);
                 }
                 dict.putIfAbsent(currentFormName, message);

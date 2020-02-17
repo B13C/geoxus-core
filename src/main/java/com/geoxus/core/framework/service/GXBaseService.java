@@ -39,20 +39,23 @@ public interface GXBaseService<T> extends IService<T> {
     @GXFieldCommentAnnotation(zh = "日志对象")
     Logger log = LoggerFactory.getLogger(GXBaseService.class);
 
-    @GXFieldCommentAnnotation(zh = "模型标识")
-    String MODEL_IDENTIFICATION = "";
+    /**
+     * 标识核心模型主键名字
+     *
+     * @return
+     */
+    default String getCoreModelPrimaryName() {
+        return "core_model_id";
+    }
 
-    @GXFieldCommentAnnotation(zh = "主键ID")
-    String PRIMARY_KEY = "id";
-
-    @GXFieldCommentAnnotation(zh = "标识核心模型主键名字")
-    String CORE_MODEL_PRIMARY_NAME = "core_model_id";
-
-    @GXFieldCommentAnnotation(zh = "默认当前分页")
-    int DEFAULT_CURRENT_PAGE = 1;
-
-    @GXFieldCommentAnnotation(zh = "默认每页的大小")
-    int DEFAULT_PAGE_SIZE = 20;
+    /**
+     * 获取模型标识
+     *
+     * @return
+     */
+    default String getModelIdentification() {
+        return "";
+    }
 
     /**
      * 获取当前接口的常量字段信息
@@ -393,10 +396,9 @@ public interface GXBaseService<T> extends IService<T> {
     /**
      * 获取 Primary Key
      *
-     * @param toCamelCase
      * @return
      */
-    default String getPrimaryKey(boolean toCamelCase) {
-        return toCamelCase ? StrUtil.toCamelCase(PRIMARY_KEY) : PRIMARY_KEY;
+    default String getPrimaryKey() {
+        return "id";
     }
 }

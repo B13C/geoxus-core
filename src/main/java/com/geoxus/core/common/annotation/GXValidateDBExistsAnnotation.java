@@ -22,7 +22,7 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
 @Constraint(validatedBy = GXValidateDBExistsValidator.class)
 @Documented
 public @interface GXValidateDBExistsAnnotation {
-    String message() default "{fieldName}对应的数据不存在";
+    String message() default "{fieldName}对应的数据不存在或是参数不存在";
 
     Class<?>[] groups() default {};
 

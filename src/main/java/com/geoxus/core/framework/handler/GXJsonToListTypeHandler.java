@@ -6,9 +6,9 @@ import cn.hutool.json.JSONArray;
 import cn.hutool.json.JSONObject;
 import cn.hutool.json.JSONUtil;
 import com.geoxus.core.common.annotation.GXFieldCommentAnnotation;
+import com.geoxus.core.common.constant.GXCommonConstant;
 import com.geoxus.core.common.util.GXSpringContextUtils;
 import com.geoxus.core.framework.service.GXCoreModelAttributePermissionService;
-import com.geoxus.core.framework.service.GXBaseService;
 import org.apache.ibatis.type.BaseTypeHandler;
 import org.apache.ibatis.type.JdbcType;
 import org.apache.ibatis.type.MappedTypes;
@@ -22,7 +22,7 @@ import java.util.Map;
 @MappedTypes({List.class})
 public class GXJsonToListTypeHandler extends BaseTypeHandler<List<Map<String, Object>>> {
     @GXFieldCommentAnnotation(zh = "标识核心模型主键名字")
-    private static final String CORE_MODEL_PRIMARY_NAME = GXBaseService.CORE_MODEL_PRIMARY_NAME;
+    private static final String CORE_MODEL_PRIMARY_NAME = GXCommonConstant.CORE_MODEL_PRIMARY_NAME;
 
     @Override
     public void setNonNullParameter(PreparedStatement ps, int i, List<Map<String, Object>> parameter, JdbcType jdbcType) throws SQLException {
