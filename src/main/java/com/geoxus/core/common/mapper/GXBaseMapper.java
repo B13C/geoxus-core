@@ -9,6 +9,7 @@ import org.apache.ibatis.annotations.SelectProvider;
 import org.apache.ibatis.annotations.UpdateProvider;
 
 import java.util.List;
+import java.util.Set;
 
 @Mapper
 public interface GXBaseMapper<T> extends BaseMapper<T> {
@@ -20,4 +21,7 @@ public interface GXBaseMapper<T> extends BaseMapper<T> {
 
     @UpdateProvider(type = GXBaseBuilder.class, method = "updateStatus")
     boolean updateStatusByCondition(String tableName, int status, Dict condition, String operator);
+
+    @SelectProvider(type = GXBaseBuilder.class, method = "getFieldBySQL")
+    Dict getFieldBySQL(String tableName, Set<String> fieldSet, Dict condition);
 }

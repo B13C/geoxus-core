@@ -1,5 +1,6 @@
 package com.geoxus.core.common.builder;
 
+import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.convert.Convert;
 import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.lang.Dict;
@@ -111,8 +112,42 @@ public interface GXBaseBuilder {
         return sql.toString();
     }
 
+    /**
+     * 查询单表的指定字段
+     *
+     * @param tableName
+     * @param fieldSet
+     * @param condition
+     * @return
+     */
+    static String getFieldBySQL(String tableName, Set<String> fieldSet, Dict condition) {
+        final SQL sql = new SQL().SELECT(CollUtil.join(fieldSet, ",")).FROM(tableName);
+        final Set<String> conditionKeys = condition.keySet();
+        for (String conditionKey : conditionKeys) {
+            String template = "{} = '{}'";
+            final Object value = condition.getObj(conditionKey);
+            if (value instanceof Number) {
+                template = "{} = {}";
+            }
+            sql.WHERE(StrUtil.format(template, conditionKey, value));
+        }
+        return sql.toString();
+    }
+
+    /**
+     * 列表
+     *
+     * @param param
+     * @return
+     */
     String listOrSearch(Dict param);
 
+    /**
+     * 详情
+     *
+     * @param param
+     * @return
+     */
     String detail(Dict param);
 
     /**

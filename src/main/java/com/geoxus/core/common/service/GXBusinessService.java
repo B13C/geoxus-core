@@ -24,10 +24,7 @@ import com.geoxus.core.framework.service.GXCoreMediaLibraryService;
 import javax.validation.ConstraintValidatorContext;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 public interface GXBusinessService<T> extends GXBaseService<T>, GXValidateDBExists {
     @GXFieldCommentAnnotation(zh = "核心模型的字段名字")
@@ -132,6 +129,19 @@ public interface GXBusinessService<T> extends GXBaseService<T>, GXValidateDBExis
     default boolean updateStatusBySQL(Class<T> clazz, int status, Dict condition, String operator) {
         GXBaseMapper<T> baseMapper = (GXBaseMapper<T>) getBaseMapper();
         return baseMapper.updateStatusByCondition(getTableName(clazz), status, condition, operator);
+    }
+
+    /**
+     * 获取表中的指定字段
+     *
+     * @param clazz
+     * @param fieldSet
+     * @param condition
+     * @return
+     */
+    default Dict getFieldBySQL(Class<T> clazz, Set<String> fieldSet, Dict condition) {
+        GXBaseMapper<T> baseMapper = (GXBaseMapper<T>) getBaseMapper();
+        return baseMapper.getFieldBySQL(getTableName(clazz), fieldSet, condition);
     }
 
     /**
