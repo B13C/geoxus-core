@@ -2,7 +2,6 @@ package com.geoxus.core.common.annotation;
 
 import com.geoxus.core.common.validator.GXValidateExtDataService;
 import com.geoxus.core.common.validator.impl.GXValidateExtDataValidator;
-import com.geoxus.core.framework.service.impl.GXValidateModelExtDataServiceServiceImpl;
 import org.springframework.messaging.handler.annotation.Payload;
 
 import javax.validation.Constraint;
@@ -24,7 +23,7 @@ public @interface GXValidateExtDataAnnotation {
 
     Class<? extends Payload>[] payload() default {};
 
-    Class<? extends GXValidateExtDataService> service() default GXValidateModelExtDataServiceServiceImpl.class;
+    Class<? extends GXValidateExtDataService> service() default GXValidateExtDataService.class;
 
     String tableName();
 

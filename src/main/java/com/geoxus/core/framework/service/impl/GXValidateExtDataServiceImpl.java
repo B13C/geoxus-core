@@ -24,7 +24,7 @@ import java.util.Set;
 import java.util.regex.Pattern;
 
 @Service
-public class GXValidateModelExtDataServiceServiceImpl implements GXValidateExtDataService {
+public class GXValidateExtDataServiceImpl implements GXValidateExtDataService {
     private static final int VERIFY_VALUE = 1;
 
     private static final String FIELD_NOT_EXISTS = "{}模型中不存在{}属性";
