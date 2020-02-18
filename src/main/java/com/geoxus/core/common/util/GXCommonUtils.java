@@ -14,14 +14,22 @@ import com.geoxus.core.common.annotation.GXFieldCommentAnnotation;
 import com.geoxus.core.common.event.GXBaseEvent;
 import com.geoxus.core.rpc.config.GXRabbitMQRPCRemoteServersConfig;
 import com.geoxus.core.rpc.service.GXRabbitMQRPCClientService;
+import com.google.common.base.Function;
+import com.google.common.base.Supplier;
+import com.google.common.cache.CacheBuilder;
+import com.google.common.cache.CacheLoader;
+import com.google.common.cache.LoadingCache;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.cache.Cache;
+import org.springframework.cache.CacheManager;
 
 import java.lang.reflect.Field;
 import java.util.*;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 public class GXCommonUtils {
@@ -565,5 +573,52 @@ public class GXCommonUtils {
             return (String) server.get(key);
         }
         return "";
+    }
+
+    /**
+     * 获取Spring的Cache实例
+     *
+     * @param cacheName cache的名字
+     * @return
+     */
+    public static Cache getSpringCacheManager(String cacheName) {
+        final CacheManager cacheManager = GXSpringContextUtils.getBean(CacheManager.class);
+        return cacheManager.getCache(cacheName);
+    }
+
+    /**
+     * 获取Guava的缓存实例
+     *
+     * @param maximumSize 最大的存储条目
+     * @param duration    缓存时间
+     * @param unit        缓存时间单位
+     * @param supplier    当缓存中数据不存在时,提供数据的供应者,可以从数据库查询
+     * @param <K>         key的泛型
+     * @param <V>         值的泛型
+     * @return
+     */
+    public static <K, V> LoadingCache<K, V> getGuavaCache(long maximumSize, long duration, TimeUnit unit, Supplier<V> supplier) {
+        return CacheBuilder.newBuilder()
+                .maximumSize(maximumSize)
+                .expireAfterAccess(duration, unit)
+                .build(CacheLoader.from(supplier));
+    }
+
+    /**
+     * 获取Guava的缓存实例
+     *
+     * @param maximumSize 最大的存储条目
+     * @param duration    缓存时间
+     * @param unit        缓存时间单位
+     * @param function    当缓存中数据不存在时,提供数据的供应者,可以从数据库查询
+     * @param <K>         key的泛型
+     * @param <V>         值的泛型
+     * @return
+     */
+    public static <K, V> LoadingCache<K, V> getGuavaCache(long maximumSize, long duration, TimeUnit unit, Function<K, V> function) {
+        return CacheBuilder.newBuilder()
+                .maximumSize(maximumSize)
+                .expireAfterAccess(duration, unit)
+                .build(CacheLoader.from(function));
     }
 }
