@@ -589,36 +589,44 @@ public class GXCommonUtils {
     /**
      * 获取Guava的缓存实例
      *
+     * @param <K>         key的泛型
+     * @param <V>         值的泛型
      * @param maximumSize 最大的存储条目
      * @param duration    缓存时间
      * @param unit        缓存时间单位
      * @param supplier    当缓存中数据不存在时,提供数据的供应者,可以从数据库查询
-     * @param <K>         key的泛型
-     * @param <V>         值的泛型
+     * @param fixedExpire 是否固定过期时间
      * @return
      */
-    public static <K, V> LoadingCache<K, V> getGuavaCache(long maximumSize, long duration, TimeUnit unit, Supplier<V> supplier) {
-        return CacheBuilder.newBuilder()
-                .maximumSize(maximumSize)
-                .expireAfterAccess(duration, unit)
-                .build(CacheLoader.from(supplier));
+    public static <K, V> LoadingCache<K, V> getGuavaCache(long maximumSize, long duration, TimeUnit unit, Supplier<V> supplier, boolean fixedExpire) {
+        final CacheBuilder<Object, Object> cacheBuilder = CacheBuilder.newBuilder().maximumSize(maximumSize);
+        if (fixedExpire) {
+            cacheBuilder.expireAfterWrite(duration, unit);
+        } else {
+            cacheBuilder.expireAfterAccess(duration, unit);
+        }
+        return cacheBuilder.build(CacheLoader.from(supplier));
     }
 
     /**
      * 获取Guava的缓存实例
      *
+     * @param <K>         key的泛型
+     * @param <V>         值的泛型
      * @param maximumSize 最大的存储条目
      * @param duration    缓存时间
      * @param unit        缓存时间单位
      * @param function    当缓存中数据不存在时,提供数据的供应者,可以从数据库查询
-     * @param <K>         key的泛型
-     * @param <V>         值的泛型
+     * @param fixedExpire 是否固定过期时间
      * @return
      */
-    public static <K, V> LoadingCache<K, V> getGuavaCache(long maximumSize, long duration, TimeUnit unit, Function<K, V> function) {
-        return CacheBuilder.newBuilder()
-                .maximumSize(maximumSize)
-                .expireAfterAccess(duration, unit)
-                .build(CacheLoader.from(function));
+    public static <K, V> LoadingCache<K, V> getGuavaCache(long maximumSize, long duration, TimeUnit unit, Function<K, V> function, boolean fixedExpire) {
+        final CacheBuilder<Object, Object> cacheBuilder = CacheBuilder.newBuilder().maximumSize(maximumSize);
+        if (fixedExpire) {
+            cacheBuilder.expireAfterWrite(duration, unit);
+        } else {
+            cacheBuilder.expireAfterAccess(duration, unit);
+        }
+        return cacheBuilder.build(CacheLoader.from(function));
     }
 }
