@@ -1,16 +1,22 @@
 package com.geoxus.core.common.controller;
 
 import cn.hutool.core.lang.Dict;
+import com.geoxus.core.common.annotation.GXRequestBodyToBeanAnnotation;
 import com.geoxus.core.common.constant.GXControllerConstants;
 import com.geoxus.core.common.entity.GXBaseEntity;
 import com.geoxus.core.common.util.GXHttpContextUtils;
 import com.geoxus.core.common.util.GXResultUtils;
+import com.geoxus.core.common.validator.group.GXCreateGroup;
+import com.geoxus.core.common.validator.group.GXUpdateGroup;
+import org.springframework.validation.annotation.Validated;
+
+import javax.validation.Valid;
 
 public interface GXController<T extends GXBaseEntity> {
     /**
      * 创建数据
      */
-    default GXResultUtils create(T target) {
+    default GXResultUtils create(@Validated(value = {GXCreateGroup.class}) @GXRequestBodyToBeanAnnotation() T target) {
         return GXResultUtils.ok(GXControllerConstants.DEFAULT_DATA);
     }
 
@@ -20,7 +26,7 @@ public interface GXController<T extends GXBaseEntity> {
      * @param target
      * @return
      */
-    default GXResultUtils update(T target) {
+    default GXResultUtils update(@Valid @GXRequestBodyToBeanAnnotation(groups = {GXUpdateGroup.class}) T target) {
         return GXResultUtils.ok(GXControllerConstants.DEFAULT_DATA);
     }
 
