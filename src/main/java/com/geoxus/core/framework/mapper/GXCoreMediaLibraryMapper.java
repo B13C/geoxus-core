@@ -16,7 +16,7 @@ public interface GXCoreMediaLibraryMapper extends GXBaseMapper<GXCoreMediaLibrar
     @Override
     @SelectProvider(type = GXCoreMediaLibraryBuilder.class, method = "listOrSearch")
     @ResultMap("mediaResult")
-    List<Dict> listOrSearch(IPage<Dict> page, Dict param);
+    List<Dict> listOrSearchPage(IPage<Dict> page, Dict param);
 
     @SelectProvider(type = GXCoreMediaLibraryBuilder.class, method = "detail")
     @Results(id = "mediaResult", value = {

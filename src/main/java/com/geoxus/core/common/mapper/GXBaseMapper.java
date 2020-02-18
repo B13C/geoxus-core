@@ -17,11 +17,14 @@ public interface GXBaseMapper<T> extends BaseMapper<T> {
     boolean updateFieldByCondition(String tableName, Dict data, Dict whereData);
 
     @SelectProvider(type = GXBaseBuilder.class, method = "listOrSearch")
-    List<Dict> listOrSearch(IPage<Dict> page, Dict param);
+    List<Dict> listOrSearchPage(IPage<Dict> page, Dict param);
 
     @UpdateProvider(type = GXBaseBuilder.class, method = "updateStatus")
     boolean updateStatusByCondition(String tableName, int status, Dict condition, String operator);
 
     @SelectProvider(type = GXBaseBuilder.class, method = "getFieldBySQL")
     Dict getFieldBySQL(String tableName, Set<String> fieldSet, Dict condition);
+
+    @SelectProvider(type = GXBaseBuilder.class, method = "listOrSearch")
+    List<Dict> listOrSearch(Dict param);
 }

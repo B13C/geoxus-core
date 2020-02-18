@@ -17,7 +17,7 @@ import java.util.List;
 public interface GXCoreConfigMapper extends GXBaseMapper<GXCoreConfigEntity> {
     @Override
     @SelectProvider(type = GXCoreConfigBuilder.class, method = "listOrSearch")
-    List<Dict> listOrSearch(IPage<Dict> page, Dict param);
+    List<Dict> listOrSearchPage(IPage<Dict> page, Dict param);
 
     @SelectProvider(type = GXCoreConfigBuilder.class, method = "detail")
     @Results({

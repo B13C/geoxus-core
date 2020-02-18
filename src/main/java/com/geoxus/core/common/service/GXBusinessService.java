@@ -275,7 +275,7 @@ public interface GXBusinessService<T> extends GXBaseService<T>, GXValidateDBExis
     default GXPagination generatePage(Dict param) {
         final IPage<Dict> riPage = constructPageObjectFromParam(param);
         GXBaseMapper<Dict> baseMapper = (GXBaseMapper<Dict>) getBaseMapper();
-        final List<Dict> list = baseMapper.listOrSearch(riPage, param);
+        final List<Dict> list = baseMapper.listOrSearchPage(riPage, param);
         riPage.setRecords(list);
         return new GXPagination(riPage.getRecords(), riPage.getTotal(), riPage.getSize(), riPage.getCurrent());
     }

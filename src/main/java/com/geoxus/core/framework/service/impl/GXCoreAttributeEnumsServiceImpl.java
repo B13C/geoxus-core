@@ -52,7 +52,7 @@ public class GXCoreAttributeEnumsServiceImpl extends ServiceImpl<GXCoreAttribute
     @Cacheable(value = "attribute_enums", key = "targetClass + methodName + #p0.getStr('attribute_name')")
     public List<Dict> getAttributeEnumsByCondition(Dict condition) {
         final Page<Dict> page = new Page<>(1, 500);
-        return baseMapper.listOrSearch(page, condition);
+        return baseMapper.listOrSearchPage(page, condition);
     }
 
     @Override
