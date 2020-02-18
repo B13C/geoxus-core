@@ -24,7 +24,10 @@ import com.geoxus.core.framework.service.GXCoreMediaLibraryService;
 import javax.validation.ConstraintValidatorContext;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Set;
 
 public interface GXBusinessService<T> extends GXBaseService<T>, GXValidateDBExists {
     /**
@@ -73,15 +76,25 @@ public interface GXBusinessService<T> extends GXBaseService<T>, GXValidateDBExis
      * @return
      */
     default boolean batchDelete(Dict param) {
-        final List<Long> ids = Optional.ofNullable(Convert.convert(new TypeReference<List<Long>>() {
-        }, param.getObj(getPrimaryKey()))).orElse(new ArrayList<>());
-        final ArrayList<T> updateMessageEntities = new ArrayList<>();
+        final List<Long> ids = Convert.convert(new TypeReference<List<Long>>() {
+        }, param.getObj(getPrimaryKey()));
+        if (null == ids) {
+            return false;
+        }
+        final ArrayList<T> updateEntities = new ArrayList<>();
         for (Long id : ids) {
             T entity = getById(id);
-            entity = modifyEntityJSONFieldSingleValue(entity, "ext.status", GXBusinessStatusCode.DELETED.getCode());
-            updateMessageEntities.add(entity);
+            final Object status = ReflectUtil.invoke(entity, "getStatus");
+            Long entityCurrentStatus = 0L;
+            if (null != status) {
+                entityCurrentStatus = Convert.toLong(status, 0L);
+            }
+            if ((entityCurrentStatus & GXBusinessStatusCode.DELETED.getCode()) != GXBusinessStatusCode.DELETED.getCode()) {
+                ReflectUtil.invoke(entity, "setStatus", GXBusinessStatusCode.DELETED.getCode());
+                updateEntities.add(entity);
+            }
         }
-        return updateMessageEntities.isEmpty() || updateBatchById(updateMessageEntities);
+        return updateEntities.isEmpty() || updateBatchById(updateEntities);
     }
 
     /**
