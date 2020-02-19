@@ -7,7 +7,7 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.geoxus.core.common.annotation.GXFieldCommentAnnotation;
-import com.geoxus.core.common.constant.GXCommonConstant;
+import com.geoxus.core.common.constant.GXCommonConstants;
 import com.geoxus.core.framework.entity.GXCoreAttributesEntity;
 import com.geoxus.core.framework.entity.GXCoreAttributesEnumsEntity;
 import com.geoxus.core.framework.mapper.GXCoreAttributeEnumsMapper;
@@ -26,7 +26,7 @@ public class GXCoreAttributeEnumsServiceImpl extends ServiceImpl<GXCoreAttribute
     private static final String FIELD_VALUE_NOT_EXISTS = "{}属性不存在值{}";
 
     @GXFieldCommentAnnotation(zh = "标识核心模型主键名字")
-    private static final String CORE_MODEL_PRIMARY_NAME = GXCommonConstant.CORE_MODEL_PRIMARY_NAME;
+    private static final String CORE_MODEL_PRIMARY_NAME = GXCommonConstants.CORE_MODEL_PRIMARY_NAME;
 
     @Autowired
     private GXCoreAttributesService coreAttributesService;

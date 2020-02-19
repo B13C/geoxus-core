@@ -4,7 +4,7 @@ import cn.hutool.core.convert.Convert;
 import cn.hutool.core.lang.Dict;
 import cn.hutool.json.JSONUtil;
 import com.geoxus.core.common.annotation.GXFieldCommentAnnotation;
-import com.geoxus.core.common.constant.GXCommonConstant;
+import com.geoxus.core.common.constant.GXCommonConstants;
 import com.geoxus.core.common.util.GXSpringContextUtils;
 import com.geoxus.core.framework.service.GXCoreModelAttributePermissionService;
 import org.apache.ibatis.type.BaseTypeHandler;
@@ -19,7 +19,7 @@ import java.util.Map;
 @MappedTypes({Map.class})
 public class GXJsonToMapTypeHandler extends BaseTypeHandler<Map<String, Object>> {
     @GXFieldCommentAnnotation(zh = "标识核心模型主键名字")
-    private static final String CORE_MODEL_PRIMARY_NAME = GXCommonConstant.CORE_MODEL_PRIMARY_NAME;
+    private static final String CORE_MODEL_PRIMARY_NAME = GXCommonConstants.CORE_MODEL_PRIMARY_NAME;
 
     @Override
     public void setNonNullParameter(PreparedStatement ps, int i, Map<String, Object> parameter, JdbcType jdbcType) throws SQLException {

@@ -3,7 +3,7 @@ package com.geoxus.core.common.aspect;
 import cn.hutool.core.convert.Convert;
 import cn.hutool.core.lang.Dict;
 import com.geoxus.core.common.annotation.GXCheckRequestVerifyCodeAnnotation;
-import com.geoxus.core.common.constant.GXCommonConstant;
+import com.geoxus.core.common.constant.GXCommonConstants;
 import com.geoxus.core.common.exception.GXException;
 import com.geoxus.core.common.service.GXCaptchaService;
 import com.geoxus.core.common.service.GXSendSMSService;
@@ -40,11 +40,11 @@ public class GXCheckRequestVerifyCodeAspect {
         if (verifyType == 0) {
             throw new GXException(GXResultCode.NEED_CAPTCHA);
         }
-        if (verifyType == GXCommonConstant.SMS_VERIFY && null != param.getStr("phone") &&
+        if (verifyType == GXCommonConstants.SMS_VERIFY && null != param.getStr("phone") &&
                 !getSendSMSService().verification(param.getStr("phone"), param.getStr("verify_code"))) {
             throw new GXException(GXResultCode.NEED_CAPTCHA);
         }
-        if (verifyType == GXCommonConstant.CAPTCHA_VERIFY &&
+        if (verifyType == GXCommonConstants.CAPTCHA_VERIFY &&
                 !getCaptchaService().checkCaptcha(param.getStr("uuid"), param.getStr("verify_code"))) {
             throw new GXException(GXResultCode.NEED_CAPTCHA);
         }

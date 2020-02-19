@@ -119,6 +119,28 @@ public interface GXBaseBuilder {
     }
 
     /**
+     * 判断给定条件的值是否存在
+     *
+     * @param tableName 表名
+     * @param condition 条件
+     * @return
+     */
+    static String checkRecordIsExists(String tableName, Dict condition) {
+        final SQL sql = new SQL().SELECT("1").FROM(tableName);
+        final Set<String> conditionKeys = condition.keySet();
+        for (String conditionKey : conditionKeys) {
+            String template = "{} = '{}'";
+            final Object value = condition.getObj(conditionKey);
+            if (value instanceof Number) {
+                template = "{} = {}";
+            }
+            sql.WHERE(StrUtil.format(template, conditionKey, value));
+        }
+        sql.LIMIT(1);
+        return StrUtil.format("SELECT IFNULL(({}) , NULL)", sql.toString());
+    }
+
+    /**
      * 查询单表的指定字段
      *
      * @param tableName
@@ -264,7 +286,7 @@ public interface GXBaseBuilder {
      * @param value
      * @return
      */
-    default Dict putConditionToSearchCondition(Dict requestParam, String key, Object value) {
+    default Dict addConditionToSearchCondition(Dict requestParam, String key, Object value) {
         final Object obj = requestParam.getObj(GXBaseBuilderConstants.SEARCH_CONDITION_NAME);
         if (null == obj) {
             return requestParam;
@@ -281,7 +303,7 @@ public interface GXBaseBuilder {
      * @param sourceData
      * @return
      */
-    default Dict putConditionToSearchCondition(Dict requestParam, Dict sourceData) {
+    default Dict addConditionToSearchCondition(Dict requestParam, Dict sourceData) {
         final Object obj = requestParam.getObj(GXBaseBuilderConstants.SEARCH_CONDITION_NAME);
         if (null == obj) {
             return requestParam;

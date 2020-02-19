@@ -2,7 +2,7 @@ package com.geoxus.core.common.constant;
 
 import com.geoxus.core.common.annotation.GXFieldCommentAnnotation;
 
-public class GXCommonConstant {
+public class GXCommonConstants {
     @GXFieldCommentAnnotation(zh = "手机验证码标识")
     public static final int SMS_VERIFY = 1;
 

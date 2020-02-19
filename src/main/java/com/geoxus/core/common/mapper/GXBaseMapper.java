@@ -27,4 +27,7 @@ public interface GXBaseMapper<T> extends BaseMapper<T> {
 
     @SelectProvider(type = GXBaseBuilder.class, method = "listOrSearch")
     List<Dict> listOrSearch(Dict param);
+
+    @SelectProvider(type = GXBaseBuilder.class, method = "checkRecordIsExists")
+    Integer checkRecordIsExists(String tableName, Dict condition);
 }

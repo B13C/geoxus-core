@@ -12,7 +12,7 @@ import com.baomidou.mybatisplus.annotation.TableName;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.geoxus.core.common.constant.GXCommonConstant;
+import com.geoxus.core.common.constant.GXCommonConstants;
 import com.geoxus.core.common.mapper.GXBaseMapper;
 import com.geoxus.core.common.util.GXSpringContextUtils;
 import com.geoxus.core.common.validator.GXValidateDBExists;
@@ -136,6 +136,18 @@ public interface GXBusinessService<T> extends GXBaseService<T>, GXValidateDBExis
     default boolean updateStatusBySQL(Class<T> clazz, int status, Dict condition, String operator) {
         GXBaseMapper<T> baseMapper = (GXBaseMapper<T>) getBaseMapper();
         return baseMapper.updateStatusByCondition(getTableName(clazz), status, condition, operator);
+    }
+
+    /**
+     * 检测给定的条件记录是否存在
+     *
+     * @param clazz     实体的Class
+     * @param condition 条件
+     * @return
+     */
+    default Integer checkRecordIsExists(Class<T> clazz, Dict condition) {
+        GXBaseMapper<T> baseMapper = (GXBaseMapper<T>) getBaseMapper();
+        return baseMapper.checkRecordIsExists(getTableName(clazz), condition);
     }
 
     /**
@@ -265,8 +277,8 @@ public interface GXBusinessService<T> extends GXBaseService<T>, GXValidateDBExis
      * @return
      */
     default Dict getPageInfoFromParam(Dict param) {
-        int currentPage = GXCommonConstant.DEFAULT_CURRENT_PAGE;
-        int pageSize = GXCommonConstant.DEFAULT_PAGE_SIZE;
+        int currentPage = GXCommonConstants.DEFAULT_CURRENT_PAGE;
+        int pageSize = GXCommonConstants.DEFAULT_PAGE_SIZE;
         final Dict pagingInfo = Convert.convert(Dict.class, param.getObj("paging_info"));
         if (null != pagingInfo) {
             if (null != pagingInfo.getInt("current")) {
