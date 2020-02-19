@@ -11,6 +11,7 @@ import cn.hutool.json.JSONUtil;
 import com.geoxus.core.common.annotation.GXFieldCommentAnnotation;
 import com.geoxus.core.common.constant.GXBaseBuilderConstants;
 import com.geoxus.core.common.entity.GXBaseEntity;
+import com.geoxus.core.common.util.GXCommonUtils;
 import com.geoxus.core.common.util.GXSpringContextUtils;
 import com.geoxus.core.framework.service.GXCoreModelService;
 import com.geoxus.core.framework.service.GXDBSchemaService;
@@ -220,11 +221,12 @@ public interface GXBaseBuilder {
     /**
      * 合并搜索条件到SQL对象中
      *
-     * @param sql
-     * @param requestParam
+     * @param sql          SQL对象
+     * @param requestParam 请求参数
+     * @param aliasPrefix  别名
      * @return
      */
-    default Dict mergeSearchConditionToSQL(SQL sql, Dict requestParam) {
+    default Dict mergeSearchConditionToSQL(SQL sql, Dict requestParam, String aliasPrefix) {
         final Dict condition = Dict.create().set(GXBaseBuilderConstants.MODEL_IDENTIFICATION_NAME, getModelIdentificationValue());
         Dict searchField = GXSpringContextUtils.getBean(GXCoreModelService.class).getSearchCondition(condition);
         searchField.putAll(getDefaultSearchField());
@@ -233,6 +235,9 @@ public interface GXBaseBuilder {
         for (String key : keySet) {
             if (null != searchCondition.getObj(key)) {
                 String operator = searchField.getStr(key);
+                if (null == operator && StrUtil.isNotBlank(aliasPrefix)) {
+                    operator = searchField.getStr(StrUtil.concat(true, aliasPrefix, ".", key));
+                }
                 if (StrUtil.isNotBlank(GXBaseBuilderConstants.TIME_FIELDS.getStr(key))) {
                     if (null == operator) {
                         operator = GXBaseBuilderConstants.TIME_FIELDS.getStr(key);
@@ -247,7 +252,11 @@ public interface GXBaseBuilder {
                     LOG.warn(StrUtil.format("{}字段没有配置搜索条件", key));
                     continue;
                 }
-                sql.WHERE(StrUtil.format("{} ".concat(operator), key, searchCondition.getObj(key)));
+                if (StrUtil.isNotBlank(aliasPrefix)) {
+                    sql.WHERE(StrUtil.format("{}.{} ".concat(operator), aliasPrefix, key, searchCondition.getObj(key)));
+                } else {
+                    sql.WHERE(StrUtil.format("{} ".concat(operator), key, searchCondition.getObj(key)));
+                }
             }
         }
         return Dict.create();
@@ -287,13 +296,7 @@ public interface GXBaseBuilder {
      * @return
      */
     default Dict addConditionToSearchCondition(Dict requestParam, String key, Object value) {
-        final Object obj = requestParam.getObj(GXBaseBuilderConstants.SEARCH_CONDITION_NAME);
-        if (null == obj) {
-            return requestParam;
-        }
-        final Dict data = Convert.convert(Dict.class, obj);
-        data.set(key, value);
-        return data;
+        return GXCommonUtils.addConditionToSearchCondition(requestParam, key, value, false);
     }
 
     /**
@@ -304,13 +307,7 @@ public interface GXBaseBuilder {
      * @return
      */
     default Dict addConditionToSearchCondition(Dict requestParam, Dict sourceData) {
-        final Object obj = requestParam.getObj(GXBaseBuilderConstants.SEARCH_CONDITION_NAME);
-        if (null == obj) {
-            return requestParam;
-        }
-        final Dict data = Convert.convert(Dict.class, obj);
-        data.putAll(sourceData);
-        return data;
+        return GXCommonUtils.addConditionToSearchCondition(requestParam, sourceData, false);
     }
 
     /**

@@ -11,6 +11,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.geoxus.core.common.annotation.GXFieldCommentAnnotation;
+import com.geoxus.core.common.constant.GXBaseBuilderConstants;
 import com.geoxus.core.common.event.GXBaseEvent;
 import com.geoxus.core.rpc.config.GXRabbitMQRPCRemoteServersConfig;
 import com.geoxus.core.rpc.service.GXRabbitMQRPCClientService;
@@ -628,5 +629,51 @@ public class GXCommonUtils {
             cacheBuilder.expireAfterAccess(duration, unit);
         }
         return cacheBuilder.build(CacheLoader.from(function));
+    }
+
+    /**
+     * 给现有查询条件新增查询条件
+     *
+     * @param requestParam       请求参数
+     * @param key                添加的key
+     * @param value              添加的value
+     * @param returnRequestParam 是否返回requestParam
+     * @return
+     */
+    public static Dict addConditionToSearchCondition(Dict requestParam, String key, Object value, boolean returnRequestParam) {
+        final Object obj = requestParam.getObj(GXBaseBuilderConstants.SEARCH_CONDITION_NAME);
+        if (null == obj) {
+            return requestParam;
+        }
+        final Dict data = Convert.convert(Dict.class, obj);
+        data.set(key, value);
+        if (returnRequestParam) {
+            requestParam.put(GXBaseBuilderConstants.SEARCH_CONDITION_NAME, data);
+            return requestParam;
+        }
+        return data;
+    }
+
+
+    /**
+     * 给现有查询条件新增查询条件
+     *
+     * @param requestParam       请求参数
+     * @param sourceData         需要添加的map
+     * @param returnRequestParam 是否返回requestParam
+     * @return
+     */
+    public static Dict addConditionToSearchCondition(Dict requestParam, Dict sourceData, boolean returnRequestParam) {
+        final Object obj = requestParam.getObj(GXBaseBuilderConstants.SEARCH_CONDITION_NAME);
+        if (null == obj) {
+            return requestParam;
+        }
+        final Dict data = Convert.convert(Dict.class, obj);
+        data.putAll(sourceData);
+        if (returnRequestParam) {
+            requestParam.put(GXBaseBuilderConstants.SEARCH_CONDITION_NAME, data);
+            return requestParam;
+        }
+        return data;
     }
 }
