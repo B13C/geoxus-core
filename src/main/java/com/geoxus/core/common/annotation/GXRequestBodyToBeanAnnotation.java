@@ -11,4 +11,6 @@ public @interface GXRequestBodyToBeanAnnotation {
     String value() default "";
 
     Class<?>[] groups() default {};
+
+    String primaryKey() default "id";
 }
