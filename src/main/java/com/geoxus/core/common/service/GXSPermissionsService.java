@@ -21,20 +21,20 @@ public interface GXSPermissionsService<T extends GXSPermissionsEntity> extends G
     /**
      * 获取指定角色的权限ID集合
      *
-     * @param roleId
+     * @param roleId 角色ID
      * @return
      */
-    default List<Long> getRolePermissions(Integer roleId) {
+    default List<Long> getRolePermissions(Long roleId) {
         return Collections.emptyList();
     }
 
     /**
      * 获取指定用户的权限ID集合
      *
-     * @param adminId
+     * @param adminId 管理员ID
      * @return
      */
-    default List<Integer> getAdminPermissions(long adminId) {
+    default List<Long> getAdminPermissions(long adminId) {
         return Collections.emptyList();
     }
 }
