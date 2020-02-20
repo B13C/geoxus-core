@@ -14,7 +14,7 @@ public interface GXSPermissionsService<T extends GXSPermissionsEntity> extends G
      * @param adminId 为NULL是获取当前登录人的
      * @return
      */
-    default Set<String> getAdminAllPermissions(long adminId) {
+    default Set<String> getAdminAllPermissions(Long adminId) {
         return new HashSet<>();
     }
 

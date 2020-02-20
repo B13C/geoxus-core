@@ -19,17 +19,17 @@ public class GXShiroServiceImpl implements GXShiroService {
     /**
      * 获取用户权限列表
      *
-     * @param userId
+     * @param adminId
      */
-    public Set<String> getAdminPermissions(long userId) {
-        return GXSpringContextUtils.getBean(GXSPermissionsService.class).getAdminAllPermissions(userId);
+    public Set<String> getAdminAllPermissions(Long adminId) {
+        return GXSpringContextUtils.getBean(GXSPermissionsService.class).getAdminAllPermissions(adminId);
     }
 
     /**
      * 获取用户角色列表
      */
-    public Set<String> getAdminRoles(long userId) {
-        Set<String> set = GXSpringContextUtils.getBean(GXSAdminHasRolesService.class).getAdminRoles(userId);
+    public Set<String> getAdminRoles(long adminId) {
+        Set<String> set = GXSpringContextUtils.getBean(GXSAdminHasRolesService.class).getAdminRoles(adminId);
         return set;
     }
 
@@ -43,7 +43,7 @@ public class GXShiroServiceImpl implements GXShiroService {
     }
 
     @Override
-    public boolean isSuperAdmin(Dict dict) {
-        return dict.getLong("isSuperAdmin").equals(GXCommonUtils.getEnvironmentValue("super.admin.id", Long.class));
+    public boolean isSuperAdmin(Dict adminData) {
+        return adminData.getLong("isSuperAdmin").equals(GXCommonUtils.getEnvironmentValue("super.admin.id", Long.class));
     }
 }

@@ -6,23 +6,27 @@ import java.util.Set;
 
 public interface GXShiroService {
     /**
-     * 获取用户权限列表
+     * 获取当前登录管理员的所有权限列表
+     * 权限包括:
+     * <p>
+     * 1、分配给角色的权限
+     * 2、直接分配的权限
      *
-     * @param userId 用户ID
+     * @param adminId 用户ID
      * @return Set
      */
-    Set<String> getAdminPermissions(long userId);
+    Set<String> getAdminAllPermissions(Long adminId);
 
     /**
-     * 获取用户角色列表
+     * 获取当前登录管理员的角色列表
      *
-     * @param userId 用户ID
+     * @param adminId 用户ID
      * @return Set
      */
-    Set<String> getAdminRoles(long userId);
+    Set<String> getAdminRoles(long adminId);
 
     /**
-     * 查询admin
+     * 查询Admin的详细信息
      *
      * @param adminId 管理员ID
      * @return SAdminEntity
@@ -32,8 +36,8 @@ public interface GXShiroService {
     /**
      * 判断是否时超级管理员
      *
-     * @param adminEntity
+     * @param adminData admin的信息
      * @return
      */
-    boolean isSuperAdmin(Dict adminEntity);
+    boolean isSuperAdmin(Dict adminData);
 }
