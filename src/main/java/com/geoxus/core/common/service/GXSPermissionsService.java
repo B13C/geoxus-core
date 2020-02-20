@@ -24,7 +24,7 @@ public interface GXSPermissionsService<T extends GXSPermissionsEntity> extends G
      * @param roleId
      * @return
      */
-    default List<Integer> getRolePermissions(Integer roleId) {
+    default List<Long> getRolePermissions(Integer roleId) {
         return Collections.emptyList();
     }
 
