@@ -58,8 +58,15 @@ public interface GXBusinessService<T> extends GXBaseService<T>, GXValidateDBExis
     /**
      * 列表或者搜索
      */
-    default GXPagination listOrSearch(Dict param) {
+    default GXPagination listOrSearchPage(Dict param) {
         return new GXPagination(Collections.emptyList());
+    }
+
+    /**
+     * 列表或者搜索
+     */
+    default List<Dict> listOrSearch(Dict param) {
+        return Collections.emptyList();
     }
 
     /**

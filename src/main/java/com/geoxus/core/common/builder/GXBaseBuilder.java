@@ -20,6 +20,7 @@ import org.apache.ibatis.jdbc.SQL;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.Collection;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
@@ -233,7 +234,8 @@ public interface GXBaseBuilder {
         Dict searchCondition = getRequestSearchCondition(requestParam);
         Set<String> keySet = searchCondition.keySet();
         for (String key : keySet) {
-            if (null != searchCondition.getObj(key)) {
+            Object value = searchCondition.getObj(key);
+            if (null != value) {
                 String operator = searchField.getStr(key);
                 if (null == operator && StrUtil.isNotBlank(aliasPrefix)) {
                     operator = searchField.getStr(StrUtil.concat(true, aliasPrefix, ".", key));
@@ -242,7 +244,7 @@ public interface GXBaseBuilder {
                     if (null == operator) {
                         operator = GXBaseBuilderConstants.TIME_FIELDS.getStr(key);
                     }
-                    final String s = processTimeField(key, operator, searchCondition.getObj(key));
+                    final String s = processTimeField(key, operator, value);
                     if (null != s) {
                         sql.WHERE(s);
                     }
@@ -252,10 +254,13 @@ public interface GXBaseBuilder {
                     LOG.warn(StrUtil.format("{}字段没有配置搜索条件", key));
                     continue;
                 }
+                if (value instanceof Collection) {
+                    value = CollUtil.join((Collection<?>) value, ",");
+                }
                 if (StrUtil.isNotBlank(aliasPrefix)) {
-                    sql.WHERE(StrUtil.format("{}.{} ".concat(operator), aliasPrefix, key, searchCondition.getObj(key)));
+                    sql.WHERE(StrUtil.format("{}.{} ".concat(operator), aliasPrefix, key, value));
                 } else {
-                    sql.WHERE(StrUtil.format("{} ".concat(operator), key, searchCondition.getObj(key)));
+                    sql.WHERE(StrUtil.format("{} ".concat(operator), key, value));
                 }
             }
         }

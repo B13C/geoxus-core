@@ -34,7 +34,7 @@ public class GXCoreConfigServiceImpl extends ServiceImpl<GXCoreConfigMapper, GXC
     }
 
     @Override
-    public GXPagination listOrSearch(Dict param) {
+    public GXPagination listOrSearchPage(Dict param) {
         return generatePage(param);
     }
 

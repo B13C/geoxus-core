@@ -22,7 +22,7 @@ public class GXShiroServiceImpl implements GXShiroService {
      * @param userId
      */
     public Set<String> getAdminPermissions(long userId) {
-        return GXSpringContextUtils.getBean(GXSPermissionsService.class).getAdminPermissions(userId);
+        return GXSpringContextUtils.getBean(GXSPermissionsService.class).getAdminAllPermissions(userId);
     }
 
     /**
