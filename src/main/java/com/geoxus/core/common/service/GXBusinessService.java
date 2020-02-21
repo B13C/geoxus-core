@@ -1,10 +1,12 @@
 package com.geoxus.core.common.service;
 
 import cn.hutool.core.annotation.AnnotationUtil;
+import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.convert.Convert;
 import cn.hutool.core.lang.Dict;
 import cn.hutool.core.lang.TypeReference;
 import cn.hutool.core.util.ReflectUtil;
+import cn.hutool.core.util.StrUtil;
 import cn.hutool.json.JSON;
 import cn.hutool.json.JSONObject;
 import cn.hutool.json.JSONUtil;
@@ -375,5 +377,23 @@ public interface GXBusinessService<T> extends GXBaseService<T>, GXValidateDBExis
             return annotation.value();
         }
         return "";
+    }
+
+    /**
+     * 获取记录的父级path
+     *
+     * @param parentId   父级ID
+     * @param appendSelf 　是否将parentId附加到返回结果上面
+     * @return String
+     */
+    default String getParentPath(Class<T> clazz, Long parentId, boolean appendSelf) {
+        final Dict dict = getFieldBySQL(clazz, CollUtil.newHashSet("path"), Dict.create().set(getPrimaryKey(), parentId));
+        if (null == dict || dict.isEmpty()) {
+            return "0";
+        }
+        if (appendSelf) {
+            return StrUtil.format("{}-{}", dict.getStr("path"), parentId);
+        }
+        return dict.getStr("path");
     }
 }
