@@ -18,6 +18,7 @@ import com.geoxus.core.common.constant.GXCommonConstants;
 import com.geoxus.core.common.mapper.GXBaseMapper;
 import com.geoxus.core.common.util.GXSpringContextUtils;
 import com.geoxus.core.common.validator.GXValidateDBExists;
+import com.geoxus.core.common.validator.GXValidateDBUnique;
 import com.geoxus.core.common.vo.GXBusinessStatusCode;
 import com.geoxus.core.common.vo.response.GXPagination;
 import com.geoxus.core.framework.service.GXBaseService;
@@ -31,7 +32,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 
-public interface GXBusinessService<T> extends GXBaseService<T>, GXValidateDBExists {
+public interface GXBusinessService<T> extends GXBaseService<T>, GXValidateDBExists, GXValidateDBUnique {
     /**
      * 创建数据
      */
@@ -215,12 +216,25 @@ public interface GXBusinessService<T> extends GXBaseService<T>, GXValidateDBExis
      *
      * @param value                      The value to check for
      * @param field                      The name of the field for which to check if the value exists
-     * @param constraintValidatorContext
-     * @param param
-     * @return
+     * @param constraintValidatorContext The ValidatorContext
+     * @param param                      param
+     * @return boolean
      * @throws UnsupportedOperationException
      */
     default boolean validateExists(Object value, String field, ConstraintValidatorContext constraintValidatorContext, Dict param) throws UnsupportedOperationException {
+        return null != getById(Convert.toLong(value));
+    }
+
+    /**
+     * 验证数据的唯一性
+     *
+     * @param value                      值
+     * @param field                      字段名字
+     * @param constraintValidatorContext 验证上下文对象
+     * @param param                      参数
+     * @return boolean
+     */
+    default boolean validateUnique(Object value, String field, ConstraintValidatorContext constraintValidatorContext, Dict param) {
         return null != getById(Convert.toLong(value));
     }
 

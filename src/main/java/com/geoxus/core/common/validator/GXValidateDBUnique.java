@@ -1,5 +1,9 @@
 package com.geoxus.core.common.validator;
 
+import cn.hutool.core.lang.Dict;
+
+import javax.validation.ConstraintValidatorContext;
+
 /**
  * 验证数据是否唯一
  *
@@ -15,5 +19,5 @@ public interface GXValidateDBUnique {
      * @return True if the value exists for the field; false otherwise
      * @throws UnsupportedOperationException
      */
-    boolean validateUnique(Object value, String field) throws UnsupportedOperationException;
+    boolean validateUnique(Object value, String field, ConstraintValidatorContext constraintValidatorContext, Dict param) throws UnsupportedOperationException;
 }

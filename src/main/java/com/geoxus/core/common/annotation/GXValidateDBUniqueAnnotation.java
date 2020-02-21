@@ -20,7 +20,7 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
 @Retention(RUNTIME)
 @Constraint(validatedBy = GXValidateDBUniqueValidator.class)
 @Documented
-public @interface GXDBUniqueAnnotation {
+public @interface GXValidateDBUniqueAnnotation {
     String message() default "数据不唯一";
 
     Class<?>[] groups() default {};
@@ -29,5 +29,5 @@ public @interface GXDBUniqueAnnotation {
 
     Class<? extends GXValidateDBUnique> service();
 
-    String field();
+    String fieldName();
 }

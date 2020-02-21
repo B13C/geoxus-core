@@ -20,10 +20,13 @@ public class GXValidateDBExistsValidator implements ConstraintValidator<GXValida
 
     private String fieldName;
 
+    private Class<?>[] groups;
+
     @Override
     public void initialize(GXValidateDBExistsAnnotation exists) {
         Class<? extends GXValidateDBExists> clazz = exists.service();
         fieldName = exists.fieldName();
+        groups = exists.groups();
         service = GXSpringContextUtils.getBean(clazz);
     }
 
