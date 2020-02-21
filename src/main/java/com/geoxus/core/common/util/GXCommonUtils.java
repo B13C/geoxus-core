@@ -481,11 +481,11 @@ public class GXCommonUtils {
     /**
      * 移除JSON中任意路径的值
      *
-     * @param parse
-     * @param path
-     * @param clazz
-     * @param <R>
-     * @return
+     * @param parse JSON对象
+     * @param path  路径
+     * @param clazz Class对象
+     * @param <R>   泛型
+     * @return R
      */
     public static <R> R removeJSONObjectAnyPath(JSONObject parse, String path, Class<R> clazz) {
         int index = StrUtil.indexOf(path, '.');
@@ -512,9 +512,8 @@ public class GXCommonUtils {
     /**
      * 移除JSON中任意路径的值
      *
-     * @param parse
-     * @param path
-     * @return
+     * @param parse JSON对象
+     * @param path  路径
      */
     public static void removeJSONObjectAnyPath(JSONObject parse, String path) {
         int index = StrUtil.indexOf(path, '.');
@@ -540,7 +539,7 @@ public class GXCommonUtils {
     /**
      * 获取通用线程池
      *
-     * @return
+     * @return ExecutorService
      */
     public static ExecutorService getFixedThreadPool() {
         return EXECUTOR_SERVICE;
@@ -549,7 +548,7 @@ public class GXCommonUtils {
     /**
      * 获取定时任务线程池
      *
-     * @return
+     * @return ScheduledExecutorService
      */
     public static ScheduledExecutorService getScheduledExecutorService() {
         return SCHEDULED_EXECUTOR_SERVICE;
@@ -558,9 +557,9 @@ public class GXCommonUtils {
     /**
      * 获取RPC远程服务的名字
      *
-     * @param serverName
-     * @param key
-     * @return
+     * @param serverName 服务器名字
+     * @param key        key
+     * @return String
      */
     public static String getRemoteRPCServerValueByKey(String serverName, String key) {
         final GXRabbitMQRPCRemoteServersConfig serverConfigBean = GXSpringContextUtils.getBean(GXRabbitMQRPCRemoteServersConfig.class);
@@ -675,5 +674,15 @@ public class GXCommonUtils {
             return requestParam;
         }
         return data;
+    }
+
+    /**
+     * 获取Logger对象
+     *
+     * @param clazz Class
+     * @return Logger
+     */
+    public static Logger getLogger(Class<?> clazz) {
+        return LoggerFactory.getLogger(clazz);
     }
 }
