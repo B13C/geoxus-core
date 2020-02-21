@@ -260,7 +260,11 @@ public interface GXBaseBuilder {
                 if (StrUtil.isNotBlank(aliasPrefix)) {
                     sql.WHERE(StrUtil.format("`{}`.`{}` ".concat(operator), aliasPrefix, key, value));
                 } else {
-                    sql.WHERE(StrUtil.format("`{}` ".concat(operator), key, value));
+                    if (StrUtil.contains(key, ".")) {
+                        sql.WHERE(StrUtil.format("{} ".concat(operator), key, value));
+                    } else {
+                        sql.WHERE(StrUtil.format("`{}` ".concat(operator), key, value));
+                    }
                 }
             }
         }
