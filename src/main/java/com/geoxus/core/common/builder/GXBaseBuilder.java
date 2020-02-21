@@ -42,10 +42,10 @@ public interface GXBaseBuilder {
      *  }
      *  </pre>
      *
-     * @param tableName
-     * @param data
-     * @param whereData
-     * @return
+     * @param tableName 表名
+     * @param data      数据
+     * @param whereData 条件
+     * @return String
      */
     @SuppressWarnings("unused")
     static String updateFieldByCondition(String tableName, Dict data, Dict whereData) {
@@ -97,7 +97,7 @@ public interface GXBaseBuilder {
      * @param status    状态值
      * @param operator  操作
      * @param condition 更新条件
-     * @return
+     * @return String
      */
     static String updateStatus(String tableName, int status, Dict condition, String operator) {
         final SQL sql = new SQL().UPDATE(tableName);
@@ -125,7 +125,7 @@ public interface GXBaseBuilder {
      *
      * @param tableName 表名
      * @param condition 条件
-     * @return
+     * @return String
      */
     static String checkRecordIsExists(String tableName, Dict condition) {
         final SQL sql = new SQL().SELECT("1").FROM(tableName);
@@ -145,10 +145,10 @@ public interface GXBaseBuilder {
     /**
      * 查询单表的指定字段
      *
-     * @param tableName
-     * @param fieldSet
-     * @param condition
-     * @return
+     * @param tableName 表名
+     * @param fieldSet  字段集合
+     * @param condition 条件
+     * @return String
      */
     static String getFieldBySQL(String tableName, Set<String> fieldSet, Dict condition) {
         final SQL sql = new SQL().SELECT(CollUtil.join(fieldSet, ",")).FROM(tableName);
@@ -167,24 +167,24 @@ public interface GXBaseBuilder {
     /**
      * 列表
      *
-     * @param param
-     * @return
+     * @param param 参数
+     * @return String
      */
     String listOrSearch(Dict param);
 
     /**
      * 详情
      *
-     * @param param
-     * @return
+     * @param param 参数
+     * @return String
      */
     String detail(Dict param);
 
     /**
      * 获取请求对象中的搜索条件数据
      *
-     * @param param
-     * @return
+     * @param param 参数
+     * @return Dict
      */
     default Dict getRequestSearchCondition(Dict param) {
         return Optional.ofNullable(Convert.convert(Dict.class, param.getObj(GXBaseBuilderConstants.SEARCH_CONDITION_NAME))).orElse(param);
@@ -198,10 +198,10 @@ public interface GXBaseBuilder {
      *     }
      * </pre>
      *
-     * @param fieldName
-     * @param conditionStr
-     * @param param
-     * @return
+     * @param fieldName    字段名字
+     * @param conditionStr 查询条件
+     * @param param        参数
+     * @return String
      */
     default String processTimeField(String fieldName, String conditionStr, Object param) {
         final String today = DateUtil.today();
@@ -258,9 +258,9 @@ public interface GXBaseBuilder {
                     value = CollUtil.join((Collection<?>) value, ",");
                 }
                 if (StrUtil.isNotBlank(aliasPrefix)) {
-                    sql.WHERE(StrUtil.format("{}.{} ".concat(operator), aliasPrefix, key, value));
+                    sql.WHERE(StrUtil.format("`{}`.`{}` ".concat(operator), aliasPrefix, key, value));
                 } else {
-                    sql.WHERE(StrUtil.format("{} ".concat(operator), key, value));
+                    sql.WHERE(StrUtil.format("`{}` ".concat(operator), key, value));
                 }
             }
         }
@@ -268,13 +268,24 @@ public interface GXBaseBuilder {
     }
 
     /**
+     * 合并搜索条件到SQL对象中
+     *
+     * @param sql          SQL对象
+     * @param requestParam 请求参数
+     * @return
+     */
+    default Dict mergeSearchConditionToSQL(SQL sql, Dict requestParam) {
+        return mergeSearchConditionToSQL(sql, requestParam, "");
+    }
+
+    /**
      * 获取SQL语句的查询字段
      *
-     * @param tableName
-     * @param targetSet
-     * @param tableAlias
-     * @param remove
-     * @return
+     * @param tableName  表名
+     * @param targetSet  目标字段集合
+     * @param tableAlias 表的别名
+     * @param remove     是否移除
+     * @return String
      */
     default String getSelectFieldStr(String tableName, Set<String> targetSet, String tableAlias, boolean remove) {
         return GXSpringContextUtils.getBean(GXDBSchemaService.class).getSqlFieldStr(tableName, targetSet, tableAlias, remove);
@@ -283,10 +294,10 @@ public interface GXBaseBuilder {
     /**
      * 获取SQL语句的查询字段
      *
-     * @param tableName
-     * @param targetSet
-     * @param remove
-     * @return
+     * @param tableName 表名
+     * @param targetSet 目标字段集合
+     * @param remove    是否移除
+     * @return String
      */
     default String getSelectFieldStr(String tableName, Set<String> targetSet, boolean remove) {
         return GXSpringContextUtils.getBean(GXDBSchemaService.class).getSqlFieldStr(tableName, targetSet, remove);
@@ -295,10 +306,10 @@ public interface GXBaseBuilder {
     /**
      * 给现有查询条件新增查询条件
      *
-     * @param requestParam
-     * @param key
-     * @param value
-     * @return
+     * @param requestParam 请求参数
+     * @param key          key
+     * @param value        value
+     * @return Dict
      */
     default Dict addConditionToSearchCondition(Dict requestParam, String key, Object value) {
         return GXCommonUtils.addConditionToSearchCondition(requestParam, key, value, false);
@@ -307,9 +318,9 @@ public interface GXBaseBuilder {
     /**
      * 给现有查询条件新增查询条件
      *
-     * @param requestParam
-     * @param sourceData
-     * @return
+     * @param requestParam 请求参数
+     * @param sourceData   数据源
+     * @return Dict
      */
     default Dict addConditionToSearchCondition(Dict requestParam, Dict sourceData) {
         return GXCommonUtils.addConditionToSearchCondition(requestParam, sourceData, false);
@@ -318,14 +329,14 @@ public interface GXBaseBuilder {
     /**
      * 默认的搜索条件
      *
-     * @return
+     * @return Dict
      */
     Dict getDefaultSearchField();
 
     /**
      * 数据配置的模型标识
      *
-     * @return
+     * @return String
      */
     String getModelIdentificationValue();
 }
