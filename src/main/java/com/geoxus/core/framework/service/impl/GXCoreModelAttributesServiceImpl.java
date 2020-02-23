@@ -6,7 +6,6 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.geoxus.core.framework.entity.GXCoreModelAttributesEntity;
 import com.geoxus.core.framework.mapper.GXCoreModelAttributesMapper;
 import com.geoxus.core.framework.service.GXCoreModelAttributesService;
-import org.mybatis.dynamic.sql.select.render.SelectStatementProvider;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
@@ -15,8 +14,8 @@ import java.util.List;
 @Service
 public class GXCoreModelAttributesServiceImpl extends ServiceImpl<GXCoreModelAttributesMapper, GXCoreModelAttributesEntity> implements GXCoreModelAttributesService {
     @Override
-    public List<GXCoreModelAttributesEntity> getModelAttributeByModelId(SelectStatementProvider selectStatementProvider) {
-        return baseMapper.getModelAttributeByModelId(selectStatementProvider);
+    public List<GXCoreModelAttributesEntity> getModelAttributesByModelId(Dict param) {
+        return baseMapper.getModelAttributesByModelId(param);
     }
 
     @Override

@@ -14,8 +14,6 @@ import com.geoxus.core.framework.mapper.GXCoreModelMapper;
 import com.geoxus.core.framework.service.GXCoreModelAttributesService;
 import com.geoxus.core.framework.service.GXCoreModelService;
 import lombok.extern.slf4j.Slf4j;
-import org.mybatis.dynamic.sql.render.RenderingStrategies;
-import org.mybatis.dynamic.sql.select.render.SelectStatementProvider;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
@@ -25,11 +23,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
-
-import static com.geoxus.core.framework.support.GXCoreAttributesTableDynamicSqlSupport.coreAttributesTable;
-import static com.geoxus.core.framework.support.GXCoreModelAttributesDynamicSqlSupport.coreModelAttributesTable;
-import static com.geoxus.core.framework.support.GXCoreModelTableDynamicSqlSupport.coreModelTable;
-import static org.mybatis.dynamic.sql.SqlBuilder.*;
 
 @Service
 @Slf4j
@@ -47,26 +40,7 @@ public class GXCoreModelServiceImpl extends ServiceImpl<GXCoreModelMapper, GXCor
         if (StrUtil.isBlank(subField)) {
             subField = null;
         }
-        final SelectStatementProvider selectStatementProvider = select(
-                coreAttributesTable.fieldName,
-                coreAttributesTable.attributeId,
-                coreAttributesTable.showName,
-                coreAttributesTable.category,
-                coreAttributesTable.dataType,
-                coreAttributesTable.frontType,
-                coreAttributesTable.validationDesc,
-                coreAttributesTable.validationExpression,
-                coreModelAttributesTable.modelAttributeField,
-                coreModelAttributesTable.required
-        )
-                .from(coreModelTable)
-                .join(coreModelAttributesTable).on(coreModelAttributesTable.modelId, equalTo(coreModelTable.modelId))
-                .join(coreAttributesTable).on(coreModelAttributesTable.attributeId, equalTo(coreAttributesTable.attributeId))
-                .where(coreModelTable.modelId, isEqualTo(modelId))
-                .and(coreModelAttributesTable.modelAttributeField, isEqualToWhenPresent(subField))
-                .build()
-                .render(RenderingStrategies.MYBATIS3);
-        final List<GXCoreModelAttributesEntity> attributes = coreModelAttributeService.getModelAttributeByModelId(selectStatementProvider);
+        final List<GXCoreModelAttributesEntity> attributes = coreModelAttributeService.getModelAttributesByModelId(Dict.create().set("model_id", modelId).set("model_attribute_field", subField));
         entity.setCoreAttributesEntities(attributes);
         return entity;
     }

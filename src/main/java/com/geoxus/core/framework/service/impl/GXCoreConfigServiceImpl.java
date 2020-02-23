@@ -10,21 +10,20 @@ import com.geoxus.core.framework.mapper.GXCoreConfigMapper;
 import com.geoxus.core.framework.service.GXCoreConfigService;
 import org.springframework.stereotype.Service;
 
+import java.util.Collections;
+
 @Service
 public class GXCoreConfigServiceImpl extends ServiceImpl<GXCoreConfigMapper, GXCoreConfigEntity> implements GXCoreConfigService {
-    @Override
     public long create(GXCoreConfigEntity target, Dict param) {
         save(target);
         return target.getConfigId();
     }
 
-    @Override
     public long update(GXCoreConfigEntity target, Dict param) {
         updateById(target);
         return target.getConfigId();
     }
 
-    @Override
     public boolean delete(Dict param) {
         final long id = param.getLong(PRIMARY_KEY);
         final GXCoreConfigEntity entity = getById(id);
@@ -33,12 +32,10 @@ public class GXCoreConfigServiceImpl extends ServiceImpl<GXCoreConfigMapper, GXC
         return false;
     }
 
-    @Override
     public GXPagination listOrSearchPage(Dict param) {
-        return generatePage(param);
+        return new GXPagination(Collections.emptyList());
     }
 
-    @Override
     public Dict detail(Dict param) {
         return baseMapper.detail(param);
     }
