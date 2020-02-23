@@ -8,7 +8,6 @@ import com.geoxus.core.common.util.GXHttpContextUtils;
 import com.geoxus.core.common.util.GXResultUtils;
 import com.geoxus.core.common.validator.group.GXCreateGroup;
 import com.geoxus.core.common.validator.group.GXUpdateGroup;
-import org.springframework.validation.annotation.Validated;
 
 import javax.validation.Valid;
 
@@ -16,7 +15,7 @@ public interface GXController<T extends GXBaseEntity> {
     /**
      * 创建数据
      */
-    default GXResultUtils create(@Validated(value = {GXCreateGroup.class}) @GXRequestBodyToBeanAnnotation() T target) {
+    default GXResultUtils create(@Valid @GXRequestBodyToBeanAnnotation(groups = {GXCreateGroup.class}) T target) {
         return GXResultUtils.ok(GXControllerConstants.DEFAULT_DATA);
     }
 

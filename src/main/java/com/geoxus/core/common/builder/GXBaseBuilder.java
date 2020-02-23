@@ -20,10 +20,7 @@ import org.apache.ibatis.jdbc.SQL;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.Collection;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 
 public interface GXBaseBuilder {
     @GXFieldCommentAnnotation(zh = "LOG对象")
@@ -162,6 +159,27 @@ public interface GXBaseBuilder {
             sql.WHERE(StrUtil.format(template, conditionKey, value));
         }
         return sql.toString();
+    }
+
+    /**
+     * 通过SQL语句批量插入数据
+     *
+     * @param tableName 表名
+     * @param fieldSet  字段集合
+     * @param dataList  需要插入的数据列表
+     * @return
+     */
+    static String batchInsertBySQL(String tableName, Set<String> fieldSet, List<Dict> dataList) {
+        String sql = "INSERT INTO " + tableName + "(" + CollUtil.join(fieldSet, ",") + ") VALUES ";
+        StringBuilder values = new StringBuilder();
+        for (Dict dict : dataList) {
+            values.append("(");
+            for (String field : fieldSet) {
+                values.append(dict.getStr(field)).append(",");
+            }
+            values.deleteCharAt(values.lastIndexOf(",")).append("),");
+        }
+        return sql + StrUtil.sub(values, 0, values.lastIndexOf(","));
     }
 
     /**

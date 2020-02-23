@@ -4,6 +4,7 @@ import cn.hutool.core.lang.Dict;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.geoxus.core.common.builder.GXBaseBuilder;
+import org.apache.ibatis.annotations.InsertProvider;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.SelectProvider;
 import org.apache.ibatis.annotations.UpdateProvider;
@@ -30,4 +31,7 @@ public interface GXBaseMapper<T> extends BaseMapper<T> {
 
     @SelectProvider(type = GXBaseBuilder.class, method = "checkRecordIsExists")
     Integer checkRecordIsExists(String tableName, Dict condition);
+
+    @InsertProvider(type = GXBaseBuilder.class, method = "batchInsertBySQL")
+    Integer batchInsertBySQL(String tableName, Set<String> fieldSet, List<Dict> dataList);
 }

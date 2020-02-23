@@ -161,6 +161,19 @@ public interface GXBusinessService<T> extends GXBaseService<T>, GXValidateDBExis
     }
 
     /**
+     * 通过SQL语句批量插入数据
+     *
+     * @param clazz    实体的Class
+     * @param fieldSet 字段集合
+     * @param dataList 数据集合
+     * @return
+     */
+    default Integer batchInsertBySQL(Class<T> clazz, Set<String> fieldSet, List<Dict> dataList) {
+        GXBaseMapper<T> baseMapper = (GXBaseMapper<T>) getBaseMapper();
+        return baseMapper.batchInsertBySQL(getTableName(clazz), fieldSet, dataList);
+    }
+
+    /**
      * 获取表中的指定字段
      *
      * @param clazz
