@@ -1,11 +1,10 @@
 package com.geoxus.core.framework.service;
 
-import com.baomidou.mybatisplus.extension.service.IService;
 import com.geoxus.core.framework.entity.GXCoreAttributesEntity;
 
 import java.util.List;
 
-public interface GXCoreAttributesService extends IService<GXCoreAttributesEntity> {
+public interface GXCoreAttributesService extends GXBaseService<GXCoreAttributesEntity> {
     /**
      * 通过类型获取属性的列表
      *
