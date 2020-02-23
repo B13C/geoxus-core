@@ -6,16 +6,16 @@ import org.mybatis.dynamic.sql.SqlTable;
 import java.sql.JDBCType;
 
 public final class GXCoreModelAttributesDynamicSqlSupport {
-    public static final CoreModelAttributeGroupTable coreModelAttributeGroupTable = new CoreModelAttributeGroupTable();
-    public static final SqlColumn<Integer> modelAttributesId = coreModelAttributeGroupTable.modelAttributesId;
-    public static final SqlColumn<String> modelAttributeGroupInnerName = coreModelAttributeGroupTable.modelAttributeField;
-    public static final SqlColumn<Integer> modelId = coreModelAttributeGroupTable.modelId;
-    public static final SqlColumn<Integer> attributeId = coreModelAttributeGroupTable.attributeId;
-    public static final SqlColumn<Integer> required = coreModelAttributeGroupTable.required;
-    public static final SqlColumn<Integer> createdAt = coreModelAttributeGroupTable.createdAt;
-    public static final SqlColumn<Integer> updatedAt = coreModelAttributeGroupTable.updatedAt;
+    public static final CoreModelAttributesTable coreModelAttributesTable = new CoreModelAttributesTable();
+    public static final SqlColumn<Integer> modelAttributesId = coreModelAttributesTable.modelAttributesId;
+    public static final SqlColumn<String> modelAttributeGroupInnerName = coreModelAttributesTable.modelAttributeField;
+    public static final SqlColumn<Integer> modelId = coreModelAttributesTable.modelId;
+    public static final SqlColumn<Integer> attributeId = coreModelAttributesTable.attributeId;
+    public static final SqlColumn<Integer> required = coreModelAttributesTable.required;
+    public static final SqlColumn<Integer> createdAt = coreModelAttributesTable.createdAt;
+    public static final SqlColumn<Integer> updatedAt = coreModelAttributesTable.updatedAt;
 
-    public static final class CoreModelAttributeGroupTable extends SqlTable {
+    public static final class CoreModelAttributesTable extends SqlTable {
         public final SqlColumn<Integer> modelAttributesId = column("model_attributes_id", JDBCType.INTEGER);
         public final SqlColumn<String> modelAttributeField = column("model_attribute_field", JDBCType.VARCHAR);
         public final SqlColumn<Integer> parentId = column("parent_id", JDBCType.INTEGER);
@@ -31,7 +31,7 @@ public final class GXCoreModelAttributesDynamicSqlSupport {
         public final SqlColumn<Integer> createdAt = column("created_at", JDBCType.INTEGER);
         public final SqlColumn<Integer> updatedAt = column("updated_at", JDBCType.INTEGER);
 
-        public CoreModelAttributeGroupTable() {
+        public CoreModelAttributesTable() {
             super("core_model_attributes");
         }
     }

@@ -27,7 +27,7 @@ import java.util.Optional;
 import java.util.Set;
 
 import static com.geoxus.core.framework.support.GXCoreAttributesTableDynamicSqlSupport.coreAttributesTable;
-import static com.geoxus.core.framework.support.GXCoreModelAttributesDynamicSqlSupport.coreModelAttributeGroupTable;
+import static com.geoxus.core.framework.support.GXCoreModelAttributesDynamicSqlSupport.coreModelAttributesTable;
 import static com.geoxus.core.framework.support.GXCoreModelTableDynamicSqlSupport.coreModelTable;
 import static org.mybatis.dynamic.sql.SqlBuilder.*;
 
@@ -56,14 +56,14 @@ public class GXCoreModelServiceImpl extends ServiceImpl<GXCoreModelMapper, GXCor
                 coreAttributesTable.frontType,
                 coreAttributesTable.validationDesc,
                 coreAttributesTable.validationExpression,
-                coreModelAttributeGroupTable.modelAttributeField,
-                coreModelAttributeGroupTable.required
+                coreModelAttributesTable.modelAttributeField,
+                coreModelAttributesTable.required
         )
                 .from(coreModelTable)
-                .join(coreModelAttributeGroupTable).on(coreModelAttributeGroupTable.modelId, equalTo(coreModelTable.modelId))
-                .join(coreAttributesTable).on(coreModelAttributeGroupTable.attributeId, equalTo(coreAttributesTable.attributeId))
+                .join(coreModelAttributesTable).on(coreModelAttributesTable.modelId, equalTo(coreModelTable.modelId))
+                .join(coreAttributesTable).on(coreModelAttributesTable.attributeId, equalTo(coreAttributesTable.attributeId))
                 .where(coreModelTable.modelId, isEqualTo(modelId))
-                .and(coreModelAttributeGroupTable.modelAttributeField, isEqualToWhenPresent(subField))
+                .and(coreModelAttributesTable.modelAttributeField, isEqualToWhenPresent(subField))
                 .build()
                 .render(RenderingStrategies.MYBATIS3);
         final List<GXCoreModelAttributesEntity> attributes = coreModelAttributeService.getModelAttributeByModelId(selectStatementProvider);
