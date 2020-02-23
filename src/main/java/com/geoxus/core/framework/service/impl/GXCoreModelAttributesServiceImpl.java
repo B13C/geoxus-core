@@ -24,4 +24,9 @@ public class GXCoreModelAttributesServiceImpl extends ServiceImpl<GXCoreModelAtt
         final Dict condition = Dict.create().set("model_id", modelId).set("attribute_id", attributeId);
         return getOne(new QueryWrapper<GXCoreModelAttributesEntity>().allEq(condition));
     }
+
+    public Integer checkCoreModelHasAttribute(Integer coreModelId, String attributeName) {
+        final Dict condition = Dict.create().set("core_model_id", coreModelId).set("field_name", attributeName);
+        return baseMapper.checkCoreModelHasAttribute(condition);
+    }
 }

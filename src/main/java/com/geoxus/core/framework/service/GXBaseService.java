@@ -1,19 +1,23 @@
 package com.geoxus.core.framework.service;
 
+import cn.hutool.core.annotation.AnnotationUtil;
 import cn.hutool.core.convert.Convert;
 import cn.hutool.core.lang.Dict;
+import cn.hutool.core.lang.TypeReference;
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.ReflectUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.json.JSON;
 import cn.hutool.json.JSONObject;
 import cn.hutool.json.JSONUtil;
+import com.baomidou.mybatisplus.annotation.TableName;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.StringUtils;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.geoxus.core.common.annotation.GXFieldCommentAnnotation;
 import com.geoxus.core.common.event.GXMediaLibraryEvent;
 import com.geoxus.core.common.exception.GXException;
+import com.geoxus.core.common.mapper.GXBaseMapper;
 import com.geoxus.core.common.util.GXCommonUtils;
 import com.geoxus.core.common.util.GXHttpContextUtils;
 import com.geoxus.core.common.util.GXSpringContextUtils;
@@ -26,6 +30,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.validation.constraints.NotNull;
 import java.lang.reflect.Field;
+import java.lang.reflect.ParameterizedType;
+import java.lang.reflect.Type;
 import java.util.*;
 
 /**
@@ -381,6 +387,117 @@ public interface GXBaseService<T> extends IService<T> {
      */
     default <R> List<R> removeListField(List<R> listData, Dict removeField, Class<R> clazz) {
         return Collections.emptyList();
+    }
+
+
+    /**
+     * 检测给定的条件记录是否存在
+     *
+     * @param clazz     实体的Class
+     * @param condition 条件
+     * @return
+     */
+    default Integer checkRecordIsExists(Class<T> clazz, Dict condition) {
+        GXBaseMapper<T> baseMapper = (GXBaseMapper<T>) getBaseMapper();
+        return baseMapper.checkRecordIsExists(getTableName(clazz), condition);
+    }
+
+    /**
+     * 获取实体的表明
+     *
+     * @param clazz
+     * @return
+     */
+    default String getTableName(Class<T> clazz) {
+        final TableName annotation = AnnotationUtil.getAnnotation(clazz, TableName.class);
+        if (null != annotation) {
+            return annotation.value();
+        }
+        return "";
+    }
+
+
+    /**
+     * 修改状态
+     *
+     * @param status    状态
+     * @param condition 条件
+     * @param operator  操作
+     * @return
+     */
+    default boolean modifyStatus(int status, Dict condition, String operator) {
+        final Type type = ((ParameterizedType) getClass().getGenericSuperclass()).getActualTypeArguments()[1];
+        Class<T> clazz = Convert.convert(new TypeReference<Class<T>>() {
+        }, type);
+        return updateStatusBySQL(clazz, status, condition, operator);
+    }
+
+    /**
+     * 通过SQL更新表中的数据
+     *
+     * @param clazz
+     * @param data
+     * @param condition
+     * @return
+     */
+    default boolean updateFieldBySQL(Class<T> clazz, Dict data, Dict condition) {
+        GXBaseMapper<T> baseMapper = (GXBaseMapper<T>) getBaseMapper();
+        return baseMapper.updateFieldByCondition(getTableName(clazz), data, condition);
+    }
+
+    /**
+     * 通过SQL更新表中的数据
+     *
+     * @param clazz
+     * @param status
+     * @param condition
+     * @return
+     */
+    default boolean updateStatusBySQL(Class<T> clazz, int status, Dict condition, String operator) {
+        GXBaseMapper<T> baseMapper = (GXBaseMapper<T>) getBaseMapper();
+        return baseMapper.updateStatusByCondition(getTableName(clazz), status, condition, operator);
+    }
+
+    /**
+     * 通过SQL语句批量插入数据
+     *
+     * @param clazz    实体的Class
+     * @param fieldSet 字段集合
+     * @param dataList 数据集合
+     * @return
+     */
+    default Integer batchInsertBySQL(Class<T> clazz, Set<String> fieldSet, List<Dict> dataList) {
+        GXBaseMapper<T> baseMapper = (GXBaseMapper<T>) getBaseMapper();
+        return baseMapper.batchInsertBySQL(getTableName(clazz), fieldSet, dataList);
+    }
+
+    /**
+     * 获取表中的指定字段
+     *
+     * @param clazz
+     * @param fieldSet
+     * @param condition
+     * @return
+     */
+    default Dict getFieldBySQL(Class<T> clazz, Set<String> fieldSet, Dict condition) {
+        GXBaseMapper<T> baseMapper = (GXBaseMapper<T>) getBaseMapper();
+        return baseMapper.getFieldBySQL(getTableName(clazz), fieldSet, condition);
+    }
+
+    /**
+     * 更新实体JSON的多个字段
+     *
+     * @param target
+     * @param param
+     * @return
+     */
+    default boolean updateJSONMultiFields(T target, List<Dict> param) {
+        JSON json = JSONUtil.parse(JSONUtil.toJsonStr(target));
+        for (Dict info : param) {
+            json.putByPath(info.getStr("path"), info.getObj("value"));
+        }
+        final T bean = (T) JSONUtil.toBean((JSONObject) json, target.getClass());
+        return updateById(bean);
     }
 
     /**

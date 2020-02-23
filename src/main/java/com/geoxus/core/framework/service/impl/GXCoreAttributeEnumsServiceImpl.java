@@ -3,7 +3,6 @@ package com.geoxus.core.framework.service.impl;
 import cn.hutool.core.lang.Dict;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.json.JSONUtil;
-import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.geoxus.core.common.annotation.GXFieldCommentAnnotation;
@@ -33,12 +32,11 @@ public class GXCoreAttributeEnumsServiceImpl extends ServiceImpl<GXCoreAttribute
 
     @Override
     public boolean isExistsAttributeValue(int attributeId, Object value, int coreModelId) {
-        final Dict condition = Dict.create();
-        condition.set("attribute_id", attributeId);
-        condition.set(CORE_MODEL_PRIMARY_NAME, coreModelId);
-        condition.set("value_enum", value);
-        GXCoreAttributesEnumsEntity entity = getOne(new QueryWrapper<GXCoreAttributesEnumsEntity>().allEq(condition));
-        return entity != null;
+        final Dict condition = Dict.create()
+                .set("attribute_id", attributeId)
+                .set(CORE_MODEL_PRIMARY_NAME, coreModelId)
+                .set("value_enum", value);
+        return null != checkRecordIsExists(GXCoreAttributesEnumsEntity.class, condition);
     }
 
     @Override

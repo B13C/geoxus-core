@@ -117,8 +117,7 @@ public class GXValidateExtDataServiceImpl implements GXValidateExtDataService {
                 context.buildConstraintViolationWithTemplate(StrUtil.format(FIELD_NOT_MATCH, model, field, rule)).addPropertyNode(errorInfo).addConstraintViolation();
                 return true;
             }
-            if (coreAttributeEnumsService.isExistsAttribute(attribute.getAttributeId(), modelId)
-                    && !coreAttributeEnumsService.isExistsAttributeValue(attribute.getAttributeId(), value, modelId)) {
+            if (!coreAttributeEnumsService.isExistsAttributeValue(attribute.getAttributeId(), value, modelId)) {
                 context.buildConstraintViolationWithTemplate(StrUtil.format(FIELD_VALUE_NOT_EXISTS, model, field, value)).addPropertyNode(field).addConstraintViolation();
                 return true;
             }

@@ -20,10 +20,10 @@ public interface GXCoreModelService extends GXBaseService<GXCoreModelEntity>, GX
      * 检测模型是否拥有制定的字段
      *
      * @param modelId
-     * @param field
+     * @param fieldName
      * @return
      */
-    boolean checkModelIsHasField(int modelId, String field);
+    boolean checkModelIsHasField(int modelId, String fieldName);
 
     /**
      * 检测表单提交的key是否与模型的key匹配

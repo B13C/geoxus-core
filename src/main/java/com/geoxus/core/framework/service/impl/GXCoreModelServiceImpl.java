@@ -46,18 +46,8 @@ public class GXCoreModelServiceImpl extends ServiceImpl<GXCoreModelMapper, GXCor
     }
 
     @Override
-    public boolean checkModelIsHasField(int modelId, String field) {
-        final GXCoreModelEntity entity = getModelDetailByModelId(modelId, null);
-        if (null == entity) {
-            return false;
-        }
-        final List<GXCoreModelAttributesEntity> attributesEntities = entity.getCoreAttributesEntities();
-        for (GXCoreModelAttributesEntity attribute : attributesEntities) {
-            if (field.equals(attribute.getFieldName())) {
-                return true;
-            }
-        }
-        return false;
+    public boolean checkModelIsHasField(int modelId, String fieldName) {
+        return null != coreModelAttributeService.checkCoreModelHasAttribute(modelId, fieldName);
     }
 
     @Override

@@ -6,6 +6,7 @@ import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.lang.Dict;
 import cn.hutool.core.lang.TypeReference;
 import cn.hutool.core.util.ClassUtil;
+import cn.hutool.core.util.ReUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.json.JSONUtil;
 import com.geoxus.core.common.annotation.GXFieldCommentAnnotation;
@@ -130,7 +131,7 @@ public interface GXBaseBuilder {
         for (String conditionKey : conditionKeys) {
             String template = "{} = '{}'";
             final Object value = condition.getObj(conditionKey);
-            if (value instanceof Number) {
+            if (ReUtil.getFirstNumber(value.toString()) instanceof Number) {
                 template = "{} = {}";
             }
             sql.WHERE(StrUtil.format(template, conditionKey, value));

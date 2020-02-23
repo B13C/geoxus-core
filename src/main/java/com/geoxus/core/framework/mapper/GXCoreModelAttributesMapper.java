@@ -13,4 +13,7 @@ import java.util.List;
 public interface GXCoreModelAttributesMapper extends GXBaseMapper<GXCoreModelAttributesEntity> {
     @SelectProvider(type = GXCoreModelAttributesBuilder.class, method = "listOrSearch")
     List<GXCoreModelAttributesEntity> getModelAttributesByModelId(Dict param);
+
+    @SelectProvider(type = GXCoreModelAttributesBuilder.class, method = "checkCoreModelHasAttribute")
+    Integer checkCoreModelHasAttribute(Dict param);
 }
