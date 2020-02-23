@@ -35,7 +35,7 @@ import static org.mybatis.dynamic.sql.SqlBuilder.*;
 @Slf4j
 public class GXCoreModelServiceImpl extends ServiceImpl<GXCoreModelMapper, GXCoreModelEntity> implements GXCoreModelService {
     @Autowired
-    private GXCoreModelAttributesService coreModelAttributeGroupService;
+    private GXCoreModelAttributesService coreModelAttributeService;
 
     @Override
     @Cacheable(value = "core_model", key = "targetClass + methodName + #modelId + #subField")
@@ -66,7 +66,7 @@ public class GXCoreModelServiceImpl extends ServiceImpl<GXCoreModelMapper, GXCor
                 .and(coreModelAttributeGroupTable.modelAttributeField, isEqualToWhenPresent(subField))
                 .build()
                 .render(RenderingStrategies.MYBATIS3);
-        final List<GXCoreModelAttributesEntity> attributes = coreModelAttributeGroupService.getModelAttributeByModelId(selectStatementProvider);
+        final List<GXCoreModelAttributesEntity> attributes = coreModelAttributeService.getModelAttributeByModelId(selectStatementProvider);
         entity.setCoreAttributesEntities(attributes);
         return entity;
     }
