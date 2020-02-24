@@ -32,7 +32,10 @@ import javax.validation.constraints.NotNull;
 import java.lang.reflect.Field;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+import java.util.Set;
 
 /**
  * 业务基础Service
@@ -372,23 +375,9 @@ public interface GXBaseService<T> extends IService<T> {
      * @param condition
      * @return
      */
-    default T getOneByCondition(Dict condition) {
-        return getOne(new QueryWrapper<T>().allEq(condition));
+    default Dict getOneByCondition(Class<T> clazz, Set<String> fieldSet, Dict condition) {
+        return getFieldBySQL(clazz, fieldSet, condition);
     }
-
-    /**
-     * 移除列表中每个项里面的某些字段
-     *
-     * @param listData
-     * @param removeField
-     * @param clazz
-     * @param <R>
-     * @return
-     */
-    default <R> List<R> removeListField(List<R> listData, Dict removeField, Class<R> clazz) {
-        return Collections.emptyList();
-    }
-
 
     /**
      * 检测给定的条件记录是否存在
@@ -415,7 +404,6 @@ public interface GXBaseService<T> extends IService<T> {
         }
         return "";
     }
-
 
     /**
      * 修改状态
