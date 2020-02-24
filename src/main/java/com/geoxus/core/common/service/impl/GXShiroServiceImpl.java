@@ -1,6 +1,10 @@
 package com.geoxus.core.common.service.impl;
 
+import cn.hutool.core.convert.Convert;
 import cn.hutool.core.lang.Dict;
+import cn.hutool.core.lang.TypeReference;
+import cn.hutool.core.util.ArrayUtil;
+import cn.hutool.core.util.StrUtil;
 import com.geoxus.core.common.entity.GXSAdminEntity;
 import com.geoxus.core.common.service.GXSAdminHasRolesService;
 import com.geoxus.core.common.service.GXSAdminService;
@@ -11,6 +15,8 @@ import com.geoxus.core.common.util.GXSpringContextUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import java.util.Arrays;
+import java.util.List;
 import java.util.Set;
 
 @Service
@@ -44,6 +50,10 @@ public class GXShiroServiceImpl implements GXShiroService {
 
     @Override
     public boolean isSuperAdmin(Dict adminData) {
-        return adminData.getLong("isSuperAdmin").equals(GXCommonUtils.getEnvironmentValue("super.admin.id", Long.class));
+        final String primaryKey = StrUtil.toCamelCase(GXSpringContextUtils.getBean(GXSAdminService.class).getPrimaryKey());
+        if (null != adminData.getLong(primaryKey)) {
+            return adminData.getLong(primaryKey).equals(GXCommonUtils.getEnvironmentValue("super.admin.id", Long.class));
+        }
+        return adminData.getLong("isSuperAdmin") == 1;
     }
 }

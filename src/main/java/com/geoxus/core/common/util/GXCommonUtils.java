@@ -49,10 +49,10 @@ public class GXCommonUtils {
     /**
      * 根据key获取配置文件中的配置信息
      *
-     * @param key
-     * @param clazzType
-     * @param <R>
-     * @return
+     * @param key       key
+     * @param clazzType 返回类型
+     * @param <R>       泛型类型
+     * @return <R>
      * @example getEnvironmentValue(" alipay.appId ", String.class)
      */
     public static <R> R getEnvironmentValue(String key, Class<R> clazzType) {
@@ -66,11 +66,11 @@ public class GXCommonUtils {
     /**
      * 根据key获取配置文件中的配置信息
      *
-     * @param key
-     * @param clazzType
-     * @param defaultValue
-     * @param <R>
-     * @return
+     * @param key          KEY
+     * @param clazzType    返回类型
+     * @param defaultValue 泛型类型
+     * @param <R>          <R>
+     * @return <R>
      * @example getEnvironmentValue(" alipay.appId ", String.class, " ")
      */
     public static <R> R getEnvironmentValue(String key, Class<R> clazzType, R defaultValue) {
@@ -79,6 +79,20 @@ public class GXCommonUtils {
             return defaultValue;
         }
         return envValue;
+    }
+
+    /**
+     * 根据key获取配置文件中的配置信息
+     *
+     * @param key Key
+     * @return String
+     */
+    public static String getEnvironmentValue(String key) {
+        final String property = GXSpringContextUtils.getEnvironment().getProperty(key);
+        if (null == property) {
+            return "";
+        }
+        return property;
     }
 
     /**
