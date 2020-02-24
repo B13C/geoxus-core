@@ -32,7 +32,7 @@ public class GXTokenManager {
     private static final String KEY = "GEO_XUS_SHIRO_TOKEN_KEY";
 
     @GXFieldCommentAnnotation(zh = "ADMIN端TOKEN即将过期的刷新时间")
-    private static final int ADMIN_EXPIRES_REFRESH = 30 * 60;
+    private static final int ADMIN_EXPIRES_REFRESH = 24 * 60;
 
     /**
      * 生成ADMIN后台登录的token
@@ -49,7 +49,7 @@ public class GXTokenManager {
      */
     public static String generateAdminToken(long adminId, Dict param) {
         param.putIfAbsent(ADMIN_ID, adminId);
-        param.putIfAbsent("expires", DateUtil.currentSeconds() + EXPIRES);
+        param.putIfAbsent("expires", DateUtil.currentSeconds() + ADMIN_EXPIRES_REFRESH);
         return GXAuthCodeUtils.authCodeEncode(JSONUtil.toJsonStr(param), KEY);
     }
 
@@ -103,6 +103,7 @@ public class GXTokenManager {
                 return null;
             } else if (dict.getInt("expires") - currentTime < ADMIN_EXPIRES_REFRESH) {
                 dict.put("refresh", true);
+                dict.set("expires", currentTime + ADMIN_EXPIRES_REFRESH);
             }
             return dict;
         } catch (JSONException exception) {
