@@ -7,7 +7,7 @@ import cn.hutool.core.util.StrUtil;
 import cn.hutool.crypto.SecureUtil;
 import com.geoxus.core.common.exception.GXException;
 import com.geoxus.core.common.service.GXApiIdempotentService;
-import com.geoxus.core.common.util.GXRedisKeysUtils;
+import com.geoxus.core.common.util.GXCacheKeysUtils;
 import com.geoxus.core.common.util.GXRedisUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -21,19 +21,19 @@ public class GXApiIdempotentServiceImpl implements GXApiIdempotentService {
     @Autowired
     private GXRedisUtils redisUtils;
     @Autowired
-    private GXRedisKeysUtils redisKeysUtils;
+    private GXCacheKeysUtils redisKeysUtils;
 
     @Override
     public String createApiIdempotentToken(Dict param) {
         final String s = getTokenValue(SecureUtil.md5(Optional.ofNullable(param.getStr("salt")).orElse("geoxus-default") + RandomUtil.randomString(10)));
-        final String idempotentKey = redisKeysUtils.getRedisKey("request.api.idempotent", API_PREFIX_KEY);
+        final String idempotentKey = redisKeysUtils.getCacheKey("request.api.idempotent", API_PREFIX_KEY);
         redisUtils.set(StrUtil.format("{}-{}", idempotentKey, s), 1, EXPIRE_TIME_SECOND);
         return s;
     }
 
     @Override
     public boolean checkApiIdempotentToken(String token) {
-        token = StrUtil.format("{}-{}", redisKeysUtils.getRedisKey("request.api.idempotent", API_PREFIX_KEY), token);
+        token = StrUtil.format("{}-{}", redisKeysUtils.getCacheKey("request.api.idempotent", API_PREFIX_KEY), token);
         final String s = Optional.ofNullable(redisUtils.get(token)).orElse("");
         if (s.isEmpty()) {
             throw new GXException("API TOKEN不能为空");
@@ -49,7 +49,7 @@ public class GXApiIdempotentServiceImpl implements GXApiIdempotentService {
         if (initStr.isEmpty()) {
             return IdUtil.randomUUID();
         }
-        final String idempotentKey = redisKeysUtils.getRedisKey("request.api.idempotent", API_PREFIX_KEY);
+        final String idempotentKey = redisKeysUtils.getCacheKey("request.api.idempotent", API_PREFIX_KEY);
         return StrUtil.format("{}-{}", idempotentKey, initStr);
     }
 }

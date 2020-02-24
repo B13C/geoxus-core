@@ -1,4 +1,4 @@
-redis-key:
+cache-key:
   keys:
     - sys.config: sys:config
     - sys.captcha: sys:captcha

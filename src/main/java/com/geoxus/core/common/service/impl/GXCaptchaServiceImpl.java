@@ -2,36 +2,40 @@ package com.geoxus.core.common.service.impl;
 
 import cn.hutool.captcha.CaptchaUtil;
 import cn.hutool.captcha.LineCaptcha;
+import cn.hutool.core.lang.Dict;
 import cn.hutool.core.util.IdUtil;
-import com.geoxus.core.common.util.GXRedisKeysUtils;
-import com.geoxus.core.common.util.GXRedisUtils;
+import com.geoxus.core.common.annotation.GXFieldCommentAnnotation;
 import com.geoxus.core.common.service.GXCaptchaService;
+import com.geoxus.core.common.util.GXCacheKeysUtils;
+import com.geoxus.core.common.util.GXCommonUtils;
+import com.google.common.cache.LoadingCache;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 @Service
 @Slf4j
 public class GXCaptchaServiceImpl implements GXCaptchaService {
-    @Autowired
-    private GXRedisUtils redisUtils;
+    @GXFieldCommentAnnotation(zh = "Guava 缓存组件")
+    private static final LoadingCache<Object, Object> guavaCache = GXCommonUtils.getGuavaCache(1000, 5L * 60, TimeUnit.SECONDS, () -> null, true);
 
     @Autowired
-    private GXRedisKeysUtils redisKeysUtils;
+    private GXCacheKeysUtils cacheKeysUtils;
 
     @Override
-    public Map<String, Object> getCaptcha() {
-        return createCaptcha();
+    public Map<String, Object> getCaptcha(Dict param) {
+        return createCaptcha(param);
     }
 
     @Override
     public boolean checkCaptcha(String uuid, String code) {
-        String key = redisKeysUtils.getCaptchaConfigKey(uuid);
-        if (code.equalsIgnoreCase(redisUtils.get(key))) {
-            redisUtils.delete(key);
+        String cacheKey = cacheKeysUtils.getCaptchaConfigKey(uuid);
+        if (code.equalsIgnoreCase((String) guavaCache.getIfPresent(cacheKey))) {
+            guavaCache.invalidate(cacheKey);
             return true;
         }
         return false;
@@ -42,13 +46,22 @@ public class GXCaptchaServiceImpl implements GXCaptchaService {
      *
      * @return Map
      */
-    private Map<String, Object> createCaptcha() {
+    private Map<String, Object> createCaptcha(Dict param) {
+        int width = 200;
+        int height = 100;
+        if (null != param.getInt("width")) {
+            width = param.getInt("width");
+        }
+        if (null != param.getInt("height")) {
+            height = param.getInt("height");
+        }
         Map<String, Object> result = new HashMap<>();
         String uuid = IdUtil.randomUUID();
-        LineCaptcha lineCaptcha = CaptchaUtil.createLineCaptcha(200, 100);
+        LineCaptcha lineCaptcha = CaptchaUtil.createLineCaptcha(width, height);
         final String base64Img = lineCaptcha.getImageBase64();
         final String code = lineCaptcha.getCode();
-        redisUtils.set(redisKeysUtils.getCaptchaConfigKey(uuid), code, 5L * 60);
+        final String cacheKey = cacheKeysUtils.getCaptchaConfigKey(uuid);
+        guavaCache.put(cacheKey, code);
         result.put("uuid", uuid);
         result.put("base64", "data:image/png;base64," + base64Img);
         return result;

@@ -14,9 +14,9 @@ import java.util.Map;
 
 @Component
 @Slf4j
-public class GXRedisKeysUtils {
+public class GXCacheKeysUtils {
     @Autowired
-    private RedisKeysConfig redisKeysConfig;
+    private CacheKeysConfig cacheKeysConfig;
 
     /**
      * 获取系统配置的KEY
@@ -25,7 +25,7 @@ public class GXRedisKeysUtils {
      * @return String
      */
     public String getSysConfigKey(String key) {
-        return getRedisKey("sys.config", key);
+        return getCacheKey("sys.config", key);
     }
 
     /**
@@ -35,7 +35,7 @@ public class GXRedisKeysUtils {
      * @return String
      */
     public String getCaptchaConfigKey(String key) {
-        return getRedisKey("sys.captcha", key);
+        return getCacheKey("sys.captcha", key);
     }
 
     /**
@@ -45,7 +45,7 @@ public class GXRedisKeysUtils {
      * @return String
      */
     public String getNetEaseSMSCodeConfigKey(String key) {
-        return getRedisKey("sys.net-ease", key);
+        return getCacheKey("sys.net-ease", key);
     }
 
     /**
@@ -55,18 +55,18 @@ public class GXRedisKeysUtils {
      * @return String
      */
     public String getAliYunSMSCodeConfigKey(String key) {
-        return getRedisKey("sys.ali-yun", key);
+        return getCacheKey("sys.ali-yun", key);
     }
 
     /**
      * 根据配置文件的name和key获取Redis的key
      *
-     * @param configName
-     * @param key
-     * @return
+     * @param configName 配置名字
+     * @param key        配置的key
+     * @return String
      */
-    public String getRedisKey(String configName, String key) {
-        final List<Map<String, String>> list = redisKeysConfig.getKeys();
+    public String getCacheKey(String configName, String key) {
+        final List<Map<String, String>> list = cacheKeysConfig.getKeys();
         log.info(list.toString());
         for (Map<String, String> map : list) {
             final String s = map.get(configName);
@@ -80,9 +80,9 @@ public class GXRedisKeysUtils {
     @Data
     @Component
     @Configuration
-    @PropertySource(value = {"classpath:/ymls/${spring.profiles.active}/redis-key.yml"}, factory = GXYamlPropertySourceFactory.class, encoding = "UTF-8")
-    @ConfigurationProperties(prefix = "redis-key")
-    static class RedisKeysConfig {
+    @PropertySource(value = {"classpath:/ymls/${spring.profiles.active}/cache-key.yml"}, factory = GXYamlPropertySourceFactory.class, encoding = "UTF-8")
+    @ConfigurationProperties(prefix = "cache-key")
+    static class CacheKeysConfig {
         private List<Map<String, String>> keys;
     }
 }
