@@ -1,5 +1,6 @@
 package com.geoxus.core.common.util;
 
+import cn.hutool.core.util.StrUtil;
 import com.geoxus.core.common.factory.GXYamlPropertySourceFactory;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
@@ -73,6 +74,9 @@ public class GXCacheKeysUtils {
             if (null != s && !s.isEmpty()) {
                 return s + ":" + key;
             }
+        }
+        if (StrUtil.isNotBlank(key)) {
+            return StrUtil.format("geoxus:default:{}", key);
         }
         return "geoxus:default:key";
     }

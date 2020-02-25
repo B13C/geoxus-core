@@ -645,6 +645,27 @@ public class GXCommonUtils {
     }
 
     /**
+     * 获取Guava的缓存实例
+     *
+     * @param <K>         key的泛型
+     * @param <V>         值的泛型
+     * @param maximumSize 最大的存储条目
+     * @param duration    缓存时间
+     * @param unit        缓存时间单位
+     * @param fixedExpire 是否固定过期时间
+     * @return
+     */
+    public static <K, V> com.google.common.cache.Cache<K, V> getGuavaCache(long maximumSize, long duration, TimeUnit unit, boolean fixedExpire) {
+        final CacheBuilder<Object, Object> cacheBuilder = CacheBuilder.newBuilder().maximumSize(maximumSize);
+        if (fixedExpire) {
+            cacheBuilder.expireAfterWrite(duration, unit);
+        } else {
+            cacheBuilder.expireAfterAccess(duration, unit);
+        }
+        return cacheBuilder.build();
+    }
+
+    /**
      * 给现有查询条件新增查询条件
      *
      * @param requestParam       请求参数

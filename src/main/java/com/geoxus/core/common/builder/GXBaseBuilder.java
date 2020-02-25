@@ -247,7 +247,11 @@ public interface GXBaseBuilder {
      * @return
      */
     default Dict mergeSearchConditionToSQL(SQL sql, Dict requestParam, String aliasPrefix) {
-        final Dict condition = Dict.create().set(GXBaseBuilderConstants.MODEL_IDENTIFICATION_NAME, getModelIdentificationValue());
+        final String modelIdentificationValue = getModelIdentificationValue();
+        if (StrUtil.isBlank(modelIdentificationValue)) {
+            LOG.error("请配置{}.{}的模型标识", getClass().getSimpleName(), GXBaseBuilderConstants.MODEL_IDENTIFICATION_NAME);
+        }
+        final Dict condition = Dict.create().set(GXBaseBuilderConstants.MODEL_IDENTIFICATION_NAME, modelIdentificationValue);
         Dict searchField = GXSpringContextUtils.getBean(GXCoreModelService.class).getSearchCondition(condition);
         searchField.putAll(getDefaultSearchField());
         Dict searchCondition = getRequestSearchCondition(requestParam);

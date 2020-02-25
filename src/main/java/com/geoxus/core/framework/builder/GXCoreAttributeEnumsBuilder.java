@@ -34,7 +34,7 @@ public class GXCoreAttributeEnumsBuilder implements GXBaseBuilder {
 
     @Override
     public String getModelIdentificationValue() {
-        return "";
+        return "core_attribute_enums";
     }
 
     public String exists(Dict param) {
