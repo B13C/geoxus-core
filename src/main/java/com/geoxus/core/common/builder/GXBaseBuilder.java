@@ -274,7 +274,7 @@ public interface GXBaseBuilder {
                     continue;
                 }
                 if (null == operator) {
-                    LOG.warn(StrUtil.format("{}字段没有配置搜索条件", key));
+                    LOG.warn("{}字段没有配置搜索条件", key);
                     continue;
                 }
                 if (value instanceof Collection) {
