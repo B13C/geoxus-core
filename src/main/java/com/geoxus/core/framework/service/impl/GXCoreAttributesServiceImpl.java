@@ -22,12 +22,12 @@ public class GXCoreAttributesServiceImpl extends ServiceImpl<GXCoreAttributesMap
 
     @Override
     @Cacheable(value = "attributes", key = "targetClass + methodName + #p0")
-    public GXCoreAttributesEntity getAttributeByFieldName(String fieldName) {
-        return Optional.ofNullable(getOne(new QueryWrapper<GXCoreAttributesEntity>().eq("field_name", fieldName))).orElse(new GXCoreAttributesEntity());
+    public GXCoreAttributesEntity getAttributeByAttributeName(String attributeName) {
+        return Optional.ofNullable(getOne(new QueryWrapper<GXCoreAttributesEntity>().eq("attribute_name", attributeName))).orElse(new GXCoreAttributesEntity());
     }
 
     @Override
-    public boolean checkFieldIsExists(String fieldName) {
-        return getOne(new QueryWrapper<GXCoreAttributesEntity>().eq("field_name", fieldName)) != null;
+    public boolean checkFieldIsExists(String attributeName) {
+        return getOne(new QueryWrapper<GXCoreAttributesEntity>().eq("attribute_name", attributeName)) != null;
     }
 }

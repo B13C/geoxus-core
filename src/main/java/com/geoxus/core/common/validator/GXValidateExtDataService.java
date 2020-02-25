@@ -10,9 +10,9 @@ public interface GXValidateExtDataService {
      * Checks whether or not a given value exists for a given field
      *
      * @param o     The value to check for
-     * @param model The name of the model
+     * @param modelIdentification The name of the model
      * @return True if the value exists for the field; false otherwise
      * @throws UnsupportedOperationException
      */
-    boolean validateExtData(Object o, String model, String subFiled, ConstraintValidatorContext context) throws UnsupportedOperationException;
+    boolean validateExtData(Object o, String modelIdentification, String subFiled, ConstraintValidatorContext context) throws UnsupportedOperationException;
 }

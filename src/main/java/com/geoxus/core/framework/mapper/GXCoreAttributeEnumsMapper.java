@@ -24,4 +24,8 @@ public interface GXCoreAttributeEnumsMapper extends GXBaseMapper<GXCoreAttribute
     @Override
     @SelectProvider(type = GXCoreAttributeEnumsBuilder.class, method = "listOrSearch")
     List<Dict> listOrSearchPage(IPage<Dict> page, Dict param);
+
+    @Override
+    @SelectProvider(type = GXCoreAttributeEnumsBuilder.class, method = "listOrSearch")
+    List<Dict> listOrSearch(Dict param);
 }

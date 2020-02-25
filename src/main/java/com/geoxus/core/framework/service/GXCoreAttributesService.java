@@ -8,26 +8,26 @@ public interface GXCoreAttributesService extends GXBaseService<GXCoreAttributesE
     /**
      * 通过类型获取属性的列表
      *
-     * @param category
-     * @return
+     * @param category 分类名字
+     * @return List
      */
     List<GXCoreAttributesEntity> getAttributesByCategory(String category);
 
     /**
      * 通过字段名字获取属性
      *
-     * @param fieldName
-     * @return
+     * @param attributeName 属性名字
+     * @return GXCoreAttributesEntity
      */
-    GXCoreAttributesEntity getAttributeByFieldName(String fieldName);
+    GXCoreAttributesEntity getAttributeByAttributeName(String attributeName);
 
     /**
      * 检测字段是否存在
      * true 存在
      * false 不存在
      *
-     * @param fieldName
-     * @return
+     * @param attributeName 属性名字
+     * @return boolean
      */
-    boolean checkFieldIsExists(String fieldName);
+    boolean checkFieldIsExists(String attributeName);
 }

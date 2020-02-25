@@ -17,7 +17,7 @@ public class GXCoreAttributesEntity extends GXBaseEntity implements Serializable
 
     private String category;
 
-    private String fieldName;
+    private String attributeName;
 
     private String showName;
 

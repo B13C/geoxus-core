@@ -33,17 +33,18 @@ public class GXCoreAttributeEnumsServiceImpl extends ServiceImpl<GXCoreAttribute
     @Override
     public boolean isExistsAttributeValue(int attributeId, Object value, int coreModelId) {
         final Dict condition = Dict.create()
-                .set("attribute_id", attributeId)
-                .set(CORE_MODEL_PRIMARY_NAME, coreModelId)
-                .set("value_enum", value);
-        return null != checkRecordIsExists(GXCoreAttributesEnumsEntity.class, condition);
-    }
-
-    @Override
-    public boolean isExistsAttribute(int attributeId, int coreModelId) {
-        final Dict condition = Dict.create().set("attribute_id", attributeId).set("core_model_id", coreModelId);
-        final int cnt = baseMapper.exists(condition);
-        return cnt != 0;
+                .set("cae.attribute_id", attributeId)
+                .set("cae." + CORE_MODEL_PRIMARY_NAME, coreModelId);
+        final List<Dict> list = baseMapper.listOrSearch(condition);
+        if (list.isEmpty()) {
+            return true;
+        }
+        for (Dict dict : list) {
+            if (dict.getStr("value_enum").equals(value)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     @Override
@@ -58,7 +59,7 @@ public class GXCoreAttributeEnumsServiceImpl extends ServiceImpl<GXCoreAttribute
         Dict dict = JSONUtil.toBean(JSONUtil.toJsonStr(value), Dict.class);
         String attributeValue = dict.getStr(field);
         if (null != attributeValue) {
-            GXCoreAttributesEntity attributesEntity = coreAttributesService.getAttributeByFieldName(field);
+            GXCoreAttributesEntity attributesEntity = coreAttributesService.getAttributeByAttributeName(field);
             if (null != attributesEntity) {
                 final int coreModelId = param.getInt("core_model_id");
                 boolean exists = isExistsAttributeValue(attributesEntity.getAttributeId(), attributeValue, coreModelId);

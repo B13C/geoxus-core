@@ -129,7 +129,7 @@ public class GXAlterTableServiceImpl implements GXAlterTableService {
         final Set<String> keySet = conditionMap.keySet();
         for (String key : keySet) {
             final String field = MapUtil.getStr(conditionMap, key);
-            final GXCoreAttributesEntity attribute = coreAttributesService.getAttributeByFieldName(field);
+            final GXCoreAttributesEntity attribute = coreAttributesService.getAttributeByAttributeName(field);
             if (coreModelService.checkModelIsHasField(coreModelId, field) && !gxdbSchemaService.checkTableFieldExists(tableName, field)) {
                 sql.append(String.format(ADD_COLUMN_SQL, field, attribute.getDataType(), field, "ext")).append(",");
             }

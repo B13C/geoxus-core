@@ -28,7 +28,7 @@ public class GXValidateModelMapServiceImpl implements GXValidateModelMap {
             return false;
         }
         for (String key : keySet) {
-            final GXCoreAttributesEntity attributesEntity = coreAttributesService.getAttributeByFieldName(map.getStr(key));
+            final GXCoreAttributesEntity attributesEntity = coreAttributesService.getAttributeByAttributeName(map.getStr(key));
             final boolean matches = Pattern.matches(attributesEntity.getValidationExpression(), map.get(key).toString());
             if (!matches) {
                 throw new GXException(GXResultCode.PARAMETER_VALIDATION_ERROR);

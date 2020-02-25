@@ -48,30 +48,30 @@ public class GXValidateExtDataServiceImpl implements GXValidateExtDataService {
     private GXCoreModelAttributesService coreModelAttributeService;
 
     @Override
-    public boolean validateExtData(Object o, String model, String subFiled, ConstraintValidatorContext context) throws UnsupportedOperationException {
+    public boolean validateExtData(Object o, String modelIdentification, String subFiled, ConstraintValidatorContext context) throws UnsupportedOperationException {
         final String jsonStr = JSONUtil.toJsonStr(o);
         if (!JSONUtil.isJson(jsonStr)) {
             return false;
         }
-        final int modelId = coreModelService.getModelIdByModelIdentification(model);
+        final int modelId = coreModelService.getModelIdByModelIdentification(modelIdentification);
         if (modelId <= 0) {
-            throw new GXException(StrUtil.format(MODEL_SETTING_NOT_EXISTS, model));
+            throw new GXException(StrUtil.format(MODEL_SETTING_NOT_EXISTS, modelIdentification));
         }
-        final GXCoreModelEntity modelEntity = coreModelService.getModelDetailByModelId(modelId, subFiled);
-        final List<GXCoreModelAttributesEntity> attributesList = modelEntity.getCoreAttributesEntities();
+        final GXCoreModelEntity coreModelEntity = coreModelService.getModelDetailByModelId(modelId, subFiled);
+        final List<GXCoreModelAttributesEntity> attributesList = coreModelEntity.getCoreAttributesEntities();
         final Dict validateRule = Dict.create();
         for (GXCoreModelAttributesEntity defaultAttributeEntity : attributesList) {
             validateRule.set(defaultAttributeEntity.getFieldName(), defaultAttributeEntity.getValidationExpression());
         }
         if (JSONUtil.isJsonObj(jsonStr)) {
             final Dict validateDataMap = Convert.convert(Dict.class, JSONUtil.toBean(jsonStr, Dict.class));
-            return !dataValidation(model, modelId, validateRule, validateDataMap, context, -1);
+            return !dataValidation(modelIdentification, modelId, validateRule, validateDataMap, context, -1);
         } else {
             final JSONArray jsonArray = JSONUtil.parseArray(jsonStr);
             int currentIndex = 0;
             for (Object object : jsonArray) {
                 final Dict validateDataMap = Convert.convert(Dict.class, object);
-                if (dataValidation(model, modelId, validateRule, validateDataMap, context, currentIndex++)) {
+                if (dataValidation(modelIdentification, modelId, validateRule, validateDataMap, context, currentIndex++)) {
                     return false;
                 }
             }
@@ -82,29 +82,29 @@ public class GXValidateExtDataServiceImpl implements GXValidateExtDataService {
     /**
      * 数据验证
      *
-     * @param model
+     * @param modelIdentification
      * @param modelId
      * @param validateRule
      * @param validateDataMap
      * @param context
      * @return
      */
-    private boolean dataValidation(String model, int modelId, Dict validateRule, Map<String, Object> validateDataMap, ConstraintValidatorContext context, int currentIndex) {
+    private boolean dataValidation(String modelIdentification, int modelId, Dict validateRule, Map<String, Object> validateDataMap, ConstraintValidatorContext context, int currentIndex) {
         final Set<String> keySet = validateDataMap.keySet();
         for (String field : keySet) {
             final boolean b = coreModelService.checkModelIsHasField(modelId, field);
             final String errorInfo = currentIndex > -1 ? currentIndex + "." + field : field;
             if (!b) {
-                context.buildConstraintViolationWithTemplate(StrUtil.format(FIELD_NOT_EXISTS, model, field)).addPropertyNode(errorInfo).addConstraintViolation();
+                context.buildConstraintViolationWithTemplate(StrUtil.format(FIELD_NOT_EXISTS, modelIdentification, field)).addPropertyNode(errorInfo).addConstraintViolation();
                 return true;
             }
-            final GXCoreAttributesEntity attribute = coreAttributesService.getAttributeByFieldName(field);
-            GXCoreModelAttributesEntity modelAttributeGroupEntity = coreModelAttributeService.getModelAttributeByModelIdAndAttributeId(modelId, attribute.getAttributeId());
-            String rule = modelAttributeGroupEntity.getValidationExpression();
+            final GXCoreAttributesEntity attribute = coreAttributesService.getAttributeByAttributeName(field);
+            Dict modelAttributesData = coreModelAttributeService.getModelAttributeByModelIdAndAttributeId(modelId, attribute.getAttributeId());
+            String rule = modelAttributesData.getStr("validation_expression");
             if (StrUtil.isBlank(rule)) {
                 rule = Convert.toStr(validateRule.get(field));
             }
-            if (StrUtil.isBlank(rule) && modelAttributeGroupEntity.getForceValidation() == 0) {
+            if (StrUtil.isBlank(rule) && modelAttributesData.getInt("force_validation") == 0) {
                 // 不验证当前数据
                 return false;
             }
@@ -113,12 +113,12 @@ public class GXValidateExtDataServiceImpl implements GXValidateExtDataService {
                 return true;
             }
             final boolean isMatch = Pattern.matches(rule, value);
-            if (modelAttributeGroupEntity.getRequired() == VERIFY_VALUE && !isMatch) {
-                context.buildConstraintViolationWithTemplate(StrUtil.format(FIELD_NOT_MATCH, model, field, rule)).addPropertyNode(errorInfo).addConstraintViolation();
+            if (!isMatch && modelAttributesData.getInt("required") == VERIFY_VALUE) {
+                context.buildConstraintViolationWithTemplate(StrUtil.format(FIELD_NOT_MATCH, modelIdentification, field, rule)).addPropertyNode(errorInfo).addConstraintViolation();
                 return true;
             }
             if (!coreAttributeEnumsService.isExistsAttributeValue(attribute.getAttributeId(), value, modelId)) {
-                context.buildConstraintViolationWithTemplate(StrUtil.format(FIELD_VALUE_NOT_EXISTS, model, field, value)).addPropertyNode(field).addConstraintViolation();
+                context.buildConstraintViolationWithTemplate(StrUtil.format(FIELD_VALUE_NOT_EXISTS, modelIdentification, field, value)).addPropertyNode(field).addConstraintViolation();
                 return true;
             }
         }

@@ -20,7 +20,7 @@ public class GXCoreModelAttributePermissionServiceImpl extends ServiceImpl<GXCor
         final List<GXCoreAttributesEntity> attributes = baseMapper.getModelAttributePermissionByModelId(Dict.create().set("core_model_id", coreModelId));
         final ArrayList<String> strings = new ArrayList<>();
         for (GXCoreAttributesEntity entity : attributes) {
-            strings.add(entity.getFieldName());
+            strings.add(entity.getAttributeName());
         }
         return strings;
     }

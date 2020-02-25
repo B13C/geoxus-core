@@ -49,24 +49,6 @@ public interface GXBaseService<T> extends IService<T> {
     Logger log = LoggerFactory.getLogger(GXBaseService.class);
 
     /**
-     * 标识核心模型主键名字
-     *
-     * @return
-     */
-    default String getCoreModelPrimaryName() {
-        return "core_model_id";
-    }
-
-    /**
-     * 获取模型标识
-     *
-     * @return
-     */
-    default String getModelIdentification() {
-        return "";
-    }
-
-    /**
      * 获取当前接口的常量字段信息
      *
      * @return
