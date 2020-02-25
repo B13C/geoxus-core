@@ -59,7 +59,7 @@ public class GXCoreMediaLibraryServiceImpl extends ServiceImpl<GXCoreMediaLibrar
                 final GXCoreMediaLibraryEntity entity = getOne(new QueryWrapper<GXCoreMediaLibraryEntity>().eq("id", dict.getLong("id")));
                 final String customProperties = StrUtil.format("[{}]", Optional.ofNullable(dict.getStr("custom_properties")).orElse(""));
                 if (null != entity) {
-                    entity.setModelId(targetModelId);
+                    entity.setTargetId(targetModelId);
                     entity.setModelType(coreModelService.getModelTypeByModelId(itemCoreModelId, "defaultModelType"));
                     entity.setCoreModelId(itemCoreModelId);
                     entity.setCustomProperties(JSONUtil.toJsonStr(customProperties));
@@ -100,7 +100,7 @@ public class GXCoreMediaLibraryServiceImpl extends ServiceImpl<GXCoreMediaLibrar
             entity.setCollectionName(Optional.ofNullable(param.getStr("collection_name")).orElse("default"));
             entity.setResourceType(Optional.ofNullable(param.getStr("resource_type")).orElse("defaultResourceType"));
             entity.setModelType(Optional.ofNullable(param.getStr("model_type")).orElse("defaultModelType"));
-            entity.setModelId(Optional.ofNullable(param.getLong("model_id")).orElse(0L));
+            entity.setTargetId(Optional.ofNullable(param.getLong("model_id")).orElse(0L));
             entity.setCoreModelId(Optional.ofNullable(param.getLong("core_model_id")).orElse(0L));
             save(entity);
             return entity;
