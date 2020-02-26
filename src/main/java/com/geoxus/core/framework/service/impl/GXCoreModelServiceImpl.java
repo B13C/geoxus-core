@@ -47,7 +47,7 @@ public class GXCoreModelServiceImpl extends ServiceImpl<GXCoreModelMapper, GXCor
 
     @Override
     @Cacheable(value = "core_model", key = "targetClass + methodName + #modelId + #subField")
-    public GXCoreModelEntity getModelDetailByModelId(int modelId, String subField) {
+    public GXCoreModelEntity getCoreModelByModelId(int modelId, String subField) {
         final GXCoreModelEntity entity = getById(modelId);
         if (null == entity) {
             return null;
@@ -61,13 +61,13 @@ public class GXCoreModelServiceImpl extends ServiceImpl<GXCoreModelMapper, GXCor
     }
 
     @Override
-    public boolean checkModelIsHasField(int modelId, String fieldName) {
-        return null != coreModelAttributeService.checkCoreModelHasAttribute(modelId, fieldName);
+    public boolean checkModelHasAttribute(int modelId, String attributeName) {
+        return null != coreModelAttributeService.checkCoreModelHasAttribute(modelId, attributeName);
     }
 
     @Override
     public boolean checkFormKeyMatch(Set<String> keySet, String modelName) {
-        final GXCoreModelEntity modelEntity = getModelDetailByModelId(getModelIdByModelIdentification(modelName), null);
+        final GXCoreModelEntity modelEntity = getCoreModelByModelId(getModelIdByModelIdentification(modelName), null);
         if (null == modelEntity) {
             return false;
         }

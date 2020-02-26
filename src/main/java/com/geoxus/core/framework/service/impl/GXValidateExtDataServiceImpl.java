@@ -57,7 +57,7 @@ public class GXValidateExtDataServiceImpl implements GXValidateExtDataService {
         if (modelId <= 0) {
             throw new GXException(StrUtil.format(MODEL_SETTING_NOT_EXISTS, modelIdentification));
         }
-        final GXCoreModelEntity coreModelEntity = coreModelService.getModelDetailByModelId(modelId, subFiled);
+        final GXCoreModelEntity coreModelEntity = coreModelService.getCoreModelByModelId(modelId, subFiled);
         final List<GXCoreModelAttributesEntity> attributesList = coreModelEntity.getCoreAttributesEntities();
         final Dict validateRule = Dict.create();
         for (GXCoreModelAttributesEntity defaultAttributeEntity : attributesList) {
@@ -82,17 +82,17 @@ public class GXValidateExtDataServiceImpl implements GXValidateExtDataService {
     /**
      * 数据验证
      *
-     * @param modelIdentification
-     * @param modelId
-     * @param validateRule
-     * @param validateDataMap
-     * @param context
-     * @return
+     * @param modelIdentification 模型标识
+     * @param modelId             模型ID
+     * @param validateRule        验证规则
+     * @param validateDataMap     需要验证的数据
+     * @param context             验证组件上下文对象
+     * @return boolean
      */
     private boolean dataValidation(String modelIdentification, int modelId, Dict validateRule, Map<String, Object> validateDataMap, ConstraintValidatorContext context, int currentIndex) {
         final Set<String> keySet = validateDataMap.keySet();
         for (String field : keySet) {
-            final boolean b = coreModelService.checkModelIsHasField(modelId, field);
+            final boolean b = coreModelService.checkModelHasAttribute(modelId, field);
             final String errorInfo = currentIndex > -1 ? currentIndex + "." + field : field;
             if (!b) {
                 context.buildConstraintViolationWithTemplate(StrUtil.format(FIELD_NOT_EXISTS, modelIdentification, field)).addPropertyNode(errorInfo).addConstraintViolation();
