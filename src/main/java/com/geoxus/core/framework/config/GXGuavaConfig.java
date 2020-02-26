@@ -12,6 +12,11 @@ import java.util.concurrent.TimeUnit;
 @Configuration
 public class GXGuavaConfig {
     @Bean
+    public Cache<String, String> captchaCache() {
+        return GXGuavaUtils.getGuavaCacheExpireAfterWrite(10000, 300, TimeUnit.SECONDS);
+    }
+    
+    @Bean
     public Cache<String, GXCoreModelEntity> coreModelEntityCache() {
         return GXGuavaUtils.getGuavaCacheExpireAfterWrite(10000, 24, TimeUnit.HOURS);
     }

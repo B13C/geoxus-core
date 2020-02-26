@@ -7,22 +7,20 @@ import cn.hutool.core.util.IdUtil;
 import com.geoxus.core.common.annotation.GXFieldCommentAnnotation;
 import com.geoxus.core.common.service.GXCaptchaService;
 import com.geoxus.core.common.util.GXCacheKeysUtils;
-import com.geoxus.core.common.util.GXGuavaUtils;
 import com.google.common.cache.Cache;
-import com.google.common.cache.LoadingCache;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.concurrent.TimeUnit;
 
 @Service
 @Slf4j
 public class GXCaptchaServiceImpl implements GXCaptchaService {
     @GXFieldCommentAnnotation(zh = "Guava 缓存组件")
-    final Cache<Object, Object> guavaCache = GXGuavaUtils.getGuavaCacheExpireAfterWrite(1000, 5L * 60, TimeUnit.SECONDS);
+    @Autowired
+    private Cache<String, String> captchaCache;
 
     @Autowired
     private GXCacheKeysUtils cacheKeysUtils;
@@ -35,8 +33,8 @@ public class GXCaptchaServiceImpl implements GXCaptchaService {
     @Override
     public boolean checkCaptcha(String uuid, String code) {
         String cacheKey = cacheKeysUtils.getCaptchaConfigKey(uuid);
-        if (code.equalsIgnoreCase((String) guavaCache.getIfPresent(cacheKey))) {
-            guavaCache.invalidate(cacheKey);
+        if (code.equalsIgnoreCase(captchaCache.getIfPresent(cacheKey))) {
+            captchaCache.invalidate(cacheKey);
             return true;
         }
         return false;
@@ -62,7 +60,7 @@ public class GXCaptchaServiceImpl implements GXCaptchaService {
         final String base64Img = lineCaptcha.getImageBase64();
         final String code = lineCaptcha.getCode();
         final String cacheKey = cacheKeysUtils.getCaptchaConfigKey(uuid);
-        guavaCache.put(cacheKey, code);
+        captchaCache.put(cacheKey, code);
         result.put("uuid", uuid);
         result.put("base64", "data:image/png;base64," + base64Img);
         return result;
