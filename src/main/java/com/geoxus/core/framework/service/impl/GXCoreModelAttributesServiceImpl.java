@@ -6,7 +6,7 @@ import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.geoxus.core.common.annotation.GXFieldCommentAnnotation;
 import com.geoxus.core.common.util.GXCacheKeysUtils;
-import com.geoxus.core.common.util.GXCommonUtils;
+import com.geoxus.core.common.util.GXGuavaUtils;
 import com.geoxus.core.framework.entity.GXCoreModelAttributesEntity;
 import com.geoxus.core.framework.mapper.GXCoreModelAttributesMapper;
 import com.geoxus.core.framework.service.GXCoreModelAttributesService;
@@ -27,7 +27,7 @@ public class GXCoreModelAttributesServiceImpl extends ServiceImpl<GXCoreModelAtt
     private static final Cache<String, Dict> cacheDictObject;
 
     static {
-        cacheDictObject = GXCommonUtils.getGuavaCache(10000, 24, TimeUnit.HOURS, false);
+        cacheDictObject = GXGuavaUtils.getGuavaCacheExpireAfterWrite(10000, 24, TimeUnit.HOURS);
     }
 
     @Autowired

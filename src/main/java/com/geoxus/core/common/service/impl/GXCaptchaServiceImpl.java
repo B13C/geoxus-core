@@ -7,7 +7,8 @@ import cn.hutool.core.util.IdUtil;
 import com.geoxus.core.common.annotation.GXFieldCommentAnnotation;
 import com.geoxus.core.common.service.GXCaptchaService;
 import com.geoxus.core.common.util.GXCacheKeysUtils;
-import com.geoxus.core.common.util.GXCommonUtils;
+import com.geoxus.core.common.util.GXGuavaUtils;
+import com.google.common.cache.Cache;
 import com.google.common.cache.LoadingCache;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,7 +22,7 @@ import java.util.concurrent.TimeUnit;
 @Slf4j
 public class GXCaptchaServiceImpl implements GXCaptchaService {
     @GXFieldCommentAnnotation(zh = "Guava 缓存组件")
-    private static final LoadingCache<Object, Object> guavaCache = GXCommonUtils.getGuavaCache(1000, 5L * 60, TimeUnit.SECONDS, () -> null, true);
+    final Cache<Object, Object> guavaCache = GXGuavaUtils.getGuavaCacheExpireAfterWrite(1000, 5L * 60, TimeUnit.SECONDS);
 
     @Autowired
     private GXCacheKeysUtils cacheKeysUtils;

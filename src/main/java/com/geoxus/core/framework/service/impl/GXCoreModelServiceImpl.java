@@ -10,7 +10,7 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.geoxus.core.common.annotation.GXFieldCommentAnnotation;
 import com.geoxus.core.common.constant.GXBaseBuilderConstants;
 import com.geoxus.core.common.util.GXCacheKeysUtils;
-import com.geoxus.core.common.util.GXCommonUtils;
+import com.geoxus.core.common.util.GXGuavaUtils;
 import com.geoxus.core.framework.entity.GXCoreModelAttributesEntity;
 import com.geoxus.core.framework.entity.GXCoreModelEntity;
 import com.geoxus.core.framework.mapper.GXCoreModelMapper;
@@ -36,7 +36,7 @@ public class GXCoreModelServiceImpl extends ServiceImpl<GXCoreModelMapper, GXCor
     private static final Cache<String, GXCoreModelEntity> cache;
 
     static {
-        cache = GXCommonUtils.getGuavaCache(10000, 24, TimeUnit.HOURS, false);
+        cache = GXGuavaUtils.getGuavaCacheExpireAfterWrite(10000, 24, TimeUnit.HOURS);
     }
 
     @Autowired

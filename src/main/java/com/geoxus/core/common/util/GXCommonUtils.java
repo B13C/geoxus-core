@@ -15,11 +15,6 @@ import com.geoxus.core.common.constant.GXBaseBuilderConstants;
 import com.geoxus.core.common.event.GXBaseEvent;
 import com.geoxus.core.rpc.config.GXRabbitMQRPCRemoteServersConfig;
 import com.geoxus.core.rpc.service.GXRabbitMQRPCClientService;
-import com.google.common.base.Function;
-import com.google.common.base.Supplier;
-import com.google.common.cache.CacheBuilder;
-import com.google.common.cache.CacheLoader;
-import com.google.common.cache.LoadingCache;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.cache.Cache;
@@ -30,7 +25,6 @@ import java.util.*;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 public class GXCommonUtils {
@@ -598,84 +592,6 @@ public class GXCommonUtils {
     public static Cache getSpringCacheManager(String cacheName) {
         final CacheManager cacheManager = GXSpringContextUtils.getBean(CacheManager.class);
         return cacheManager.getCache(cacheName);
-    }
-
-    /**
-     * 获取Guava的缓存实例
-     *
-     * @param <K>         key的泛型
-     * @param <V>         值的泛型
-     * @param maximumSize 最大的存储条目
-     * @param duration    缓存时间
-     * @param unit        缓存时间单位
-     * @param supplier    当缓存中数据不存在时,提供数据的供应者,可以从数据库查询
-     * @param fixedExpire 是否固定过期时间
-     * @return
-     */
-    public static <K, V> LoadingCache<K, V> getGuavaCache(long maximumSize, long duration, TimeUnit unit, Supplier<V> supplier, boolean fixedExpire) {
-        final CacheBuilder<Object, Object> cacheBuilder = CacheBuilder.newBuilder().maximumSize(maximumSize);
-        if (fixedExpire) {
-            cacheBuilder.expireAfterWrite(duration, unit);
-        } else {
-            cacheBuilder.expireAfterAccess(duration, unit);
-        }
-        return cacheBuilder.build(CacheLoader.from(supplier));
-    }
-
-    /**
-     * 获取Guava的缓存实例
-     *
-     * @param <K>         key的泛型
-     * @param <V>         值的泛型
-     * @param maximumSize 最大的存储条目
-     * @param duration    缓存时间
-     * @param unit        缓存时间单位
-     * @param function    当缓存中数据不存在时,提供数据的供应者,可以从数据库查询
-     * @param fixedExpire 是否固定过期时间
-     * @return
-     */
-    public static <K, V> LoadingCache<K, V> getGuavaCache(long maximumSize, long duration, TimeUnit unit, Function<K, V> function, boolean fixedExpire) {
-        final CacheBuilder<Object, Object> cacheBuilder = CacheBuilder.newBuilder().maximumSize(maximumSize);
-        if (fixedExpire) {
-            cacheBuilder.expireAfterWrite(duration, unit);
-        } else {
-            cacheBuilder.expireAfterAccess(duration, unit);
-        }
-        return cacheBuilder.build(CacheLoader.from(function));
-    }
-
-    /**
-     * 获取Guava的缓存实例
-     *
-     * @param <K>         key的泛型
-     * @param <V>         值的泛型
-     * @param maximumSize 最大的存储条目
-     * @param duration    缓存时间
-     * @param unit        缓存时间单位
-     * @param fixedExpire 是否固定过期时间
-     * @return
-     */
-    public static <K, V> com.google.common.cache.Cache<K, V> getGuavaCache(long maximumSize, long duration, TimeUnit unit, boolean fixedExpire) {
-        return getGuavaCacheBuilder(maximumSize, duration, unit, fixedExpire).build();
-    }
-
-    /**
-     * 获取Guava的缓存实例
-     *
-     * @param maximumSize 最大的存储条目
-     * @param duration    缓存时间
-     * @param unit        缓存时间单位
-     * @param fixedExpire 是否固定过期时间
-     * @return
-     */
-    public static CacheBuilder<Object, Object> getGuavaCacheBuilder(long maximumSize, long duration, TimeUnit unit, boolean fixedExpire) {
-        final CacheBuilder<Object, Object> cacheBuilder = CacheBuilder.newBuilder().maximumSize(maximumSize);
-        if (fixedExpire) {
-            cacheBuilder.expireAfterWrite(duration, unit);
-        } else {
-            cacheBuilder.expireAfterAccess(duration, unit);
-        }
-        return cacheBuilder;
     }
 
     /**
