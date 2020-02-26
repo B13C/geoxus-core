@@ -80,7 +80,6 @@ public class GXCoreModelServiceImpl extends ServiceImpl<GXCoreModelMapper, GXCor
     }
 
     @Override
-    //@Cacheable(value = "core_model", key = "targetClass + methodName + #p0")
     public int getModelIdByModelIdentification(String modelName) {
         final String cacheKey = gxCacheKeysUtils.getCacheKey("", "core_model_" + modelName);
         final GXCoreModelEntity o = getCacheValueFromLoader(cache, cacheKey, () -> {
