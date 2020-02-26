@@ -59,7 +59,7 @@ public class GXCoreModelServiceImpl extends ServiceImpl<GXCoreModelMapper, GXCor
 
     @Override
     public boolean checkModelHasAttribute(int modelId, String attributeName) {
-        return null != coreModelAttributeService.checkCoreModelHasAttribute(modelId, attributeName);
+        return 1 == coreModelAttributeService.checkCoreModelHasAttribute(modelId, attributeName);
     }
 
     @Override

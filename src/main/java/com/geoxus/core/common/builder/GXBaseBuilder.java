@@ -137,7 +137,7 @@ public interface GXBaseBuilder {
             sql.WHERE(StrUtil.format(template, conditionKey, value));
         }
         sql.LIMIT(1);
-        return StrUtil.format("SELECT IFNULL(({}) , NULL)", sql.toString());
+        return StrUtil.format("SELECT IFNULL(({}) , 0)", sql.toString());
     }
 
     /**

@@ -33,7 +33,7 @@ public class GXCoreModelAttributesBuilder implements GXBaseBuilder {
      * @return
      */
     public String checkCoreModelHasAttribute(Dict param) {
-        String mainSql = "SELECT IFNULL(({}), NULL)";
+        String mainSql = "SELECT IFNULL(({}), 0)";
         String subSql = "SELECT 1 FROM core_attributes";
         subSql = subSql.concat("\nINNER JOIN core_model_attributes on core_model_attributes.attribute_id=core_attributes.attribute_id");
         subSql = subSql.concat("\nWHERE (core_attributes.attribute_name = '{attribute_name}' AND core_model_attributes.model_id = {core_model_id}) LIMIT 1");
