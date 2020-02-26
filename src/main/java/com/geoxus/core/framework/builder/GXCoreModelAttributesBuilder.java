@@ -26,6 +26,12 @@ public class GXCoreModelAttributesBuilder implements GXBaseBuilder {
         return null;
     }
 
+    /**
+     * 检测指定模型是否包含指定的属性
+     *
+     * @param param 参数
+     * @return
+     */
     public String checkCoreModelHasAttribute(Dict param) {
         String mainSql = "SELECT IFNULL(({}), NULL)";
         String subSql = "SELECT 1 FROM core_attributes";

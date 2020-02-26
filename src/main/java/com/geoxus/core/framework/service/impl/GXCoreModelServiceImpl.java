@@ -10,7 +10,6 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.geoxus.core.common.annotation.GXFieldCommentAnnotation;
 import com.geoxus.core.common.constant.GXBaseBuilderConstants;
 import com.geoxus.core.common.util.GXCacheKeysUtils;
-import com.geoxus.core.common.util.GXGuavaUtils;
 import com.geoxus.core.framework.entity.GXCoreModelAttributesEntity;
 import com.geoxus.core.framework.entity.GXCoreModelEntity;
 import com.geoxus.core.framework.mapper.GXCoreModelMapper;
@@ -19,7 +18,6 @@ import com.geoxus.core.framework.service.GXCoreModelService;
 import com.google.common.cache.Cache;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 import javax.validation.ConstraintValidatorContext;
@@ -27,17 +25,13 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
-import java.util.concurrent.TimeUnit;
 
 @Service
 @Slf4j
 public class GXCoreModelServiceImpl extends ServiceImpl<GXCoreModelMapper, GXCoreModelEntity> implements GXCoreModelService {
     @GXFieldCommentAnnotation(zh = "获取Guava的缓存组件")
-    private static final Cache<String, GXCoreModelEntity> cache;
-
-    static {
-        cache = GXGuavaUtils.getGuavaCacheExpireAfterWrite(10000, 24, TimeUnit.HOURS);
-    }
+    @Autowired
+    private Cache<String, GXCoreModelEntity> coreModelEntityCache;
 
     @Autowired
     private GXCacheKeysUtils gxCacheKeysUtils;
@@ -46,9 +40,12 @@ public class GXCoreModelServiceImpl extends ServiceImpl<GXCoreModelMapper, GXCor
     private GXCoreModelAttributesService coreModelAttributeService;
 
     @Override
-    @Cacheable(value = "core_model", key = "targetClass + methodName + #modelId + #subField")
     public GXCoreModelEntity getCoreModelByModelId(int modelId, String subField) {
-        final GXCoreModelEntity entity = getById(modelId);
+        final String cacheKey = gxCacheKeysUtils.getCacheKey("", "geoxus_core_model_" + modelId + "_" + subField);
+        final GXCoreModelEntity entity = getCacheValueFromLoader(coreModelEntityCache, cacheKey, () -> {
+            log.info("getCoreModelByModelId() From DB Get Data!");
+            return getById(modelId);
+        });
         if (null == entity) {
             return null;
         }
@@ -81,18 +78,21 @@ public class GXCoreModelServiceImpl extends ServiceImpl<GXCoreModelMapper, GXCor
 
     @Override
     public int getModelIdByModelIdentification(String modelName) {
-        final String cacheKey = gxCacheKeysUtils.getCacheKey("", "core_model_" + modelName);
-        final GXCoreModelEntity o = getCacheValueFromLoader(cache, cacheKey, () -> {
+        final String cacheKey = gxCacheKeysUtils.getCacheKey("", "geoxus_core_model_" + modelName);
+        final GXCoreModelEntity entity = getCacheValueFromLoader(coreModelEntityCache, cacheKey, () -> {
             log.info("getModelIdByModelIdentification() From DB Get Data!");
             return getOne(new QueryWrapper<GXCoreModelEntity>().select("model_id").eq("model_identification", modelName));
         });
-        return null == o ? 0 : o.getModelId();
+        return null == entity ? 0 : entity.getModelId();
     }
 
     @Override
-    @Cacheable(value = "core_model", key = "targetClass + methodName + #p0")
     public String getModelTypeByModelId(long coreModelId, String defaultValue) {
-        final GXCoreModelEntity entity = getOne(new QueryWrapper<GXCoreModelEntity>().select("model_type").eq("model_id", coreModelId));
+        final String cacheKey = gxCacheKeysUtils.getCacheKey("", "geoxus_core_model_" + coreModelId);
+        final GXCoreModelEntity entity = getCacheValueFromLoader(coreModelEntityCache, cacheKey, () -> {
+            log.info("getModelTypeByModelId() From DB Get Data!");
+            return getOne(new QueryWrapper<GXCoreModelEntity>().select("model_type").eq("model_id", coreModelId));
+        });
         if (null == entity) {
             return defaultValue + "Type";
         }

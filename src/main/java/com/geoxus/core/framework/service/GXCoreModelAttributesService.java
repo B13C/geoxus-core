@@ -28,7 +28,7 @@ public interface GXCoreModelAttributesService extends GXBaseService<GXCoreModelA
      *
      * @param coreModelId   核心模型ID
      * @param attributeName 属性名字
-     * @return
+     * @return Integer
      */
     Integer checkCoreModelHasAttribute(Integer coreModelId, String attributeName);
 }
