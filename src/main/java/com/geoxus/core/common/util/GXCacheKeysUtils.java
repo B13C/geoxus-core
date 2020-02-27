@@ -1,9 +1,7 @@
 package com.geoxus.core.common.util;
 
 import cn.hutool.core.util.StrUtil;
-import com.geoxus.core.common.annotation.GXFieldCommentAnnotation;
 import com.geoxus.core.common.factory.GXYamlPropertySourceFactory;
-import com.google.common.cache.Cache;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,19 +12,10 @@ import org.springframework.stereotype.Component;
 
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.TimeUnit;
 
 @Component
 @Slf4j
 public class GXCacheKeysUtils {
-    @GXFieldCommentAnnotation(zh = "Guava缓存组件")
-    private static final Cache<String, String> guavaCache;
-
-    static {
-        guavaCache = GXGuavaUtils.getGuavaCacheExpireAfterAccess(10000, 24, TimeUnit.HOURS);
-    }
-
     @Autowired
     private CacheKeysConfig cacheKeysConfig;
 
@@ -78,27 +67,18 @@ public class GXCacheKeysUtils {
      * @return String
      */
     public String getCacheKey(String configName, String key) {
-        String cacheKey = StrUtil.format("{}:{}", cacheKeysConfig, key);
-        try {
-            final String retKey = guavaCache.get(cacheKey, () -> {
-                final List<Map<String, String>> list = cacheKeysConfig.getKeys();
-                log.info(list.toString());
-                for (Map<String, String> map : list) {
-                    final String s = map.get(configName);
-                    if (null != s && !s.isEmpty()) {
-                        return s + ":" + key;
-                    }
-                }
-                return "";
-            });
-            if (StrUtil.isNotBlank(retKey)) {
-                return StrUtil.format("geoxus:default:{}", key);
+        final List<Map<String, String>> list = cacheKeysConfig.getKeys();
+        log.info(list.toString());
+        for (Map<String, String> map : list) {
+            final String s = map.get(configName);
+            if (null != s && !s.isEmpty()) {
+                return s + ":" + key;
             }
-            return key;
-        } catch (ExecutionException e) {
-            log.error(e.getMessage(), e);
         }
-        return "geoxus:default:cache:key";
+        if (StrUtil.isNotBlank(key)) {
+            return StrUtil.format("geoxus:default:{}", key);
+        }
+        return "geoxus:default:key";
     }
 
     @Data

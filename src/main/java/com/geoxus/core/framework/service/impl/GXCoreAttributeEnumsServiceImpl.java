@@ -1,21 +1,17 @@
 package com.geoxus.core.framework.service.impl;
 
-import cn.hutool.core.convert.Convert;
 import cn.hutool.core.lang.Dict;
-import cn.hutool.core.lang.TypeReference;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.json.JSONUtil;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.geoxus.core.common.annotation.GXFieldCommentAnnotation;
 import com.geoxus.core.common.constant.GXCommonConstants;
-import com.geoxus.core.common.util.GXCacheKeysUtils;
 import com.geoxus.core.framework.entity.GXCoreAttributesEntity;
 import com.geoxus.core.framework.entity.GXCoreAttributesEnumsEntity;
 import com.geoxus.core.framework.mapper.GXCoreAttributeEnumsMapper;
 import com.geoxus.core.framework.service.GXCoreAttributeEnumsService;
 import com.geoxus.core.framework.service.GXCoreAttributesService;
-import com.google.common.cache.Cache;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
@@ -28,27 +24,16 @@ public class GXCoreAttributeEnumsServiceImpl extends ServiceImpl<GXCoreAttribute
     @GXFieldCommentAnnotation(zh = "字段不存在的提示")
     private static final String FIELD_VALUE_NOT_EXISTS = "{}属性不存在值{}";
 
-    @GXFieldCommentAnnotation(zh = "标识核心模型主键名字")
-    private static final String CORE_MODEL_PRIMARY_NAME = GXCommonConstants.CORE_MODEL_PRIMARY_NAME;
-
-    @Autowired
-    private Cache<String, Object> generalGuavaCache;
-
     @Autowired
     private GXCoreAttributesService coreAttributesService;
 
-    @Autowired
-    private GXCacheKeysUtils gxCacheKeysUtils;
-
     @Override
+    @Cacheable(value = "attributes", key = "targetClass + methodName + #coreModelId + #attributeId")
     public boolean isExistsAttributeValue(int attributeId, Object value, int coreModelId) {
-        final String cacheKey = gxCacheKeysUtils.getCacheKey("", "geoxus_core_attribute_enums_" + attributeId + "_" + coreModelId);
         final Dict condition = Dict.create()
                 .set("cae.attribute_id", attributeId)
-                .set("cae." + CORE_MODEL_PRIMARY_NAME, coreModelId);
-        final Object fromLoaderValue = getCacheValueFromLoader(generalGuavaCache, cacheKey, () -> baseMapper.listOrSearch(condition));
-        final List<Dict> list = Convert.convert(new TypeReference<List<Dict>>() {
-        }, fromLoaderValue);
+                .set("cae." + GXCommonConstants.CORE_MODEL_PRIMARY_NAME, coreModelId);
+        final List<Dict> list = baseMapper.listOrSearch(condition);
         if (list.isEmpty()) {
             return true;
         }

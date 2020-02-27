@@ -24,7 +24,6 @@ import com.geoxus.core.common.util.GXSpringContextUtils;
 import com.geoxus.core.common.util.GXSyncEventBusCenterUtils;
 import com.geoxus.core.common.validator.impl.GXValidatorUtils;
 import com.geoxus.core.framework.entity.GXCoreMediaLibraryEntity;
-import com.google.common.cache.Cache;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.transaction.annotation.Transactional;
@@ -37,8 +36,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Set;
-import java.util.concurrent.Callable;
-import java.util.concurrent.ExecutionException;
 
 /**
  * 业务基础Service
@@ -471,25 +468,6 @@ public interface GXBaseService<T> extends IService<T> {
         }
         final T bean = (T) JSONUtil.toBean((JSONObject) json, target.getClass());
         return updateById(bean);
-    }
-
-    /**
-     * 从数据提供者获取缓存
-     *
-     * @param <K>      缓存key的类型
-     * @param <V>      缓存的值类型
-     * @param cache    缓存组件
-     * @param cacheKey 缓存的key
-     * @param loader   数据提供者
-     * @return V
-     */
-    default <K, V> V getCacheValueFromLoader(Cache<K, V> cache, K cacheKey, Callable<? extends V> loader) {
-        try {
-            return cache.get(cacheKey, loader);
-        } catch (ExecutionException e) {
-            log.error(e.getMessage(), e);
-        }
-        return null;
     }
 
     /**

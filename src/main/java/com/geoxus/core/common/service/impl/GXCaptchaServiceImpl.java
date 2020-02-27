@@ -8,19 +8,24 @@ import com.geoxus.core.common.annotation.GXFieldCommentAnnotation;
 import com.geoxus.core.common.service.GXCaptchaService;
 import com.geoxus.core.common.util.GXCacheKeysUtils;
 import com.google.common.cache.Cache;
+import com.google.common.cache.CacheBuilder;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.time.Duration;
 import java.util.HashMap;
 import java.util.Map;
 
 @Service
 @Slf4j
 public class GXCaptchaServiceImpl implements GXCaptchaService {
-    @GXFieldCommentAnnotation(zh = "Guava 缓存组件")
-    @Autowired
-    private Cache<String, String> captchaCache;
+    @GXFieldCommentAnnotation(zh = "Guava缓存组件")
+    private static final Cache<String, String> captchaCache;
+
+    static {
+        captchaCache = CacheBuilder.newBuilder().maximumSize(10000).expireAfterWrite(Duration.ofSeconds(300L)).build();
+    }
 
     @Autowired
     private GXCacheKeysUtils cacheKeysUtils;
