@@ -27,13 +27,13 @@ import java.util.regex.Pattern;
 public class GXValidateExtDataServiceImpl implements GXValidateExtDataService {
     private static final int VERIFY_VALUE = 1;
 
-    private static final String FIELD_NOT_EXISTS = "{}模型中不存在{}属性";
+    private static final String FIELD_NOT_EXISTS = "{}模型中的{}属性不存在";
 
-    private static final String FIELD_NOT_MATCH = "{}模型中{}属性格式错误({})......";
+    private static final String FIELD_NOT_MATCH = "{}模型中的{}属性格式错误,需要满足({})的验证条件";
 
-    private static final String FIELD_VALUE_NOT_EXISTS = "{}模型中{}属性枚举值{}不存在......";
+    private static final String FIELD_VALUE_NOT_EXISTS = "{}模型中的{}属性的值{}不存在";
 
-    private static final String MODEL_SETTING_NOT_EXISTS = "{}不存在,请先配置模型......";
+    private static final String MODEL_SETTING_NOT_EXISTS = "{}模型不存在,请先配置模型";
 
     @Autowired
     private GXCoreModelService coreModelService;

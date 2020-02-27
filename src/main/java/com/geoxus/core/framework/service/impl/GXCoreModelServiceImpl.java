@@ -1,5 +1,6 @@
 package com.geoxus.core.framework.service.impl;
 
+import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.convert.Convert;
 import cn.hutool.core.lang.Dict;
 import cn.hutool.core.lang.TypeReference;
@@ -32,6 +33,12 @@ public class GXCoreModelServiceImpl extends ServiceImpl<GXCoreModelMapper, GXCor
     @GXFieldCommentAnnotation(zh = "获取Guava的缓存组件")
     @Autowired
     private Cache<String, GXCoreModelEntity> coreModelEntityCache;
+
+    @Autowired
+    private Cache<String, Dict> coreModelDictCache;
+
+    @Autowired
+    private Cache<String, Object> generalGuavaCache;
 
     @Autowired
     private GXCacheKeysUtils gxCacheKeysUtils;
@@ -79,11 +86,12 @@ public class GXCoreModelServiceImpl extends ServiceImpl<GXCoreModelMapper, GXCor
     @Override
     public int getModelIdByModelIdentification(String modelName) {
         final String cacheKey = gxCacheKeysUtils.getCacheKey("", "geoxus_core_model_" + modelName);
-        final GXCoreModelEntity entity = getCacheValueFromLoader(coreModelEntityCache, cacheKey, () -> {
+        final Dict dict = getCacheValueFromLoader(coreModelDictCache, cacheKey, () -> {
             log.info("getModelIdByModelIdentification() From DB Get Data!");
-            return getOne(new QueryWrapper<GXCoreModelEntity>().select("model_id").eq("model_identification", modelName));
+            final Dict condition = Dict.create().set(GXBaseBuilderConstants.MODEL_IDENTIFICATION_NAME, modelName);
+            return getFieldBySQL(GXCoreModelEntity.class, CollUtil.newHashSet("model_id"), condition);
         });
-        return null == entity ? 0 : entity.getModelId();
+        return null == dict ? 0 : dict.getInt("model_id");
     }
 
     @Override
@@ -112,7 +120,9 @@ public class GXCoreModelServiceImpl extends ServiceImpl<GXCoreModelMapper, GXCor
     @Override
     public boolean validateExists(Object value, String field, ConstraintValidatorContext constraintValidatorContext, Dict param) throws UnsupportedOperationException {
         log.info("validateExists : {} , field : {}", value, field);
+        final String cacheKey = gxCacheKeysUtils.getCacheKey("", "validate_exists_" + value);
         final Integer coreModelId = Convert.toInt(value);
-        return coreModelId == null || null != getById(coreModelId);
+        final Object o = getCacheValueFromLoader(generalGuavaCache, cacheKey, () -> checkRecordIsExists(GXCoreModelEntity.class, Dict.create().set("model_id", coreModelId)));
+        return 1 == Convert.convert(Integer.class, o, 0);
     }
 }

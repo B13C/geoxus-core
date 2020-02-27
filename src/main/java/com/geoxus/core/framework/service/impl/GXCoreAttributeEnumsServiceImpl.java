@@ -1,17 +1,21 @@
 package com.geoxus.core.framework.service.impl;
 
+import cn.hutool.core.convert.Convert;
 import cn.hutool.core.lang.Dict;
+import cn.hutool.core.lang.TypeReference;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.json.JSONUtil;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.geoxus.core.common.annotation.GXFieldCommentAnnotation;
 import com.geoxus.core.common.constant.GXCommonConstants;
+import com.geoxus.core.common.util.GXCacheKeysUtils;
 import com.geoxus.core.framework.entity.GXCoreAttributesEntity;
 import com.geoxus.core.framework.entity.GXCoreAttributesEnumsEntity;
 import com.geoxus.core.framework.mapper.GXCoreAttributeEnumsMapper;
 import com.geoxus.core.framework.service.GXCoreAttributeEnumsService;
 import com.geoxus.core.framework.service.GXCoreAttributesService;
+import com.google.common.cache.Cache;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
@@ -28,14 +32,23 @@ public class GXCoreAttributeEnumsServiceImpl extends ServiceImpl<GXCoreAttribute
     private static final String CORE_MODEL_PRIMARY_NAME = GXCommonConstants.CORE_MODEL_PRIMARY_NAME;
 
     @Autowired
+    private Cache<String, Object> generalGuavaCache;
+
+    @Autowired
     private GXCoreAttributesService coreAttributesService;
+
+    @Autowired
+    private GXCacheKeysUtils gxCacheKeysUtils;
 
     @Override
     public boolean isExistsAttributeValue(int attributeId, Object value, int coreModelId) {
+        final String cacheKey = gxCacheKeysUtils.getCacheKey("", "geoxus_core_attribute_enums_" + attributeId + "_" + coreModelId);
         final Dict condition = Dict.create()
                 .set("cae.attribute_id", attributeId)
                 .set("cae." + CORE_MODEL_PRIMARY_NAME, coreModelId);
-        final List<Dict> list = baseMapper.listOrSearch(condition);
+        final Object fromLoaderValue = getCacheValueFromLoader(generalGuavaCache, cacheKey, () -> baseMapper.listOrSearch(condition));
+        final List<Dict> list = Convert.convert(new TypeReference<List<Dict>>() {
+        }, fromLoaderValue);
         if (list.isEmpty()) {
             return true;
         }
