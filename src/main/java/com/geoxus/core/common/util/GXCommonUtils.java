@@ -19,6 +19,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.cache.Cache;
 import org.springframework.cache.CacheManager;
+import org.springframework.cache.ehcache.EhCacheCacheManager;
 
 import java.lang.reflect.Field;
 import java.util.*;
@@ -589,9 +590,19 @@ public class GXCommonUtils {
      * @param cacheName cache的名字
      * @return
      */
-    public static Cache getSpringCacheManager(String cacheName) {
+    public static Cache getSpringCache(String cacheName) {
         final CacheManager cacheManager = GXSpringContextUtils.getBean(CacheManager.class);
+        assert cacheManager != null;
         return cacheManager.getCache(cacheName);
+    }
+
+    /**
+     * 获取EhCacheCacheManager的实例
+     *
+     * @return EhCacheCacheManager
+     */
+    public static EhCacheCacheManager getEhCacheCacheManager() {
+        return GXSpringContextUtils.getBean(EhCacheCacheManager.class);
     }
 
     /**

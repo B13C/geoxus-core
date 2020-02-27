@@ -28,7 +28,7 @@ public class GXCoreAttributeEnumsServiceImpl extends ServiceImpl<GXCoreAttribute
     private GXCoreAttributesService coreAttributesService;
 
     @Override
-    @Cacheable(value = "attributes", key = "targetClass + methodName + #coreModelId + #attributeId")
+    @Cacheable(value = "attributes", key = "targetClass + methodName + #coreModelId + #attributeId + #value")
     public boolean isExistsAttributeValue(int attributeId, Object value, int coreModelId) {
         final Dict condition = Dict.create()
                 .set("cae.attribute_id", attributeId)

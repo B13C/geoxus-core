@@ -7,13 +7,15 @@ import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.databind.SerializerProvider;
 import com.geoxus.core.common.factory.GXYamlPropertySourceFactory;
 import com.geoxus.core.common.interceptor.GXCustomMultipartResolver;
+import com.geoxus.core.common.util.GXSpringContextUtils;
 import com.geoxus.core.common.validator.impl.GXValidateDBUniqueValidator;
+import net.sf.ehcache.CacheManager;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingClass;
 import org.springframework.boot.web.servlet.MultipartConfigFactory;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.PropertySource;
+import org.springframework.cache.ehcache.EhCacheCacheManager;
+import org.springframework.context.annotation.*;
 import org.springframework.http.converter.json.Jackson2ObjectMapperBuilder;
 import org.springframework.util.unit.DataSize;
 import org.springframework.web.multipart.MultipartResolver;
@@ -59,5 +61,12 @@ public class GXCommonConfig {
             }
         });
         return objectMapper.disable(SerializationFeature.FAIL_ON_EMPTY_BEANS);
+    }
+
+    @Bean
+    @ConditionalOnExpression("!'${spring.cache.type}'.equals('ehcache')")
+    public EhCacheCacheManager ehCacheManager() {
+        final CacheManager cacheManager = new CacheManager(getClass().getResource("/ehcache.xml"));
+        return new EhCacheCacheManager(cacheManager);
     }
 }

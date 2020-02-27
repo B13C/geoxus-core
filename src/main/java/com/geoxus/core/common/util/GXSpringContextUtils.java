@@ -16,27 +16,32 @@ import java.util.Map;
  */
 @Component
 public class GXSpringContextUtils implements ApplicationContextAware {
-    private static ApplicationContext applicationContext;
-
     private static final Logger log = LoggerFactory.getLogger(GXSpringContextUtils.class);
 
-    @Override
-    public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
-        GXSpringContextUtils.applicationContext = applicationContext;
-    }
+    private static ApplicationContext applicationContext;
 
     public static Object getBean(String name) {
-        return applicationContext.getBean(name);
+        try {
+            return applicationContext.getBean(name);
+        } catch (RuntimeException e) {
+            log.error(e.getMessage(), e);
+        }
+        return null;
     }
 
     public static <T> T getBean(Class<T> clazz) {
-        return applicationContext.getBean(clazz);
+        try {
+            return applicationContext.getBean(clazz);
+        } catch (NoSuchBeanDefinitionException e) {
+            log.error(e.getMessage(), e);
+        }
+        return null;
     }
 
     public static <T> T getBean(String name, Class<T> requiredType) {
         try {
             return applicationContext.getBean(name, requiredType);
-        } catch (NoSuchBeanDefinitionException e) {
+        } catch (RuntimeException e) {
             log.error(e.getMessage(), e);
         }
         return null;
@@ -64,5 +69,10 @@ public class GXSpringContextUtils implements ApplicationContextAware {
 
     public static ApplicationContext getApplicationContext() {
         return applicationContext;
+    }
+
+    @Override
+    public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
+        GXSpringContextUtils.applicationContext = applicationContext;
     }
 }
