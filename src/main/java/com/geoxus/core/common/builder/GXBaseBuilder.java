@@ -220,9 +220,10 @@ public interface GXBaseBuilder {
      * @param fieldName    字段名字
      * @param conditionStr 查询条件
      * @param param        参数
+     * @param aliasPrefix  表的别名
      * @return String
      */
-    default String processTimeField(String fieldName, String conditionStr, Object param) {
+    default String processTimeField(String fieldName, String conditionStr, Object param, String aliasPrefix) {
         final String today = DateUtil.today();
         String startDate = StrUtil.format("{} 0:0:0", today);
         String endDate = StrUtil.format("{} 23:59:59", today);
@@ -232,6 +233,9 @@ public interface GXBaseBuilder {
         }
         if (null != dict.getStr("end")) {
             endDate = dict.getStr("end");
+        }
+        if (StrUtil.isNotBlank(aliasPrefix)) {
+            fieldName = StrUtil.format("{}.{}", aliasPrefix, fieldName);
         }
         final long start = DateUtil.parse(startDate).getTime() / 1000;
         final long end = DateUtil.parse(endDate).getTime() / 1000;
@@ -252,7 +256,7 @@ public interface GXBaseBuilder {
             LOG.error("请配置{}.{}的模型标识", getClass().getSimpleName(), GXBaseBuilderConstants.MODEL_IDENTIFICATION_NAME);
         }
         final Dict condition = Dict.create().set(GXBaseBuilderConstants.MODEL_IDENTIFICATION_NAME, modelIdentificationValue);
-        Dict searchField = GXSpringContextUtils.getBean(GXCoreModelService.class).getSearchCondition(condition);
+        Dict searchField = Objects.requireNonNull(GXSpringContextUtils.getBean(GXCoreModelService.class)).getSearchCondition(condition);
         searchField.putAll(getDefaultSearchField());
         Dict searchCondition = getRequestSearchCondition(requestParam);
         Set<String> keySet = searchCondition.keySet();
@@ -267,7 +271,7 @@ public interface GXBaseBuilder {
                     if (null == operator) {
                         operator = GXBaseBuilderConstants.TIME_FIELDS.getStr(key);
                     }
-                    final String s = processTimeField(key, operator, value);
+                    final String s = processTimeField(key, operator, value, aliasPrefix);
                     if (null != s) {
                         sql.WHERE(s);
                     }

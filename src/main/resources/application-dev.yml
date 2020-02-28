@@ -67,6 +67,9 @@ spring:
       config: classpath:ehcache.xml
     redis:
       key-prefix: redisCache
+    cache-names:
+      - __DEFAULT__
+      - common
   rabbitmq:
     host: xx.xx.xx.xx
     port: 5672

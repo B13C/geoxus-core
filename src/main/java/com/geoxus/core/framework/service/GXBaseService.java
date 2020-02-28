@@ -32,10 +32,7 @@ import javax.validation.constraints.NotNull;
 import java.lang.reflect.Field;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 /**
  * 业务基础Service
@@ -255,15 +252,20 @@ public interface GXBaseService<T> extends IService<T> {
     /**
      * 修改实体的JSON字段的值
      *
-     * @param entity
-     * @param param
-     * @return
+     * @param entity 实体对象
+     * @param param  修改参数
+     * @return T
+     * @example modifyEntityJSONFieldMultiValue(t, Dict.create ().set(" ext ", Dict.create ().set(" name ", " jack ").set(" age ", 30)))
      */
     default T modifyEntityJSONFieldMultiValue(T entity, Dict param) {
         JSONObject jsonObject = JSONUtil.parseObj(entity);
         final Set<String> mainFieldKeySet = param.keySet();
         for (String mainPath : mainFieldKeySet) {
-            final Dict subDict = Convert.convert(Dict.class, param.getObj(mainPath));
+            final Object obj = param.getObj(mainPath);
+            if (!(obj instanceof Map)) {
+                continue;
+            }
+            final Dict subDict = Convert.convert(Dict.class, obj);
             final Set<String> subFieldKeySet = subDict.keySet();
             JSONObject o = jsonObject.getByPath(mainPath, JSONObject.class);
             for (String subPath : subFieldKeySet) {
