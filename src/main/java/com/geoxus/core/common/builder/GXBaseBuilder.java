@@ -234,7 +234,7 @@ public interface GXBaseBuilder {
         if (null != dict.getStr("end")) {
             endDate = dict.getStr("end");
         }
-        if (StrUtil.isNotBlank(aliasPrefix)) {
+        if (!StrUtil.contains(fieldName, ".") && StrUtil.isNotBlank(aliasPrefix)) {
             fieldName = StrUtil.format("{}.{}", aliasPrefix, fieldName);
         }
         final long start = DateUtil.parse(startDate).getTime() / 1000;
@@ -259,6 +259,7 @@ public interface GXBaseBuilder {
         Dict searchField = Objects.requireNonNull(GXSpringContextUtils.getBean(GXCoreModelService.class)).getSearchCondition(condition);
         searchField.putAll(getDefaultSearchField());
         Dict searchCondition = getRequestSearchCondition(requestParam);
+        final Dict timeFields = getTimeFields();
         Set<String> keySet = searchCondition.keySet();
         for (String key : keySet) {
             Object value = searchCondition.getObj(key);
@@ -267,9 +268,9 @@ public interface GXBaseBuilder {
                 if (null == operator && StrUtil.isNotBlank(aliasPrefix)) {
                     operator = searchField.getStr(StrUtil.concat(true, aliasPrefix, ".", key));
                 }
-                if (StrUtil.isNotBlank(GXBaseBuilderConstants.TIME_FIELDS.getStr(key))) {
+                if (StrUtil.isNotBlank(timeFields.getStr(key))) {
                     if (null == operator) {
-                        operator = GXBaseBuilderConstants.TIME_FIELDS.getStr(key);
+                        operator = timeFields.getStr(key);
                     }
                     final String s = processTimeField(key, operator, value, aliasPrefix);
                     if (null != s) {
@@ -284,7 +285,7 @@ public interface GXBaseBuilder {
                 if (value instanceof Collection) {
                     value = CollUtil.join((Collection<?>) value, ",");
                 }
-                if (StrUtil.isNotBlank(aliasPrefix)) {
+                if (StrUtil.isNotBlank(aliasPrefix) && !StrUtil.contains(key, ".")) {
                     sql.WHERE(StrUtil.format("`{}`.`{}` ".concat(operator), aliasPrefix, key, value));
                 } else {
                     if (StrUtil.contains(key, ".")) {
@@ -355,6 +356,15 @@ public interface GXBaseBuilder {
      */
     default Dict addConditionToSearchCondition(Dict requestParam, Dict sourceData) {
         return GXCommonUtils.addConditionToSearchCondition(requestParam, sourceData, false);
+    }
+
+    /**
+     * 获取时间字段配置
+     *
+     * @return
+     */
+    default Dict getTimeFields() {
+        return GXBaseBuilderConstants.TIME_FIELDS;
     }
 
     /**

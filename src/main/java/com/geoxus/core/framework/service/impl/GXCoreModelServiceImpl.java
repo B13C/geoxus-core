@@ -97,7 +97,7 @@ public class GXCoreModelServiceImpl extends ServiceImpl<GXCoreModelMapper, GXCor
     @Cacheable(value = "__DEFAULT__", key = "targetClass + methodName + #value + #field")
     public boolean validateExists(Object value, String field, ConstraintValidatorContext constraintValidatorContext, Dict param) throws UnsupportedOperationException {
         log.info("validateExists : {} , field : {}", value, field);
-        final Integer coreModelId = Convert.toInt(value);
+        final Integer coreModelId = Convert.toInt(value, 0);
         final Object o = checkRecordIsExists(GXCoreModelEntity.class, Dict.create().set("model_id", coreModelId));
         return 1 == Convert.convert(Integer.class, o, 0);
     }

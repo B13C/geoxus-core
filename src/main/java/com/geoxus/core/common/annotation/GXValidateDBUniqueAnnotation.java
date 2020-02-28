@@ -21,7 +21,7 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
 @Constraint(validatedBy = GXValidateDBUniqueValidator.class)
 @Documented
 public @interface GXValidateDBUniqueAnnotation {
-    String message() default "数据不唯一";
+    String message() default "该数据已经存在";
 
     Class<?>[] groups() default {};
 
