@@ -17,20 +17,20 @@ import java.util.List;
 @Slf4j
 public class GXCoreModelAttributesServiceImpl extends ServiceImpl<GXCoreModelAttributesMapper, GXCoreModelAttributesEntity> implements GXCoreModelAttributesService {
     @Override
-    @Cacheable(value = "attributes", key = "targetClass + methodName + #p0.getStr('model_id') + #p0.getStr('model_attribute_field')")
+    @Cacheable(value = "__DEFAULT__", key = "targetClass + methodName + #p0.getStr('model_id') + #p0.getStr('model_attribute_field')")
     public List<GXCoreModelAttributesEntity> getModelAttributesByModelId(Dict param) {
         return baseMapper.getModelAttributesByModelId(param);
     }
 
     @Override
-    @Cacheable(value = "attributes", key = "targetClass + methodName + #modelId + #attributeId")
+    @Cacheable(value = "__DEFAULT__", key = "targetClass + methodName + #modelId + #attributeId")
     public Dict getModelAttributeByModelIdAndAttributeId(int modelId, int attributeId) {
         final Dict condition = Dict.create().set("model_id", modelId).set("attribute_id", attributeId);
         final HashSet<String> fieldSet = CollUtil.newHashSet("validation_expression", "force_validation", "required");
         return getFieldBySQL(GXCoreModelAttributesEntity.class, fieldSet, condition);
     }
 
-    @Cacheable(value = "attributes", key = "targetClass + methodName + #coreModelId + #attributeName")
+    @Cacheable(value = "__DEFAULT__", key = "targetClass + methodName + #coreModelId + #attributeName")
     public Integer checkCoreModelHasAttribute(Integer coreModelId, String attributeName) {
         final Dict condition = Dict.create().set("core_model_id", coreModelId).set("attribute_name", attributeName);
         return baseMapper.checkCoreModelHasAttribute(condition);

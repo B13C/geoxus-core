@@ -32,7 +32,7 @@ public class GXCoreModelServiceImpl extends ServiceImpl<GXCoreModelMapper, GXCor
     private GXCoreModelAttributesService coreModelAttributeService;
 
     @Override
-    @Cacheable(value = "core_model", key = "targetClass + methodName + #modelId + #subField")
+    @Cacheable(value = "__DEFAULT__", key = "targetClass + methodName + #modelId + #subField")
     public GXCoreModelEntity getCoreModelByModelId(int modelId, String subField) {
         final GXCoreModelEntity entity = getById(modelId);
         if (null == entity) {
@@ -66,15 +66,15 @@ public class GXCoreModelServiceImpl extends ServiceImpl<GXCoreModelMapper, GXCor
     }
 
     @Override
-    @Cacheable(value = "core_model", key = "targetClass + methodName + #modelName")
-    public int getModelIdByModelIdentification(String modelName) {
+    @Cacheable(value = "__DEFAULT__", key = "targetClass + methodName + #p0")
+    public Integer getModelIdByModelIdentification(String modelName) {
         final Dict condition = Dict.create().set(GXBaseBuilderConstants.MODEL_IDENTIFICATION_NAME, modelName);
         final Dict dict = getFieldBySQL(GXCoreModelEntity.class, CollUtil.newHashSet("model_id"), condition);
         return null == dict ? 0 : dict.getInt("model_id");
     }
 
     @Override
-    @Cacheable(value = "core_model", key = "targetClass + methodName + #coreModelId")
+    @Cacheable(value = "__DEFAULT__", key = "targetClass + methodName + #coreModelId")
     public String getModelTypeByModelId(long coreModelId, String defaultValue) {
         final GXCoreModelEntity entity = getOne(new QueryWrapper<GXCoreModelEntity>().select("model_type").eq("model_id", coreModelId));
         if (null == entity) {
@@ -94,7 +94,7 @@ public class GXCoreModelServiceImpl extends ServiceImpl<GXCoreModelMapper, GXCor
     }
 
     @Override
-    @Cacheable(value = "core_model", key = "targetClass + methodName + #value + #field")
+    @Cacheable(value = "__DEFAULT__", key = "targetClass + methodName + #value + #field")
     public boolean validateExists(Object value, String field, ConstraintValidatorContext constraintValidatorContext, Dict param) throws UnsupportedOperationException {
         log.info("validateExists : {} , field : {}", value, field);
         final Integer coreModelId = Convert.toInt(value);

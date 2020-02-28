@@ -15,7 +15,7 @@ import java.util.List;
 @Service
 public class GXCoreModelAttributePermissionServiceImpl extends ServiceImpl<GXCoreModelAttributesPermissionMapper, GXCoreModelAttributesPermissionEntity> implements GXCoreModelAttributePermissionService {
     @Override
-    @Cacheable(value = "attribute_permission", key = "targetClass + methodName + #coreModelId")
+    @Cacheable(value = "__DEFAULT__", key = "targetClass + methodName + #coreModelId")
     public List<String> getModelAttributePermissionByCoreModelId(int coreModelId) {
         final List<GXCoreAttributesEntity> attributes = baseMapper.getModelAttributePermissionByModelId(Dict.create().set("core_model_id", coreModelId));
         final ArrayList<String> strings = new ArrayList<>();

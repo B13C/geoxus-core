@@ -17,13 +17,13 @@ import java.util.Optional;
 @Slf4j
 public class GXCoreAttributesServiceImpl extends ServiceImpl<GXCoreAttributesMapper, GXCoreAttributesEntity> implements GXCoreAttributesService {
     @Override
-    @Cacheable(value = "attributes", key = "targetClass + methodName + #p0")
+    @Cacheable(value = "__DEFAULT__", key = "targetClass + methodName + #p0")
     public List<GXCoreAttributesEntity> getAttributesByCategory(String category) {
         return Optional.ofNullable(list(new QueryWrapper<GXCoreAttributesEntity>().eq("category", category))).orElse(new ArrayList<>());
     }
 
     @Override
-    @Cacheable(value = "attributes", key = "targetClass + methodName + #attributeName")
+    @Cacheable(value = "__DEFAULT__", key = "targetClass + methodName + #attributeName")
     public GXCoreAttributesEntity getAttributeByAttributeName(String attributeName) {
         return getOne(new QueryWrapper<GXCoreAttributesEntity>().eq("attribute_name", attributeName));
     }

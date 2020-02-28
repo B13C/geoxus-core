@@ -40,7 +40,7 @@ public interface GXCoreModelService extends GXBaseService<GXCoreModelEntity>, GX
      * @param modelName 模型名字
      * @return int
      */
-    int getModelIdByModelIdentification(String modelName);
+    Integer getModelIdByModelIdentification(String modelName);
 
     /**
      * 通过modelId获取命名空间

@@ -29,7 +29,7 @@ public class GXDBSchemaServiceImpl implements GXDBSchemaService {
     private static DataSource dataSource = GXSpringContextUtils.getBean(DataSource.class);
 
     @Override
-    @Cacheable(value = "table_column", key = "targetClass + methodName +#tableName")
+    @Cacheable(value = "__DEFAULT__", key = "targetClass + methodName +#tableName")
     public List<GXDBSchemaService.TableField> getTableColumn(String tableName) {
         final List<TableField> resultData = new ArrayList<>();
         try {
@@ -55,7 +55,7 @@ public class GXDBSchemaServiceImpl implements GXDBSchemaService {
     }
 
     @Override
-    @Cacheable(value = "table_column", key = "targetClass + methodName +#tableName")
+    @Cacheable(value = "__DEFAULT__", key = "targetClass + methodName +#tableName")
     public List<GXDBSchemaService.TableIndexData> listTableIndex(String tableName) throws SQLException {
         Map<String, Map<String, Object>> returnList = new HashMap<>();
         List<GXDBSchemaService.TableIndexData> list = new ArrayList<>();
@@ -120,7 +120,7 @@ public class GXDBSchemaServiceImpl implements GXDBSchemaService {
     }
 
     @Override
-    @Cacheable(value = "table_column", key = "targetClass + methodName +#tableName")
+    @Cacheable(value = "__DEFAULT__", key = "targetClass + methodName +#tableName")
     public String getSqlFieldStr(String tableName, Set<String> targetSet, boolean remove) {
         final List<TableField> tableFields = getTableColumn(tableName);
         final HashSet<String> result = new HashSet<>();
