@@ -536,7 +536,7 @@ public interface GXBaseService<T> extends IService<T> {
      *
      * @param event
      */
-    default <T> void postSyncEvent(GXBaseEvent<T> event) {
+    default void postSyncEvent(GXBaseEvent<T> event) {
         GXCommonUtils.postSyncEvent(event);
     }
 
@@ -545,7 +545,7 @@ public interface GXBaseService<T> extends IService<T> {
      *
      * @param event
      */
-    default <T> void postAsyncEvent(GXBaseEvent<T> event) {
+    default void postAsyncEvent(GXBaseEvent<T> event) {
         GXCommonUtils.postAsyncEvent(event);
     }
 
