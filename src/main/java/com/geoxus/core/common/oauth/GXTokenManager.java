@@ -103,7 +103,7 @@ public class GXTokenManager {
                 return null;
             } else if (dict.getInt("expires") - currentTime < ADMIN_EXPIRES_REFRESH) {
                 dict.put("refresh", true);
-                dict.set("expires", currentTime + ADMIN_EXPIRES_REFRESH);
+                dict.set("expires", currentTime + 2880);
             }
             return dict;
         } catch (JSONException exception) {

@@ -131,7 +131,7 @@ public interface GXBaseBuilder {
         for (String conditionKey : conditionKeys) {
             String template = "{} = '{}'";
             final String value = condition.getStr(conditionKey);
-            if (ReUtil.isMatch("^[0-9]*$", value)) {
+            if (ReUtil.isMatch("^[+-]?(0|([1-9]\\d*))(\\.\\d+)?$", value)) {
                 template = "{} = {}";
             }
             sql.WHERE(StrUtil.format(template, conditionKey, value));
