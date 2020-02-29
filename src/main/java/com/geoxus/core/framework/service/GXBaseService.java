@@ -519,7 +519,7 @@ public interface GXBaseService<T> extends IService<T> {
                         }
                         value = JSONUtil.toJsonStr(toBean);
                     } else {
-                        value = value.concat(dataObj.toString());
+                        value = value.concat("::" + dataObj.toString());
                     }
                 }
                 tableValues.set(key, value);
