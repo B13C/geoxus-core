@@ -1,5 +1,6 @@
 package com.geoxus.core.common.util;
 
+import cn.hutool.core.annotation.AnnotationUtil;
 import cn.hutool.core.convert.Convert;
 import cn.hutool.core.lang.Dict;
 import cn.hutool.core.util.*;
@@ -7,6 +8,7 @@ import cn.hutool.json.JSON;
 import cn.hutool.json.JSONArray;
 import cn.hutool.json.JSONObject;
 import cn.hutool.json.JSONUtil;
+import com.baomidou.mybatisplus.annotation.TableName;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -649,6 +651,20 @@ public class GXCommonUtils {
             return requestParam;
         }
         return data;
+    }
+
+    /**
+     * 获取实体的表名字
+     *
+     * @param clazz Class
+     * @return String
+     */
+    public static String getTableName(Class<?> clazz) {
+        final TableName annotation = AnnotationUtil.getAnnotation(clazz, TableName.class);
+        if (null != annotation) {
+            return annotation.value();
+        }
+        return "";
     }
 
     /**

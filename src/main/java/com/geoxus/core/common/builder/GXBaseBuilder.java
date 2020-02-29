@@ -171,14 +171,27 @@ public interface GXBaseBuilder {
      * @return
      */
     static String batchInsertBySQL(String tableName, Set<String> fieldSet, List<Dict> dataList) {
-        String sql = "INSERT INTO " + tableName + "(" + CollUtil.join(fieldSet, ",") + ") VALUES ";
+        if (dataList.isEmpty()) {
+            return "";
+        }
+        final Set<String> newFieldSet = new HashSet<>(dataList.get(0).keySet());
+        if (!fieldSet.retainAll(newFieldSet)) {
+            fieldSet = newFieldSet;
+        }
+        String sql = "INSERT INTO " + tableName + "(`" + CollUtil.join(fieldSet, "`,`") + "`) VALUES ";
         StringBuilder values = new StringBuilder();
         for (Dict dict : dataList) {
-            values.append("(");
+            int len = dict.size();
+            int key = 0;
+            values.append("('");
             for (String field : fieldSet) {
-                values.append(dict.getStr(field)).append(",");
+                if (++key == len) {
+                    values.append(dict.getObj(field)).append("'");
+                } else {
+                    values.append(dict.getObj(field)).append("','");
+                }
             }
-            values.deleteCharAt(values.lastIndexOf(",")).append("),");
+            values.append("),");
         }
         return sql + StrUtil.sub(values, 0, values.lastIndexOf(","));
     }

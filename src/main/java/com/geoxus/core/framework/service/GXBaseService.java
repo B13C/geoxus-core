@@ -1,7 +1,8 @@
 package com.geoxus.core.framework.service;
 
-import cn.hutool.core.annotation.AnnotationUtil;
+import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.convert.Convert;
+import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.lang.Dict;
 import cn.hutool.core.lang.TypeReference;
 import cn.hutool.core.util.ObjectUtil;
@@ -10,11 +11,11 @@ import cn.hutool.core.util.StrUtil;
 import cn.hutool.json.JSON;
 import cn.hutool.json.JSONObject;
 import cn.hutool.json.JSONUtil;
-import com.baomidou.mybatisplus.annotation.TableName;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.StringUtils;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.geoxus.core.common.annotation.GXFieldCommentAnnotation;
+import com.geoxus.core.common.event.GXBaseEvent;
 import com.geoxus.core.common.event.GXMediaLibraryEvent;
 import com.geoxus.core.common.exception.GXException;
 import com.geoxus.core.common.mapper.GXBaseMapper;
@@ -32,6 +33,7 @@ import javax.validation.constraints.NotNull;
 import java.lang.reflect.Field;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
+import java.sql.SQLException;
 import java.util.*;
 
 /**
@@ -382,11 +384,7 @@ public interface GXBaseService<T> extends IService<T> {
      * @return
      */
     default String getTableName(Class<T> clazz) {
-        final TableName annotation = AnnotationUtil.getAnnotation(clazz, TableName.class);
-        if (null != annotation) {
-            return annotation.value();
-        }
-        return "";
+        return GXCommonUtils.getTableName(clazz);
     }
 
     /**
@@ -470,6 +468,70 @@ public interface GXBaseService<T> extends IService<T> {
         }
         final T bean = (T) JSONUtil.toBean((JSONObject) json, target.getClass());
         return updateById(bean);
+    }
+
+    /**
+     * 记录原表的数据到历史表里面
+     *
+     * @param originTableName  原表名
+     * @param historyTableName 历史表名字
+     * @param condition        条件
+     * @param appendData       附加信息
+     * @return boolean
+     */
+    @Transactional(rollbackFor = Exception.class)
+    default boolean recordModificationHistory(String originTableName, String historyTableName, Dict condition, Dict appendData) {
+        GXBaseMapper<T> baseMapper = (GXBaseMapper<T>) getBaseMapper();
+        assert baseMapper != null;
+        final Dict targetDict = baseMapper.getFieldBySQL(originTableName, CollUtil.newHashSet("*"), condition);
+        if (targetDict.isEmpty()) {
+            return false;
+        }
+        GXAlterTableService gxAlterTableService = GXSpringContextUtils.getBean(GXAlterTableService.class);
+        assert gxAlterTableService != null;
+        List<GXDBSchemaService.TableField> tableColumns = CollUtil.newArrayList();
+        try {
+            tableColumns = gxAlterTableService.getTableColumns(historyTableName);
+        } catch (SQLException e) {
+            log.error(e.getMessage(), e);
+        }
+        if (tableColumns.isEmpty()) {
+            return false;
+        }
+        final Set<String> tableField = CollUtil.newHashSet();
+        for (GXDBSchemaService.TableField field : tableColumns) {
+            tableField.add(field.getColumnName());
+        }
+        final Dict tableValues = Dict.create();
+        final HashSet<String> lastTableField = new HashSet<>();
+        for (String key : tableField) {
+            if (null != targetDict.getObj(key)) {
+                lastTableField.add(key);
+                tableValues.set(key, targetDict.getObj(key));
+            }
+        }
+        tableValues.set("updated_at", tableValues.getInt("created_at"));
+        tableValues.set("created_at", DateUtil.currentSeconds());
+        final Integer insert = baseMapper.batchInsertBySQL(historyTableName, lastTableField, CollUtil.newArrayList(tableValues));
+        return insert > 0;
+    }
+
+    /**
+     * 派发同步事件
+     *
+     * @param event
+     */
+    default <T> void postSyncEvent(GXBaseEvent<T> event) {
+        GXCommonUtils.postSyncEvent(event);
+    }
+
+    /**
+     * 派发异步事件
+     *
+     * @param event
+     */
+    default <T> void postAsyncEvent(GXBaseEvent<T> event) {
+        GXCommonUtils.postAsyncEvent(event);
     }
 
     /**

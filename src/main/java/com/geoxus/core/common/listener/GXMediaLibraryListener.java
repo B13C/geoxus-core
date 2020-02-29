@@ -7,6 +7,7 @@ import cn.hutool.core.util.ReflectUtil;
 import cn.hutool.json.JSONObject;
 import com.geoxus.core.common.event.GXMediaLibraryEvent;
 import com.geoxus.core.framework.service.GXCoreMediaLibraryService;
+import com.google.common.eventbus.AllowConcurrentEvents;
 import com.google.common.eventbus.Subscribe;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,6 +24,7 @@ public class GXMediaLibraryListener extends GXSyncBaseListener {
     private GXCoreMediaLibraryService coreMediaLibraryService;
 
     @Subscribe
+    @AllowConcurrentEvents
     public void updateMediaOwner(GXMediaLibraryEvent<?> event) {
         final Dict param = event.getParam();
         final Object o = event.getTarget();
