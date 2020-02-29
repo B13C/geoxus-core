@@ -505,9 +505,24 @@ public interface GXBaseService<T> extends IService<T> {
         final Dict tableValues = Dict.create();
         final HashSet<String> lastTableField = new HashSet<>();
         for (String key : tableField) {
-            if (null != targetDict.getObj(key)) {
+            String value = targetDict.getStr(key);
+            if (null != value) {
                 lastTableField.add(key);
-                tableValues.set(key, targetDict.getObj(key));
+                final Object dataObj = appendData.getObj(key);
+                if (null != dataObj) {
+                    if (JSONUtil.isJson(value)) {
+                        final Dict toBean = JSONUtil.toBean(value, Dict.class);
+                        if ((dataObj instanceof Dict)) {
+                            toBean.putAll((Dict) dataObj);
+                        } else {
+                            toBean.set(key, dataObj);
+                        }
+                        value = JSONUtil.toJsonStr(toBean);
+                    } else {
+                        value = value.concat(dataObj.toString());
+                    }
+                }
+                tableValues.set(key, value);
             }
         }
         tableValues.set("updated_at", tableValues.getInt("created_at"));
