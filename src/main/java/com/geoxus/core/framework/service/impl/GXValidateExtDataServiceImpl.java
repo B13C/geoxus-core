@@ -48,7 +48,7 @@ public class GXValidateExtDataServiceImpl implements GXValidateExtDataService {
     private GXCoreModelAttributesService coreModelAttributeService;
 
     @Override
-    public boolean validateExtData(Object o, String modelIdentification, String subFiled, ConstraintValidatorContext context) throws UnsupportedOperationException {
+    public boolean validateExtData(Object o, String modelIdentification, String subFiled, boolean isFullMatchAttribute, ConstraintValidatorContext context) throws UnsupportedOperationException {
         final String jsonStr = JSONUtil.toJsonStr(o);
         if (!JSONUtil.isJson(jsonStr)) {
             return false;
@@ -56,6 +56,12 @@ public class GXValidateExtDataServiceImpl implements GXValidateExtDataService {
         final int modelId = coreModelService.getModelIdByModelIdentification(modelIdentification);
         if (modelId <= 0) {
             throw new GXException(StrUtil.format(MODEL_SETTING_NOT_EXISTS, modelIdentification));
+        }
+        if (isFullMatchAttribute) {
+            final boolean b = coreModelAttributeService.checkCoreModelFieldAttributes(modelId, subFiled, jsonStr);
+            if (!b) {
+                throw new GXException(StrUtil.format("{}字段提交的属性与数据库配置的字段属性不匹配!", subFiled));
+            }
         }
         final GXCoreModelEntity coreModelEntity = coreModelService.getCoreModelByModelId(modelId, subFiled);
         final List<GXCoreModelAttributesEntity> attributesList = coreModelEntity.getCoreAttributesEntities();

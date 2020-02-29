@@ -16,4 +16,7 @@ public interface GXCoreModelAttributesMapper extends GXBaseMapper<GXCoreModelAtt
 
     @SelectProvider(type = GXCoreModelAttributesBuilder.class, method = "checkCoreModelHasAttribute")
     Integer checkCoreModelHasAttribute(Dict param);
+
+    @SelectProvider(type = GXCoreModelAttributesBuilder.class, method = "listOrSearch")
+    List<Dict> listOrSearch(Dict param);
 }

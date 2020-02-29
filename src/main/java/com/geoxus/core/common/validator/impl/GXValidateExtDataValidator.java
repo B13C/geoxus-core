@@ -14,12 +14,15 @@ public class GXValidateExtDataValidator implements ConstraintValidator<GXValidat
 
     private String subField;
 
+    private boolean isFullMatchAttribute;
+
     @Override
     public void initialize(GXValidateExtDataAnnotation constraintAnnotation) {
         Class<? extends GXValidateExtDataService> clazz = constraintAnnotation.service();
         modelName = constraintAnnotation.tableName();
         subField = constraintAnnotation.fieldName();
         service = GXSpringContextUtils.getBean(clazz);
+        isFullMatchAttribute = constraintAnnotation.isFullMatchAttribute();
     }
 
     @Override
@@ -27,6 +30,6 @@ public class GXValidateExtDataValidator implements ConstraintValidator<GXValidat
         if (null == o) {
             return true;
         }
-        return service.validateExtData(o, modelName, subField, context);
+        return service.validateExtData(o, modelName, subField, isFullMatchAttribute, context);
     }
 }

@@ -1,8 +1,8 @@
 package com.geoxus.core.common.exception;
 
 import cn.hutool.http.HttpStatus;
-import com.geoxus.core.common.vo.GXResultCode;
 import com.geoxus.core.common.util.GXResultUtils;
+import com.geoxus.core.common.vo.GXResultCode;
 import com.mysql.jdbc.exceptions.MySQLIntegrityConstraintViolationException;
 import com.mysql.jdbc.exceptions.jdbc4.MySQLSyntaxErrorException;
 import lombok.extern.slf4j.Slf4j;
@@ -18,6 +18,7 @@ import org.springframework.web.servlet.NoHandlerFoundException;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import javax.validation.ValidationException;
+import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -129,4 +130,11 @@ public class GXExceptionHandler {
         log.error(e.getMessage(), e);
         return GXResultUtils.error(HttpStatus.HTTP_INTERNAL_ERROR, e.getMessage());
     }
+
+    @ExceptionHandler(SQLException.class)
+    public GXResultUtils handleSQLException(SQLException e, RedirectAttributes redirectAttributes) {
+        log.error(e.getMessage(), e);
+        return GXResultUtils.error(HttpStatus.HTTP_INTERNAL_ERROR, e.getMessage());
+    }
+
 }

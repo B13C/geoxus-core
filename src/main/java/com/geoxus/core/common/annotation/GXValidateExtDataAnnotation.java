@@ -28,4 +28,6 @@ public @interface GXValidateExtDataAnnotation {
     String tableName();
 
     String fieldName() default "ext";
+
+    boolean isFullMatchAttribute() default false;
 }

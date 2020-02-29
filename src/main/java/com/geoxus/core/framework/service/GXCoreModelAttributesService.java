@@ -31,4 +31,15 @@ public interface GXCoreModelAttributesService extends GXBaseService<GXCoreModelA
      * @return Integer
      */
     Integer checkCoreModelHasAttribute(Integer coreModelId, String attributeName);
+
+    /**
+     * 检测指定模型的指定字段是否包含响应的字段(全部匹配相应的字段)
+     *
+     * @param coreModelId 核心模型ID
+     * @param modelField  需要检测的模型字段
+     * @param json        需要验证的数据
+     * @return boolean
+     * @example checkCoreModelFieldAttribute(8, " ext ", JSON)
+     */
+    boolean checkCoreModelFieldAttributes(Integer coreModelId, String modelField, String json);
 }

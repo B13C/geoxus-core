@@ -130,8 +130,8 @@ public interface GXBaseBuilder {
         final Set<String> conditionKeys = condition.keySet();
         for (String conditionKey : conditionKeys) {
             String template = "{} = '{}'";
-            final Object value = condition.getObj(conditionKey);
-            if (ReUtil.getFirstNumber(value.toString()) instanceof Number) {
+            final String value = condition.getStr(conditionKey);
+            if (ReUtil.isMatch("^[0-9]*$", value)) {
                 template = "{} = {}";
             }
             sql.WHERE(StrUtil.format(template, conditionKey, value));

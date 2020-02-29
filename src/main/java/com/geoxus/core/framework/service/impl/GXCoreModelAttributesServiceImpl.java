@@ -2,6 +2,7 @@ package com.geoxus.core.framework.service.impl;
 
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.lang.Dict;
+import cn.hutool.json.JSONUtil;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.geoxus.core.framework.entity.GXCoreModelAttributesEntity;
 import com.geoxus.core.framework.mapper.GXCoreModelAttributesMapper;
@@ -12,6 +13,8 @@ import org.springframework.stereotype.Service;
 
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 @Service
 @Slf4j
@@ -34,5 +37,22 @@ public class GXCoreModelAttributesServiceImpl extends ServiceImpl<GXCoreModelAtt
     public Integer checkCoreModelHasAttribute(Integer coreModelId, String attributeName) {
         final Dict condition = Dict.create().set("core_model_id", coreModelId).set("attribute_name", attributeName);
         return baseMapper.checkCoreModelHasAttribute(condition);
+    }
+
+    @Override
+    public boolean checkCoreModelFieldAttributes(Integer coreModelId, String modelAttributeField, String jsonStr) {
+        final Dict condition = Dict.create().set("model_id", coreModelId).set("model_attribute_field", modelAttributeField);
+        final List<Dict> list = baseMapper.listOrSearch(condition);
+        Set<String> set = CollUtil.newHashSet();
+        Set<String> set1 = CollUtil.newHashSet();
+        for (Dict dict : list) {
+            set.add(dict.getStr("attribute_name"));
+        }
+        final Dict dict = JSONUtil.toBean(jsonStr, Dict.class);
+        for (Map.Entry<String, Object> entry : dict.entrySet()) {
+            set1.add(entry.getKey());
+        }
+        log.info("checkCoreModelFieldAttributes ->> set : {} , set1 : {}", set, set1);
+        return set.toString().equals(set1.toString());
     }
 }
