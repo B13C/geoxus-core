@@ -57,7 +57,7 @@ public class GXValidateExtDataServiceImpl implements GXValidateExtDataService {
         if (modelId <= 0) {
             throw new GXException(StrUtil.format(MODEL_SETTING_NOT_EXISTS, modelIdentification));
         }
-        if (isFullMatchAttribute) {
+        if (isFullMatchAttribute && !StrUtil.equals(jsonStr, "{}")) {
             final boolean b = coreModelAttributeService.checkCoreModelFieldAttributes(modelId, subFiled, jsonStr);
             if (!b) {
                 throw new GXException(StrUtil.format("{}字段提交的属性与数据库配置的字段属性不匹配!", subFiled));

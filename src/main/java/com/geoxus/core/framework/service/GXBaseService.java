@@ -5,11 +5,8 @@ import cn.hutool.core.convert.Convert;
 import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.lang.Dict;
 import cn.hutool.core.lang.TypeReference;
-import cn.hutool.core.util.ObjectUtil;
-import cn.hutool.core.util.ReflectUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.json.JSON;
-import cn.hutool.json.JSONObject;
 import cn.hutool.json.JSONUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.StringUtils;
@@ -23,7 +20,6 @@ import com.geoxus.core.common.util.GXCommonUtils;
 import com.geoxus.core.common.util.GXHttpContextUtils;
 import com.geoxus.core.common.util.GXSpringContextUtils;
 import com.geoxus.core.common.util.GXSyncEventBusCenterUtils;
-import com.geoxus.core.common.validator.impl.GXValidatorUtils;
 import com.geoxus.core.framework.entity.GXCoreMediaLibraryEntity;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -188,108 +184,34 @@ public interface GXBaseService<T> extends IService<T> {
     /**
      * 更新JSON字段中的某一个值
      *
-     * @param entity
+     * @param clazz
      * @param path
      * @param value
+     * @param condition
      * @return
      */
     @Transactional(rollbackFor = Exception.class)
-    default boolean updateJSONFieldSingleValue(T entity, String path, Object value) {
-        final T bean = modifyEntityJSONFieldSingleValue(entity, path, value);
-        return updateById(bean);
+    default boolean updateJSONFieldSingleValue(Class<T> clazz, String path, Object value, Dict condition) {
+        GXBaseMapper<T> baseMapper = (GXBaseMapper<T>) getBaseMapper();
+        int index = StrUtil.indexOf(path, '.');
+        String mainPath = StrUtil.sub(path, 0, index);
+        String subPath = StrUtil.sub(path, index + 1, path.length());
+        final Dict data = Dict.create().set(mainPath, Dict.create().set(subPath, value));
+        return baseMapper.updateFieldByCondition(getTableName(clazz), data, condition);
     }
 
     /**
      * 更新JSON字段中的某多个值
      *
-     * @param entity
-     * @param param
-     * @return
+     * @param clazz     Class对象
+     * @param data      需要更新的数据
+     * @param condition 更新条件
+     * @return boolean
      */
     @Transactional(rollbackFor = Exception.class)
-    default boolean updateJSONFieldMultiValue(T entity, Dict param) {
-        final T bean = modifyEntityJSONFieldMultiValue(entity, param);
-        return updateById(bean);
-    }
-
-    /**
-     * 修改实体的JSON字段的值
-     *
-     * @param entity
-     * @param path
-     * @param value
-     * @return
-     */
-    default T modifyEntityJSONFieldSingleValue(T entity, String path, Object value) {
-        if (ObjectUtil.isEmpty(value)) {
-            return entity;
-        }
-        JSONObject jsonObject = JSONUtil.parseObj(JSONUtil.toJsonStr(entity));
-        final boolean deleteFlag = StrUtil.startWith(path, "-");
-        if (deleteFlag) {
-            path = StrUtil.sub(path, 1, path.length());
-        }
-        int index = StrUtil.indexOf(path, '.');
-        if (index == -1) {
-            GXCommonUtils.putDataToJSONStr(jsonObject, path, value, true);
-        } else {
-            String mainPath = StrUtil.sub(path, 0, index);
-            String subPath = StrUtil.sub(path, index + 1, path.length());
-            JSONObject o = jsonObject.getByPath(mainPath, JSONObject.class);
-            if (null != o && deleteFlag) {
-                GXCommonUtils.removeJSONObjectAnyPath(o, subPath);
-                jsonObject.putByPath(mainPath, o);
-            } else {
-                GXCommonUtils.putDataToJSONStr(jsonObject, path, value, true);
-            }
-        }
-        final T bean = (T) JSONUtil.toBean((JSONObject) jsonObject, entity.getClass());
-        if (null != ReflectUtil.getFieldValue(entity, "enableValidateEntity")
-                && Convert.convert(Boolean.class, ReflectUtil.getFieldValue(entity, "enableValidateEntity"))) {
-            GXValidatorUtils.validateEntity(bean);
-        }
-        return bean;
-    }
-
-    /**
-     * 修改实体的JSON字段的值
-     *
-     * @param entity 实体对象
-     * @param param  修改参数
-     * @return T
-     * @example modifyEntityJSONFieldMultiValue(t, Dict.create ().set(" ext ", Dict.create ().set(" name ", " jack ").set(" age ", 30)))
-     */
-    default T modifyEntityJSONFieldMultiValue(T entity, Dict param) {
-        JSONObject jsonObject = JSONUtil.parseObj(entity);
-        final Set<String> mainFieldKeySet = param.keySet();
-        for (String mainPath : mainFieldKeySet) {
-            final Object obj = param.getObj(mainPath);
-            if (!(obj instanceof Map)) {
-                continue;
-            }
-            final Dict subDict = Convert.convert(Dict.class, obj);
-            final Set<String> subFieldKeySet = subDict.keySet();
-            JSONObject o = jsonObject.getByPath(mainPath, JSONObject.class);
-            for (String subPath : subFieldKeySet) {
-                final boolean deleteFlag = StrUtil.startWith(subPath, "-");
-                final Object value = subDict.getObj(subPath);
-                if (deleteFlag) {
-                    subPath = StrUtil.sub(subPath, 1, subPath.length());
-                }
-                if (deleteFlag || ObjectUtil.isEmpty(value)) {
-                    GXCommonUtils.removeJSONObjectAnyPath(o, subPath);
-                } else {
-                    GXCommonUtils.putDataToJSONStr(o, subPath, value, true);
-                }
-            }
-            jsonObject.putByPath(mainPath, o);
-        }
-        final T bean = (T) JSONUtil.toBean((JSONObject) jsonObject, entity.getClass());
-        if (null != ReflectUtil.getFieldValue(entity, "enableValidateEntity")
-                && Convert.convert(Boolean.class, ReflectUtil.getFieldValue(entity, "enableValidateEntity"))) {
-            GXValidatorUtils.validateEntity(bean);
-        }
-        return bean;
+    default boolean updateJSONFieldMultiValue(Class<T> clazz, Dict data, Dict condition) {
+        GXBaseMapper<T> baseMapper = (GXBaseMapper<T>) getBaseMapper();
+        return baseMapper.updateFieldByCondition(getTableName(clazz), data, condition);
     }
 
     /**
@@ -452,22 +374,6 @@ public interface GXBaseService<T> extends IService<T> {
     default Dict getFieldBySQL(Class<T> clazz, Set<String> fieldSet, Dict condition) {
         GXBaseMapper<T> baseMapper = (GXBaseMapper<T>) getBaseMapper();
         return baseMapper.getFieldBySQL(getTableName(clazz), fieldSet, condition);
-    }
-
-    /**
-     * 更新实体JSON的多个字段
-     *
-     * @param target
-     * @param param
-     * @return
-     */
-    default boolean updateJSONMultiFields(T target, List<Dict> param) {
-        JSON json = JSONUtil.parse(JSONUtil.toJsonStr(target));
-        for (Dict info : param) {
-            json.putByPath(info.getStr("path"), info.getObj("value"));
-        }
-        final T bean = (T) JSONUtil.toBean((JSONObject) json, target.getClass());
-        return updateById(bean);
     }
 
     /**

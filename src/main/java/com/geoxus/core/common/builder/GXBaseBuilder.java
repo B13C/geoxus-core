@@ -50,7 +50,7 @@ public interface GXBaseBuilder {
         final SQL sql = new SQL().UPDATE(tableName);
         final Set<String> dataKeys = data.keySet();
         for (String dataKey : dataKeys) {
-            final Object value = data.getObj(dataKey);
+            Object value = data.getObj(dataKey);
             if (value instanceof Table) {
                 Table<String, String, Object> table = Convert.convert(new TypeReference<Table<String, String, Object>>() {
                 }, value);
@@ -72,6 +72,9 @@ public interface GXBaseBuilder {
                     }
                 }
                 continue;
+            }
+            if (value instanceof Map) {
+                value = JSONUtil.toJsonStr(value);
             }
             sql.SET(StrUtil.format("{} = '{}'", dataKey, value));
         }
