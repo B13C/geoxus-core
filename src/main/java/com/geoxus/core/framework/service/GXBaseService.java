@@ -29,6 +29,7 @@ import javax.validation.constraints.NotNull;
 import java.lang.reflect.Field;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
+import java.nio.charset.StandardCharsets;
 import java.sql.SQLException;
 import java.util.*;
 
@@ -61,6 +62,81 @@ public interface GXBaseService<T> extends IService<T> {
     /**
      * 获取实体中指定指定的值
      *
+     * @param clazz
+     * @param path
+     * @param condition
+     * @return
+     * @example {
+     * "entity":GoodsEntity,
+     * "path":"ext.name",
+     * "type":Integer.class
+     * }
+     */
+    default <R> R getSingleJSONFieldValueByDB(Class<T> clazz, String path, Class<R> type, Dict condition) {
+        return getSingleJSONFieldValueByDB(clazz, path, condition, type, GXCommonUtils.getClassDefaultValue(type));
+    }
+
+    /**
+     * 获取实体中指定指定的值
+     *
+     * @param clazz
+     * @param path
+     * @param condition
+     * @param defaultValue
+     * @return
+     */
+    default <R> R getSingleJSONFieldValueByDB(Class<T> clazz, String path, Dict condition, Class<R> type, R defaultValue) {
+        String aliasName = "";
+        if (StrUtil.contains(path, ".")) {
+            aliasName = StrUtil.split(path, ".")[1].replace("'", "");
+            path = StrUtil.format("{} as `{}`", path, aliasName);
+        }
+        GXBaseMapper<T> baseMapper = (GXBaseMapper<T>) getBaseMapper();
+        final Dict dict = baseMapper.getFieldBySQL(getTableName(clazz), CollUtil.newHashSet(path), condition);
+        if (null == dict) {
+            return defaultValue;
+        }
+        return Convert.convert(type, new String((byte[]) dict.getObj(aliasName), StandardCharsets.UTF_8), defaultValue);
+    }
+
+    /**
+     * 获取JSON中的多个值
+     *
+     * @param clazz
+     * @param fields
+     * @param condition
+     * @return
+     */
+    default Dict getMultiJSONFieldValueByDB(Class<T> clazz, Map<String, Class<?>> fields, Dict condition) {
+        GXBaseMapper<T> baseMapper = (GXBaseMapper<T>) getBaseMapper();
+        final HashSet<String> fieldSet = CollUtil.newHashSet();
+        final Dict dataKey = Dict.create();
+        for (Map.Entry<String, Class<?>> entry : fields.entrySet()) {
+            String key = entry.getKey();
+            String aliasName = key;
+            if (StrUtil.contains(key, ".")) {
+                aliasName = StrUtil.format("ext_{}", StrUtil.split(key, ".")[1].replace("'", ""));
+                fieldSet.add(StrUtil.format("{} as `{}`", key, aliasName));
+            } else {
+                fieldSet.add(StrUtil.format("`{}`", key));
+            }
+            dataKey.set(aliasName, key);
+        }
+        final Dict dict = baseMapper.getFieldBySQL(getTableName(clazz), fieldSet, condition);
+        final Dict retDict = Dict.create();
+        for (Map.Entry<String, Object> entry : dataKey.entrySet()) {
+            Object value = dict.getObj(entry.getKey());
+            if (value instanceof byte[]) {
+                value = new String((byte[]) value, StandardCharsets.UTF_8);
+            }
+            retDict.set((String) entry.getValue(), Convert.convert(fields.get(entry.getValue()), value, GXCommonUtils.getClassDefaultValue(fields.get(entry.getValue()))));
+        }
+        return retDict;
+    }
+
+    /**
+     * 获取实体中指定指定的值
+     *
      * @param entity
      * @param path
      * @return
@@ -70,25 +146,8 @@ public interface GXBaseService<T> extends IService<T> {
      * "type":Integer.class
      * }
      */
-    default <R> R getSingleJSONFieldValue(T entity, String path, Class<R> type) {
-        JSON json = JSONUtil.parse(JSONUtil.toJsonStr(entity));
-        int index = StrUtil.indexOf(path, '.');
-        if (index == -1) {
-            if (null == json.getByPath(path)) {
-                return GXCommonUtils.getClassDefaultValue(type);
-            }
-            return Convert.convert(type, json.getByPath(path));
-        }
-        String mainField = StrUtil.sub(path, 0, index);
-        if (null == json.getByPath(mainField)) {
-            throw new GXException(StrUtil.format("实体的{}字段不存在!", mainField));
-        }
-        String subField = StrUtil.sub(path, index + 1, path.length());
-        JSON parse = JSONUtil.parse(json.getByPath(mainField));
-        if (null == parse.getByPath(subField, type)) {
-            return GXCommonUtils.getClassDefaultValue(type);
-        }
-        return Convert.convert(type, parse.getByPath(subField));
+    default <R> R getSingleJSONFieldValueByEntity(T entity, String path, Class<R> type) {
+        return getSingleJSONFieldValueByEntity(entity, path, type, GXCommonUtils.getClassDefaultValue(type));
     }
 
     /**
@@ -105,7 +164,7 @@ public interface GXBaseService<T> extends IService<T> {
      * "defaultValue":0
      * }
      */
-    default <R> R getSingleJSONFieldValue(T entity, String path, Class<R> type, R defaultValue) {
+    default <R> R getSingleJSONFieldValueByEntity(T entity, String path, Class<R> type, R defaultValue) {
         JSON json = JSONUtil.parse(JSONUtil.toJsonStr(entity));
         int index = StrUtil.indexOf(path, '.');
         if (index == -1) {
@@ -126,6 +185,7 @@ public interface GXBaseService<T> extends IService<T> {
         return Convert.convert(type, parse.getByPath(subField), defaultValue);
     }
 
+
     /**
      * 获取实体的多个JSON值
      *
@@ -133,11 +193,11 @@ public interface GXBaseService<T> extends IService<T> {
      * @param dict
      * @return
      */
-    default Dict getMultiJSONFieldValue(T entity, Dict dict) {
+    default Dict getMultiJSONFieldValueByEntity(T entity, Dict dict) {
         final Set<String> keySet = dict.keySet();
         final Dict data = Dict.create();
         for (String key : keySet) {
-            final Object value = getSingleJSONFieldValue(entity, key, (Class<?>) dict.getObj(key));
+            final Object value = getSingleJSONFieldValueByEntity(entity, key, (Class<?>) dict.getObj(key));
             final String[] strings = StrUtil.split(key, StrUtil.DOT);
             data.set(strings[strings.length - 1], value);
         }
