@@ -5,6 +5,7 @@ import cn.hutool.core.convert.Convert;
 import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.lang.Dict;
 import cn.hutool.core.lang.TypeReference;
+import cn.hutool.core.util.RandomUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.json.JSON;
 import cn.hutool.json.JSONUtil;
@@ -115,7 +116,7 @@ public interface GXBaseService<T> extends IService<T> {
             String key = entry.getKey();
             String aliasName = key;
             if (StrUtil.contains(key, ".")) {
-                aliasName = StrUtil.format("ext_{}", StrUtil.split(key, ".")[1].replace("'", ""));
+                aliasName = StrUtil.format("ext_{}", StrUtil.split(key, ".")[1].replace("'", "").concat(RandomUtil.randomString(5)));
                 fieldSet.add(StrUtil.format("{} as `{}`", key, aliasName));
             } else {
                 fieldSet.add(StrUtil.format("`{}`", key));
@@ -129,7 +130,8 @@ public interface GXBaseService<T> extends IService<T> {
             if (value instanceof byte[]) {
                 value = new String((byte[]) value, StandardCharsets.UTF_8);
             }
-            retDict.set((String) entry.getValue(), Convert.convert(fields.get(entry.getValue()), value, GXCommonUtils.getClassDefaultValue(fields.get(entry.getValue()))));
+            final Class<?> aClass = fields.get(entry.getValue());
+            retDict.set((String) entry.getValue(), Convert.convert(aClass, value, GXCommonUtils.getClassDefaultValue(aClass)));
         }
         return retDict;
     }
