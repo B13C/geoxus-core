@@ -10,9 +10,12 @@ import cn.hutool.json.JSONObject;
 import cn.hutool.json.JSONUtil;
 import com.geoxus.core.common.annotation.GXFieldCommentAnnotation;
 import com.geoxus.core.common.annotation.GXRequestBodyToBeanAnnotation;
+import com.geoxus.core.common.constant.GXCommonConstants;
 import com.geoxus.core.common.exception.GXException;
 import com.geoxus.core.common.validator.impl.GXValidatorUtils;
 import com.geoxus.core.common.vo.GXResultCode;
+import com.geoxus.core.framework.service.GXCoreModelAttributesService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.MethodParameter;
 import org.springframework.stereotype.Component;
 import org.springframework.validation.annotation.Validated;
@@ -33,6 +36,9 @@ public class GXRequestToBeanHandlerMethodArgumentResolver implements HandlerMeth
     @GXFieldCommentAnnotation(zh = "请求中的参数名字")
     public static final String JSON_REQUEST_BODY = "JSON_REQUEST_BODY";
 
+    @Autowired
+    private GXCoreModelAttributesService gxCoreModelAttributesService;
+
     @Override
     public boolean supportsParameter(MethodParameter parameter) {
         return parameter.hasParameterAnnotation(GXRequestBodyToBeanAnnotation.class);
@@ -51,6 +57,15 @@ public class GXRequestToBeanHandlerMethodArgumentResolver implements HandlerMeth
         final Class<?> parameterType = parameter.getParameterType();
         final GXRequestBodyToBeanAnnotation gxRequestBodyToBeanAnnotation = parameter.getParameterAnnotation(GXRequestBodyToBeanAnnotation.class);
         final String value = Objects.requireNonNull(gxRequestBodyToBeanAnnotation).value();
+        final String[] jsonFields = gxRequestBodyToBeanAnnotation.jsonFields();
+        final Integer coreModelId = dict.getInt(GXCommonConstants.CORE_MODEL_PRIMARY_NAME);
+        for (String jsonField : jsonFields) {
+            final Dict targetDict = gxCoreModelAttributesService.getModelAttributesDefaultValue(coreModelId, jsonField, dict.getStr(jsonField));
+            if (targetDict.isEmpty()) {
+                continue;
+            }
+            dict.set(jsonField, JSONUtil.toJsonStr(targetDict));
+        }
         Object bean;
         if (StrUtil.isNotBlank(value)) {
             final Object o = JSONUtil.getByPath(JSONUtil.parseObj(body), value);

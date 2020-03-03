@@ -12,5 +12,7 @@ public @interface GXRequestBodyToBeanAnnotation {
 
     Class<?>[] groups() default {};
 
+    String[] jsonFields() default {"ext"};
+
     String primaryKey() default "id";
 }

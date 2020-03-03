@@ -18,20 +18,17 @@ import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 import java.time.Duration;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.ExecutionException;
 
 @Service
 @Slf4j
 public class GXCoreModelAttributesServiceImpl extends ServiceImpl<GXCoreModelAttributesMapper, GXCoreModelAttributesEntity> implements GXCoreModelAttributesService {
     @GXFieldCommentAnnotation(zh = "Guava缓存组件")
-    private static final Cache<String, List<Dict>> cache;
+    private static final Cache<String, List<Dict>> LIST_DICT_CACHE;
 
     static {
-        cache = CacheBuilder.newBuilder().expireAfterWrite(Duration.ofHours(24)).maximumSize(100000).build();
+        LIST_DICT_CACHE = CacheBuilder.newBuilder().expireAfterWrite(Duration.ofHours(24)).maximumSize(100000).build();
     }
 
     @Autowired
@@ -67,18 +64,15 @@ public class GXCoreModelAttributesServiceImpl extends ServiceImpl<GXCoreModelAtt
         for (Map.Entry<String, Object> entry : paramData.entrySet()) {
             paramSet.add(entry.getKey());
         }
-        final String cacheKey = gxCacheKeysUtils.getCacheKey("", StrUtil.format("{}.{}.{}", coreModelId, modelAttributeField, paramSet.toString()));
+        final String cacheKey = gxCacheKeysUtils.getCacheKey("", StrUtil.format("{}.{}.{}", coreModelId, modelAttributeField, String.join(".", paramSet)));
         final Dict condition = Dict.create().set("model_id", coreModelId).set("model_attribute_field", modelAttributeField);
         try {
-            final List<Dict> list = cache.get(cacheKey, () -> baseMapper.listOrSearch(condition));
+            final List<Dict> list = LIST_DICT_CACHE.get(cacheKey, () -> baseMapper.listOrSearch(condition));
             if (list.isEmpty()) {
                 return false;
             }
             Set<String> dbSet = CollUtil.newHashSet();
             for (Dict dict : list) {
-                if (dict.getInt("force_validation") == 0) {
-                    continue;
-                }
                 dbSet.add(dict.getStr("attribute_name"));
             }
             log.info("checkCoreModelFieldAttributes ->> dbSet : {} , paramSet : {}", dbSet, paramSet);
@@ -87,5 +81,31 @@ public class GXCoreModelAttributesServiceImpl extends ServiceImpl<GXCoreModelAtt
             log.error(e.getMessage(), e);
         }
         return false;
+    }
+
+    @Override
+    public Dict getModelAttributesDefaultValue(int coreModelId, String modelAttributeField, String jsonStr) {
+        if (!JSONUtil.isJson(jsonStr)) {
+            return Dict.create();
+        }
+        final Dict sourceDict = JSONUtil.toBean(jsonStr, Dict.class);
+        final String cacheKey = gxCacheKeysUtils.getCacheKey("", StrUtil.format("{}.{}", coreModelId, modelAttributeField));
+        final Dict condition = Dict.create().set("model_id", coreModelId).set("model_attribute_field", modelAttributeField);
+        try {
+            final Dict retDict = Dict.create();
+            final List<Dict> list = LIST_DICT_CACHE.get(cacheKey, () -> baseMapper.listOrSearch(condition));
+            for (Dict data : list) {
+                final String attributeName = data.getStr("attribute_name");
+                Object value = sourceDict.getObj(attributeName);
+                if (null == value) {
+                    value = Optional.ofNullable(data.getObj("default_value")).orElse("");
+                }
+                retDict.set(attributeName, value);
+            }
+            return retDict;
+        } catch (ExecutionException e) {
+            log.error(e.getMessage(), e);
+        }
+        return Dict.create();
     }
 }
