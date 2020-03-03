@@ -357,7 +357,7 @@ public interface GXBaseBuilder {
      * @return String
      */
     default String getSelectFieldStr(String tableName, Set<String> targetSet, String tableAlias, boolean remove) {
-        return GXSpringContextUtils.getBean(GXDBSchemaService.class).getSqlFieldStr(tableName, targetSet, tableAlias, remove);
+        return Objects.requireNonNull(GXSpringContextUtils.getBean(GXDBSchemaService.class)).getSqlFieldStr(tableName, targetSet, tableAlias, remove);
     }
 
     /**
@@ -369,7 +369,7 @@ public interface GXBaseBuilder {
      * @return String
      */
     default String getSelectFieldStr(String tableName, Set<String> targetSet, boolean remove) {
-        return GXSpringContextUtils.getBean(GXDBSchemaService.class).getSqlFieldStr(tableName, targetSet, remove);
+        return Objects.requireNonNull(GXSpringContextUtils.getBean(GXDBSchemaService.class)).getSqlFieldStr(tableName, targetSet, remove);
     }
 
     /**

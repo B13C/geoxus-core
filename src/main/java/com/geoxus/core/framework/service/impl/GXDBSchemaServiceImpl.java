@@ -1,5 +1,8 @@
 package com.geoxus.core.framework.service.impl;
 
+import cn.hutool.core.collection.CollUtil;
+import cn.hutool.core.lang.Dict;
+import cn.hutool.core.util.ArrayUtil;
 import cn.hutool.core.util.StrUtil;
 import com.geoxus.core.common.annotation.GXFieldCommentAnnotation;
 import com.geoxus.core.common.util.GXSpringContextUtils;
@@ -127,12 +130,26 @@ public class GXDBSchemaServiceImpl implements GXDBSchemaService {
         for (GXDBSchemaServiceImpl.TableField tableField : tableFields) {
             result.add(tableField.getColumnName());
         }
-        if (remove) {
-            result.removeAll(targetSet);
-        } else {
-            result.retainAll(targetSet);
+        final Dict tmpTargetDict = Dict.create();
+        for (String key : targetSet) {
+            if (StrUtil.contains(key, " ")) {
+                final String[] split = StrUtil.split(StrUtil.replace(key, " ", "::"), "::");
+                String tmpKey = String.join("", ArrayUtil.sub(split, 0, 1));
+                tmpTargetDict.set(tmpKey, key);
+            } else {
+                tmpTargetDict.set(key, key);
+            }
         }
-        return String.join(",", result);
+        if (remove) {
+            result.removeAll(tmpTargetDict.keySet());
+        } else {
+            result.retainAll(tmpTargetDict.keySet());
+        }
+        final HashSet<String> lastResult = CollUtil.newHashSet();
+        for (String field : result) {
+            lastResult.add(StrUtil.format("{}", tmpTargetDict.getStr(field)));
+        }
+        return String.join(",", lastResult);
     }
 
     @Override
@@ -147,13 +164,23 @@ public class GXDBSchemaServiceImpl implements GXDBSchemaService {
         for (GXDBSchemaServiceImpl.TableField tableField : tableFields) {
             tmpResult.add(tableField.getColumnName());
         }
+        final Dict tmpTargetDict = Dict.create();
+        for (String key : targetSet) {
+            if (StrUtil.contains(key, " ")) {
+                final String[] split = StrUtil.split(StrUtil.replace(key, " ", "::"), "::");
+                String tmpKey = String.join("", ArrayUtil.sub(split, 0, 1));
+                tmpTargetDict.set(tmpKey, key);
+            } else {
+                tmpTargetDict.set(key, key);
+            }
+        }
         if (remove) {
-            tmpResult.removeAll(targetSet);
+            tmpResult.removeAll(tmpTargetDict.keySet());
         } else {
-            tmpResult.retainAll(targetSet);
+            tmpResult.retainAll(tmpTargetDict.keySet());
         }
         for (String field : tmpResult) {
-            result.add(StrUtil.format("{}.{}", tableAlias, field));
+            result.add(StrUtil.format("{}.{}", tableAlias, tmpTargetDict.getStr(field)));
         }
         return String.join(",", result);
     }
