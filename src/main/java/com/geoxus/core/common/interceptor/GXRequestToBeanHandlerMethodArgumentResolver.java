@@ -9,7 +9,7 @@ import cn.hutool.json.JSONArray;
 import cn.hutool.json.JSONObject;
 import cn.hutool.json.JSONUtil;
 import com.geoxus.core.common.annotation.GXFieldCommentAnnotation;
-import com.geoxus.core.common.annotation.GXRequestBodyToBeanAnnotation;
+import com.geoxus.core.common.annotation.GXRequestBodyToEntityAnnotation;
 import com.geoxus.core.common.constant.GXCommonConstants;
 import com.geoxus.core.common.exception.GXException;
 import com.geoxus.core.common.validator.impl.GXValidatorUtils;
@@ -41,7 +41,7 @@ public class GXRequestToBeanHandlerMethodArgumentResolver implements HandlerMeth
 
     @Override
     public boolean supportsParameter(MethodParameter parameter) {
-        return parameter.hasParameterAnnotation(GXRequestBodyToBeanAnnotation.class);
+        return parameter.hasParameterAnnotation(GXRequestBodyToEntityAnnotation.class);
     }
 
     @Override
@@ -55,9 +55,9 @@ public class GXRequestToBeanHandlerMethodArgumentResolver implements HandlerMeth
             throw new GXException(GXResultCode.REQUEST_JSON_NOT_BODY);
         }
         final Class<?> parameterType = parameter.getParameterType();
-        final GXRequestBodyToBeanAnnotation gxRequestBodyToBeanAnnotation = parameter.getParameterAnnotation(GXRequestBodyToBeanAnnotation.class);
-        final String value = Objects.requireNonNull(gxRequestBodyToBeanAnnotation).value();
-        final String[] jsonFields = gxRequestBodyToBeanAnnotation.jsonFields();
+        final GXRequestBodyToEntityAnnotation gxRequestBodyToEntityAnnotation = parameter.getParameterAnnotation(GXRequestBodyToEntityAnnotation.class);
+        final String value = Objects.requireNonNull(gxRequestBodyToEntityAnnotation).value();
+        final String[] jsonFields = gxRequestBodyToEntityAnnotation.jsonFields();
         final Integer coreModelId = dict.getInt(GXCommonConstants.CORE_MODEL_PRIMARY_NAME);
         for (String jsonField : jsonFields) {
             final String json = Optional.ofNullable(dict.getStr(jsonField)).orElse("{}");
@@ -86,7 +86,7 @@ public class GXRequestToBeanHandlerMethodArgumentResolver implements HandlerMeth
             bean = Convert.convert(parameterType, dict);
         }
         final boolean enableValidateEntity = (boolean) Optional.ofNullable(ReflectUtil.getFieldValue(bean, "enableValidateEntity")).orElse(true);
-        Class<?>[] groups = gxRequestBodyToBeanAnnotation.groups();
+        Class<?>[] groups = gxRequestBodyToEntityAnnotation.groups();
         if (parameter.hasParameterAnnotation(Valid.class) && enableValidateEntity) {
             GXValidatorUtils.validateEntity(bean, value, groups);
         }
