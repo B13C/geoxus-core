@@ -165,7 +165,7 @@ public interface GXBusinessService<T> extends GXBaseService<T>, GXValidateDBExis
         final List<?> records = pagination.getRecords();
         for (int i = 0; i < records.size(); i++) {
             final Dict o = (Dict) records.get(i);
-            o.set("media", coreMediaLibraryService.getMediaByCondition(Dict.create().set("model_id", o.getLong(modelIdKey)).set("core_model_id", o.getLong("coreModelId"))));
+            o.set("media", coreMediaLibraryService.getMediaByCondition(Dict.create().set("model_id", o.getLong(modelIdKey)).set(GXCommonConstants.CORE_MODEL_PRIMARY_NAME, o.getLong("coreModelId"))));
         }
         return pagination;
     }
@@ -187,7 +187,7 @@ public interface GXBusinessService<T> extends GXBaseService<T>, GXValidateDBExis
         final List<?> records = pagination.getRecords();
         for (int i = 0; i < records.size(); i++) {
             final Dict o = (Dict) records.get(i);
-            o.set("media", coreMediaLibraryService.getMediaByCondition(Dict.create().set("model_id", o.getLong(modelIdKey)).set("core_model_id", o.getLong("coreModelId"))));
+            o.set("media", coreMediaLibraryService.getMediaByCondition(Dict.create().set("model_id", o.getLong(modelIdKey)).set(GXCommonConstants.CORE_MODEL_PRIMARY_NAME, o.getLong("coreModelId"))));
         }
         return pagination;
     }

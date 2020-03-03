@@ -6,6 +6,7 @@ import cn.hutool.core.util.StrUtil;
 import cn.hutool.json.JSONUtil;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.geoxus.core.common.annotation.GXFieldCommentAnnotation;
+import com.geoxus.core.common.constant.GXCommonConstants;
 import com.geoxus.core.common.util.GXCacheKeysUtils;
 import com.geoxus.core.framework.entity.GXCoreModelAttributesEntity;
 import com.geoxus.core.framework.mapper.GXCoreModelAttributesMapper;
@@ -50,7 +51,7 @@ public class GXCoreModelAttributesServiceImpl extends ServiceImpl<GXCoreModelAtt
 
     @Cacheable(value = "__DEFAULT__", key = "targetClass + methodName + #coreModelId + #attributeName")
     public Integer checkCoreModelHasAttribute(Integer coreModelId, String attributeName) {
-        final Dict condition = Dict.create().set("core_model_id", coreModelId).set("attribute_name", attributeName);
+        final Dict condition = Dict.create().set(GXCommonConstants.CORE_MODEL_PRIMARY_NAME, coreModelId).set("attribute_name", attributeName);
         return baseMapper.checkCoreModelHasAttribute(condition);
     }
 

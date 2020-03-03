@@ -59,7 +59,7 @@ public class GXCoreAttributeEnumsServiceImpl extends ServiceImpl<GXCoreAttribute
         if (null != attributeValue) {
             GXCoreAttributesEntity attributesEntity = coreAttributesService.getAttributeByAttributeName(field);
             if (null != attributesEntity) {
-                final int coreModelId = param.getInt("core_model_id");
+                final int coreModelId = param.getInt(GXCommonConstants.CORE_MODEL_PRIMARY_NAME);
                 boolean exists = isExistsAttributeValue(attributesEntity.getAttributeId(), attributeValue, coreModelId);
                 if (!exists) {
                     constraintValidatorContext.buildConstraintViolationWithTemplate(StrUtil.format(FIELD_VALUE_NOT_EXISTS, field, attributeValue)).addPropertyNode(field).addConstraintViolation();

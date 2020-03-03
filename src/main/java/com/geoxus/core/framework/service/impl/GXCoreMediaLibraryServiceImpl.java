@@ -7,6 +7,7 @@ import cn.hutool.json.JSONUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.geoxus.core.common.config.UploadConfig;
+import com.geoxus.core.common.constant.GXCommonConstants;
 import com.geoxus.core.common.exception.GXException;
 import com.geoxus.core.common.util.GXUploadUtils;
 import com.geoxus.core.framework.entity.GXCoreMediaLibraryEntity;
@@ -50,11 +51,11 @@ public class GXCoreMediaLibraryServiceImpl extends ServiceImpl<GXCoreMediaLibrar
             return true;
         }
         final ArrayList<GXCoreMediaLibraryEntity> newMediaList = new ArrayList<>();
-        final List<GXCoreMediaLibraryEntity> oldMediaList = list(new QueryWrapper<GXCoreMediaLibraryEntity>().allEq(Dict.create().set("model_id", modelId).set("core_model_id", coreModelId)));
+        final List<GXCoreMediaLibraryEntity> oldMediaList = list(new QueryWrapper<GXCoreMediaLibraryEntity>().allEq(Dict.create().set("model_id", modelId).set(GXCommonConstants.CORE_MODEL_PRIMARY_NAME, coreModelId)));
         for (JSONObject dict : param) {
             if (null != dict.getLong("id")) {
                 final long targetModelId = Optional.ofNullable(dict.getLong("model_id")).orElse(modelId);
-                final long itemCoreModelId = Optional.ofNullable(dict.getLong("core_model_id")).orElse(coreModelId);
+                final long itemCoreModelId = Optional.ofNullable(dict.getLong(GXCommonConstants.CORE_MODEL_PRIMARY_NAME)).orElse(coreModelId);
                 final String resourceType = Optional.ofNullable(dict.getStr("resource_type")).orElse("");
                 final GXCoreMediaLibraryEntity entity = getOne(new QueryWrapper<GXCoreMediaLibraryEntity>().eq("id", dict.getLong("id")));
                 final String customProperties = StrUtil.format("[{}]", Optional.ofNullable(dict.getStr("custom_properties")).orElse(""));
@@ -101,7 +102,7 @@ public class GXCoreMediaLibraryServiceImpl extends ServiceImpl<GXCoreMediaLibrar
             entity.setResourceType(Optional.ofNullable(param.getStr("resource_type")).orElse("defaultResourceType"));
             entity.setModelType(Optional.ofNullable(param.getStr("model_type")).orElse("defaultModelType"));
             entity.setTargetId(Optional.ofNullable(param.getLong("model_id")).orElse(0L));
-            entity.setCoreModelId(Optional.ofNullable(param.getLong("core_model_id")).orElse(0L));
+            entity.setCoreModelId(Optional.ofNullable(param.getLong(GXCommonConstants.CORE_MODEL_PRIMARY_NAME)).orElse(0L));
             save(entity);
             return entity;
         } catch (IOException e) {
