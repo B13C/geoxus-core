@@ -10,7 +10,8 @@ public class GXCoreModelAttributesBuilder implements GXBaseBuilder {
     public String listOrSearch(Dict param) {
         final SQL sql = new SQL().SELECT(
                 "ca.attribute_name", "ca.attribute_id", "ca.show_name", "ca.category", "ca.data_type",
-                "ca.front_type", "ca.validation_desc", "ca.validation_expression", "cma.model_attribute_field", "cma.required")
+                "ca.front_type", "ca.validation_desc", "ca.validation_expression", "cma.force_validation",
+                "cma.field_name", "cma.default_value","cma.model_attribute_field", "cma.required")
                 .FROM("core_model_attributes cma");
         sql.INNER_JOIN("core_model ON cma.model_id = core_model.model_id");
         sql.INNER_JOIN("core_attributes ca ON cma.attribute_id = ca.attribute_id");

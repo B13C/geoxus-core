@@ -76,6 +76,9 @@ public class GXCoreModelAttributesServiceImpl extends ServiceImpl<GXCoreModelAtt
             }
             Set<String> dbSet = CollUtil.newHashSet();
             for (Dict dict : list) {
+                if (dict.getInt("force_validation") == 0) {
+                    continue;
+                }
                 dbSet.add(dict.getStr("attribute_name"));
             }
             log.info("checkCoreModelFieldAttributes ->> dbSet : {} , paramSet : {}", dbSet, paramSet);
