@@ -2,6 +2,7 @@ package com.geoxus.core.framework.service.impl;
 
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.lang.Dict;
+import cn.hutool.core.util.RandomUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.json.JSONUtil;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
@@ -19,7 +20,10 @@ import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 import java.time.Duration;
-import java.util.*;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.ExecutionException;
 
 @Service
@@ -99,7 +103,10 @@ public class GXCoreModelAttributesServiceImpl extends ServiceImpl<GXCoreModelAtt
                 final String attributeName = data.getStr("attribute_name");
                 Object value = sourceDict.getObj(attributeName);
                 if (null == value) {
-                    value = Optional.ofNullable(data.getObj("default_value")).orElse("");
+                    value = data.getObj("default_value");
+                }
+                if (StrUtil.isBlank(value.toString())) {
+                    value = RandomUtil.randomString(5);
                 }
                 retDict.set(attributeName, value);
             }

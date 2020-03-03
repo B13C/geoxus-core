@@ -60,7 +60,8 @@ public class GXRequestToBeanHandlerMethodArgumentResolver implements HandlerMeth
         final String[] jsonFields = gxRequestBodyToBeanAnnotation.jsonFields();
         final Integer coreModelId = dict.getInt(GXCommonConstants.CORE_MODEL_PRIMARY_NAME);
         for (String jsonField : jsonFields) {
-            final Dict targetDict = gxCoreModelAttributesService.getModelAttributesDefaultValue(coreModelId, jsonField, dict.getStr(jsonField));
+            final String json = Optional.ofNullable(dict.getStr(jsonField)).orElse("{}");
+            final Dict targetDict = gxCoreModelAttributesService.getModelAttributesDefaultValue(coreModelId, jsonField, json);
             if (targetDict.isEmpty()) {
                 continue;
             }
