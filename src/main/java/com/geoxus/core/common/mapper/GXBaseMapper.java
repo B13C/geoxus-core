@@ -34,4 +34,7 @@ public interface GXBaseMapper<T> extends BaseMapper<T> {
 
     @InsertProvider(type = GXBaseBuilder.class, method = "batchInsertBySQL")
     Integer batchInsertBySQL(String tableName, Set<String> fieldSet, List<Dict> dataList);
+
+    @SelectProvider(type = GXBaseBuilder.class, method = "checkRecordIsUnique")
+    Integer checkRecordIsUnique(String tableName, Dict condition);
 }

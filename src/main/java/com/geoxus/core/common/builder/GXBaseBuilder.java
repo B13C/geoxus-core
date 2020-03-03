@@ -144,6 +144,27 @@ public interface GXBaseBuilder {
     }
 
     /**
+     * 判断给定条件的值是否存在
+     *
+     * @param tableName 表名
+     * @param condition 条件
+     * @return String
+     */
+    static String checkRecordIsUnique(String tableName, Dict condition) {
+        final SQL sql = new SQL().SELECT("count(*) as cnt").FROM(tableName);
+        final Set<String> conditionKeys = condition.keySet();
+        for (String conditionKey : conditionKeys) {
+            String template = "{} = '{}'";
+            final String value = condition.getStr(conditionKey);
+            if (ReUtil.isMatch("^[+-]?(0|([1-9]\\d*))(\\.\\d+)?$", value)) {
+                template = "{} = {}";
+            }
+            sql.WHERE(StrUtil.format(template, conditionKey, value));
+        }
+        return sql.toString();
+    }
+
+    /**
      * 查询单表的指定字段
      *
      * @param tableName 表名

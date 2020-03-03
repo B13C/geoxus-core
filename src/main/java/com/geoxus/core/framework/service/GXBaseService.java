@@ -350,7 +350,7 @@ public interface GXBaseService<T> extends IService<T> {
     }
 
     /**
-     * 检测给定的条件记录是否存在
+     * 检测给定条件的记录是否存在
      *
      * @param clazz     实体的Class
      * @param condition 条件
@@ -359,6 +359,18 @@ public interface GXBaseService<T> extends IService<T> {
     default Integer checkRecordIsExists(Class<T> clazz, Dict condition) {
         GXBaseMapper<T> baseMapper = (GXBaseMapper<T>) getBaseMapper();
         return baseMapper.checkRecordIsExists(getTableName(clazz), condition);
+    }
+
+    /**
+     * 检测给定条件的记录是否唯一
+     *
+     * @param clazz     实体的Class
+     * @param condition 条件
+     * @return
+     */
+    default Integer checkRecordIsUnique(Class<T> clazz, Dict condition) {
+        GXBaseMapper<T> baseMapper = (GXBaseMapper<T>) getBaseMapper();
+        return baseMapper.checkRecordIsUnique(getTableName(clazz), condition);
     }
 
     /**
