@@ -9,7 +9,6 @@ import cn.hutool.json.JSONUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.geoxus.core.common.constant.GXBaseBuilderConstants;
-import com.geoxus.core.framework.entity.GXCoreModelAttributesEntity;
 import com.geoxus.core.framework.entity.GXCoreModelEntity;
 import com.geoxus.core.framework.mapper.GXCoreModelMapper;
 import com.geoxus.core.framework.service.GXCoreModelAttributesService;
@@ -41,8 +40,8 @@ public class GXCoreModelServiceImpl extends ServiceImpl<GXCoreModelMapper, GXCor
         if (StrUtil.isBlank(subField)) {
             subField = null;
         }
-        final List<GXCoreModelAttributesEntity> attributes = coreModelAttributeService.getModelAttributesByModelId(Dict.create().set("model_id", modelId).set("model_attribute_field", subField));
-        entity.setCoreAttributesEntities(attributes);
+        final List<Dict> attributes = coreModelAttributeService.getModelAttributesByModelId(Dict.create().set("model_id", modelId).set("model_attribute_field", subField));
+        entity.setCoreAttributes(attributes);
         return entity;
     }
 
@@ -57,10 +56,10 @@ public class GXCoreModelServiceImpl extends ServiceImpl<GXCoreModelMapper, GXCor
         if (null == modelEntity) {
             return false;
         }
-        final List<GXCoreModelAttributesEntity> attributesEntities = modelEntity.getCoreAttributesEntities();
+        final List<Dict> attributes = modelEntity.getCoreAttributes();
         final Set<String> keys = new HashSet<>();
-        for (GXCoreModelAttributesEntity attribute : attributesEntities) {
-            keys.add(attribute.getFieldName());
+        for (Dict dict : attributes) {
+            keys.add(dict.getStr("field_name"));
         }
         return keys.retainAll(keySet);
     }

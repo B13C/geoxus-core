@@ -41,7 +41,7 @@ public class GXCoreModelAttributesServiceImpl extends ServiceImpl<GXCoreModelAtt
 
     @Override
     @Cacheable(value = "__DEFAULT__", key = "targetClass + methodName + #p0.getStr('model_id') + #p0.getStr('model_attribute_field')")
-    public List<GXCoreModelAttributesEntity> getModelAttributesByModelId(Dict param) {
+    public List<Dict> getModelAttributesByModelId(Dict param) {
         return baseMapper.getModelAttributesByModelId(param);
     }
 

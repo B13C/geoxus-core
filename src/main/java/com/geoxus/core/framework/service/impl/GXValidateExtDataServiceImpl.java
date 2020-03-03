@@ -8,7 +8,6 @@ import cn.hutool.json.JSONUtil;
 import com.geoxus.core.common.exception.GXException;
 import com.geoxus.core.common.validator.GXValidateExtDataService;
 import com.geoxus.core.framework.entity.GXCoreAttributesEntity;
-import com.geoxus.core.framework.entity.GXCoreModelAttributesEntity;
 import com.geoxus.core.framework.entity.GXCoreModelEntity;
 import com.geoxus.core.framework.service.GXCoreAttributeEnumsService;
 import com.geoxus.core.framework.service.GXCoreAttributesService;
@@ -64,10 +63,10 @@ public class GXValidateExtDataServiceImpl implements GXValidateExtDataService {
             }
         }
         final GXCoreModelEntity coreModelEntity = coreModelService.getCoreModelByModelId(modelId, subFiled);
-        final List<GXCoreModelAttributesEntity> attributesList = coreModelEntity.getCoreAttributesEntities();
+        final List<Dict> attributesList = coreModelEntity.getCoreAttributes();
         final Dict validateRule = Dict.create();
-        for (GXCoreModelAttributesEntity defaultAttributeEntity : attributesList) {
-            validateRule.set(defaultAttributeEntity.getFieldName(), defaultAttributeEntity.getValidationExpression());
+        for (Dict dict : attributesList) {
+            validateRule.set(dict.getStr("field_name"), dict.getStr("validation_expression"));
         }
         if (JSONUtil.isJsonObj(jsonStr)) {
             final Dict validateDataMap = Convert.convert(Dict.class, JSONUtil.toBean(jsonStr, Dict.class));

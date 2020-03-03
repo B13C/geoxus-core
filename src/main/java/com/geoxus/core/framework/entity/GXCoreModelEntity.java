@@ -1,5 +1,6 @@
 package com.geoxus.core.framework.entity;
 
+import cn.hutool.core.lang.Dict;
 import com.baomidou.mybatisplus.annotation.FieldFill;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
@@ -34,5 +35,5 @@ public class GXCoreModelEntity extends Model implements Serializable {
     private int createdAt;
 
     @TableField(exist = false)
-    private List<GXCoreModelAttributesEntity> coreAttributesEntities;
+    private List<Dict> coreAttributes;
 }

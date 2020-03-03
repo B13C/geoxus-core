@@ -12,7 +12,7 @@ public interface GXCoreModelAttributesService extends GXBaseService<GXCoreModelA
      * @param param 参数
      * @return
      */
-    List<GXCoreModelAttributesEntity> getModelAttributesByModelId(Dict param);
+    List<Dict> getModelAttributesByModelId(Dict param);
 
     /**
      * 通过模型Id和属性Id获取模型的属性组
