@@ -1,47 +1,34 @@
 package com.geoxus.core.framework.entity;
 
-import com.baomidou.mybatisplus.annotation.FieldFill;
-import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
+import com.geoxus.core.common.annotation.GXFieldCommentAnnotation;
+import com.geoxus.core.common.entity.GXBaseEntity;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
 @Data
 @TableName("core_model_attributes_permission")
 @EqualsAndHashCode(callSuper = false)
-public class GXCoreModelAttributesPermissionEntity {
+public class GXCoreModelAttributesPermissionEntity extends GXBaseEntity {
     @TableId
-    private int attributePermissionId;
+    private Integer attributePermissionId;
 
-    /**
-     * 模型组的ID 比如: goods、order、contents
-     */
-    private int modelAttributeGroupId;
+    @GXFieldCommentAnnotation(zh = "模型的字段名字,只能是JSON类型的字段名字 比如: ext、info、other")
+    private Integer modelAttributeField;
 
-    /**
-     * 属性ID
-     */
-    private int attributeId;
+    @GXFieldCommentAnnotation(zh = "属性ID")
+    private Integer attributeId;
 
-    /**
-     * 模型ID
-     */
+    @GXFieldCommentAnnotation(zh = "核心模型ID")
     private int coreModelId;
 
-    /**
-     * 允许的人员或者角色({"role":[],"user":[]})
-     */
+    @GXFieldCommentAnnotation(zh = "允许的人员或者角色({\"role\":[],\"user\":[]})")
     private String allow;
 
-    /**
-     * 拒绝的人员或者角色({"role":[],"user":[]})
-     */
+    @GXFieldCommentAnnotation(zh = "拒绝的人员或者角色({\"role\":[],\"user\":[]})")
     private String deny;
 
-    @TableField(fill = FieldFill.INSERT)
-    private int createdAt;
-
-    @TableField(fill = FieldFill.UPDATE)
-    private int updatedAt;
+    @GXFieldCommentAnnotation(zh = "是否是JSON字段 0: 不是 1: 是")
+    private Integer isJsonField = 1;
 }

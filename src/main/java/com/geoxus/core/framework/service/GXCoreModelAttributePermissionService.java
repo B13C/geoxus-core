@@ -8,7 +8,7 @@ public interface GXCoreModelAttributePermissionService extends GXBaseService<GXC
     /**
      * 通过核心模型Id获取模型属性的权限
      *
-     * @param coreModelId
+     * @param coreModelId  核心模型ID
      * @return
      */
     List<String> getModelAttributePermissionByCoreModelId(int coreModelId);

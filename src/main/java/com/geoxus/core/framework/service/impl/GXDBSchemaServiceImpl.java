@@ -127,7 +127,7 @@ public class GXDBSchemaServiceImpl implements GXDBSchemaService {
     public String getSqlFieldStr(String tableName, Set<String> targetSet, boolean remove) {
         final List<TableField> tableFields = getTableColumn(tableName);
         final HashSet<String> result = new HashSet<>();
-        for (GXDBSchemaServiceImpl.TableField tableField : tableFields) {
+        for (TableField tableField : tableFields) {
             result.add(tableField.getColumnName());
         }
         final Dict tmpTargetDict = Dict.create();
@@ -143,11 +143,17 @@ public class GXDBSchemaServiceImpl implements GXDBSchemaService {
         if (remove) {
             result.removeAll(tmpTargetDict.keySet());
         } else {
-            result.retainAll(tmpTargetDict.keySet());
+            if (!(1 == targetSet.size() && targetSet.contains("*"))) {
+                result.retainAll(tmpTargetDict.keySet());
+            }
         }
         final HashSet<String> lastResult = CollUtil.newHashSet();
         for (String field : result) {
-            lastResult.add(StrUtil.format("{}", tmpTargetDict.getStr(field)));
+            if (1 == targetSet.size() && targetSet.contains("*")) {
+                lastResult.add(StrUtil.format("{}", field));
+            } else {
+                lastResult.add(StrUtil.format("{}", tmpTargetDict.getStr(field)));
+            }
         }
         return String.join(",", lastResult);
     }
@@ -161,7 +167,7 @@ public class GXDBSchemaServiceImpl implements GXDBSchemaService {
         final List<TableField> tableFields = getTableColumn(tableName);
         final HashSet<String> tmpResult = new HashSet<>();
         final HashSet<String> result = new HashSet<>();
-        for (GXDBSchemaServiceImpl.TableField tableField : tableFields) {
+        for (TableField tableField : tableFields) {
             tmpResult.add(tableField.getColumnName());
         }
         final Dict tmpTargetDict = Dict.create();
@@ -177,10 +183,16 @@ public class GXDBSchemaServiceImpl implements GXDBSchemaService {
         if (remove) {
             tmpResult.removeAll(tmpTargetDict.keySet());
         } else {
-            tmpResult.retainAll(tmpTargetDict.keySet());
+            if (!(1 == targetSet.size() && targetSet.contains("*"))) {
+                tmpResult.retainAll(tmpTargetDict.keySet());
+            }
         }
         for (String field : tmpResult) {
-            result.add(StrUtil.format("{}.{}", tableAlias, tmpTargetDict.getStr(field)));
+            if (1 == targetSet.size() && targetSet.contains("*")) {
+                result.add(StrUtil.format("{}.{}", tableAlias, field));
+            } else {
+                result.add(StrUtil.format("{}.{}", tableAlias, tmpTargetDict.getStr(field)));
+            }
         }
         return String.join(",", result);
     }
