@@ -12,6 +12,9 @@ public class GXCoreModelAttributesPermissionsBuilder implements GXBaseBuilder {
                 .FROM("core_model_attributes_permission cmap");
         sql.LEFT_OUTER_JOIN("core_attributes as ca ON ca.attribute_id = cmap.attribute_id");
         sql.WHERE(StrUtil.format("cmap.core_model_id = {core_model_id}", param));
+        if (null != param.getStr("model_attribute_field")) {
+            sql.WHERE(StrUtil.format("cmap.model_attribute_field = {model_attribute_field}", param));
+        }
         return sql.toString();
     }
 
