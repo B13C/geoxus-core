@@ -105,7 +105,7 @@ public class GXCoreModelAttributesServiceImpl extends ServiceImpl<GXCoreModelAtt
                 if (null == value) {
                     value = data.getObj("default_value");
                 }
-                if (StrUtil.isBlank(value.toString())) {
+                if (StrUtil.isBlankIfStr(value)) {
                     value = RandomUtil.randomString(5);
                 }
                 retDict.set(attributeName, value);
