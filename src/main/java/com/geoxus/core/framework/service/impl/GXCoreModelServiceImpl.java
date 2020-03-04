@@ -31,16 +31,16 @@ public class GXCoreModelServiceImpl extends ServiceImpl<GXCoreModelMapper, GXCor
     private GXCoreModelAttributesService coreModelAttributeService;
 
     @Override
-    @Cacheable(value = "__DEFAULT__", key = "targetClass + methodName + #modelId + #subField")
-    public GXCoreModelEntity getCoreModelByModelId(int modelId, String subField) {
+    @Cacheable(value = "__DEFAULT__", key = "targetClass + methodName + #modelId + #modelAttributeField")
+    public GXCoreModelEntity getCoreModelByModelId(int modelId, String modelAttributeField) {
         final GXCoreModelEntity entity = getById(modelId);
         if (null == entity) {
             return null;
         }
-        if (StrUtil.isBlank(subField)) {
-            subField = null;
+        if (StrUtil.isBlank(modelAttributeField)) {
+            modelAttributeField = "";
         }
-        final List<Dict> attributes = coreModelAttributeService.getModelAttributesByModelId(Dict.create().set("model_id", modelId).set("model_attribute_field", subField));
+        final List<Dict> attributes = coreModelAttributeService.getModelAttributesByModelId(Dict.create().set("model_id", modelId).set("model_attribute_field", modelAttributeField));
         entity.setCoreAttributes(attributes);
         return entity;
     }

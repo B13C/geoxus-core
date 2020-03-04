@@ -11,10 +11,11 @@ public interface GXCoreModelService extends GXBaseService<GXCoreModelEntity>, GX
     /**
      * 通过模型ID获取模型的相关信息
      *
-     * @param modelId 模型ID
+     * @param modelId             模型ID
+     * @param modelAttributeField 字段名字
      * @return GXCoreModelEntity
      */
-    GXCoreModelEntity getCoreModelByModelId(int modelId, String subField);
+    GXCoreModelEntity getCoreModelByModelId(int modelId, String modelAttributeField);
 
     /**
      * 检测模型是否拥有制定的字段
