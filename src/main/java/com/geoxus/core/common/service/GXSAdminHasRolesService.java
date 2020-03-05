@@ -1,9 +1,9 @@
 package com.geoxus.core.common.service;
 
+import cn.hutool.core.lang.Dict;
 import com.geoxus.core.common.entity.GXSAdminHasRolesEntity;
 
-import java.util.HashSet;
-import java.util.Set;
+import java.util.Collections;
 
 public interface GXSAdminHasRolesService<T extends GXSAdminHasRolesEntity> extends GXBusinessService<T> {
     /**
@@ -12,7 +12,7 @@ public interface GXSAdminHasRolesService<T extends GXSAdminHasRolesEntity> exten
      * @param adminId 为NULL是获取当前登录人的
      * @return
      */
-    default Set<String> getAdminRoles(long adminId) {
-        return new HashSet<>();
+    default Dict getAdminRoles(long adminId) {
+        return Dict.create();
     }
 }

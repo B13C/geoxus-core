@@ -26,8 +26,9 @@ public class GXShiroServiceImpl implements GXShiroService {
 
     /**
      * 获取用户角色列表
+     * @return
      */
-    public Set<String> getAdminRoles(long adminId) {
+    public Dict getAdminRoles(long adminId) {
         return GXSpringContextUtils.getBean(GXSAdminHasRolesService.class).getAdminRoles(adminId);
     }
 

@@ -8,7 +8,7 @@ import org.apache.ibatis.jdbc.SQL;
 public class GXCoreModelAttributesPermissionsBuilder implements GXBaseBuilder {
     @Override
     public String listOrSearch(Dict param) {
-        final SQL sql = new SQL().SELECT("cmap.deny,cma.db_field_name,ca.attribute_name,cma.attribute_id,cma.default_value")
+        final SQL sql = new SQL().SELECT("cmap.roles,cmap.users,cma.db_field_name,ca.attribute_name,cma.attribute_id,cma.default_value")
                 .FROM("core_model_attributes_permission cmap");
         sql.INNER_JOIN("core_model_attributes cma ON cma.model_attributes_id=cmap.model_attributes_id");
         sql.LEFT_OUTER_JOIN("core_attributes ca ON ca.attribute_id = cma.attribute_id");

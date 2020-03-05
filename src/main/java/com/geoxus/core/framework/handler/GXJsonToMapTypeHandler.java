@@ -68,7 +68,11 @@ public class GXJsonToMapTypeHandler extends BaseTypeHandler<Map<String, Object>>
         GXCoreModelAttributePermissionService coreModelAttributePermissionService = GXSpringContextUtils.getBean(GXCoreModelAttributePermissionService.class);
         assert coreModelAttributePermissionService != null;
         Dict tmpDict = coreModelAttributePermissionService.getModelAttributePermissionByCoreModelId(coreModelId, Dict.create());
-        Dict dict = Convert.convert(Dict.class, Convert.convert(Dict.class, tmpDict.getObj("json_field")).getObj(this.columnName));
+        final Dict jsonFieldDict = Convert.convert(Dict.class, tmpDict.getObj("json_field"));
+        Dict dict = Dict.create();
+        if (!jsonFieldDict.isEmpty() && null != jsonFieldDict.getObj(this.columnName)) {
+            dict = Convert.convert(Dict.class, jsonFieldDict.getObj(this.columnName));
+        }
         final Dict map = Convert.convert(Dict.class, JSONUtil.toBean(from, Dict.class));
         for (String attribute : dict.keySet()) {
             map.remove(attribute);

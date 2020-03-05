@@ -15,6 +15,7 @@ import org.springframework.stereotype.Component;
 
 import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 @Component
 @Slf4j
@@ -38,7 +39,7 @@ public class GXOAuth2Realm extends AuthorizingRealm {
         //用户权限列表
         Set<String> permsSet = shiroService.getAdminAllPermissions(adminId);
         //用户角色
-        Set<String> rolesSet = shiroService.getAdminRoles(adminId);
+        Set<String> rolesSet = shiroService.getAdminRoles(adminId).values().stream().map(Object::toString).collect(Collectors.toSet());
         SimpleAuthorizationInfo info = new SimpleAuthorizationInfo();
         info.setStringPermissions(permsSet);
         info.addRoles(rolesSet);

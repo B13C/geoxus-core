@@ -23,7 +23,7 @@ public interface GXShiroService {
      * @param adminId 用户ID
      * @return Set
      */
-    Set<String> getAdminRoles(long adminId);
+    Dict getAdminRoles(long adminId);
 
     /**
      * 查询Admin的详细信息
