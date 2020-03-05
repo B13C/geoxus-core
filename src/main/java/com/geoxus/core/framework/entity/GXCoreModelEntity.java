@@ -21,7 +21,7 @@ public class GXCoreModelEntity extends Model implements Serializable {
 
     private int moduleId;
 
-    private String modelName;
+    private String tableName;
 
     private String modelShow;
 

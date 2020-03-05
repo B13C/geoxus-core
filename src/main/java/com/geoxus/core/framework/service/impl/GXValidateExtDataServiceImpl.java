@@ -66,7 +66,7 @@ public class GXValidateExtDataServiceImpl implements GXValidateExtDataService {
         final List<Dict> attributesList = coreModelEntity.getCoreAttributes();
         final Dict validateRule = Dict.create();
         for (Dict dict : attributesList) {
-            validateRule.set(dict.getStr("field_name"), dict.getStr("validation_expression"));
+            validateRule.set(dict.getStr("attribute_name"), dict.getStr("validation_expression"));
         }
         if (JSONUtil.isJsonObj(jsonStr)) {
             final Dict validateDataMap = Convert.convert(Dict.class, JSONUtil.toBean(jsonStr, Dict.class));

@@ -15,23 +15,21 @@ public class GXCoreModelAttributesEntity extends GXBaseEntity implements Seriali
     @TableId("model_attributes_id")
     private int modelAttributesId;
 
-    private String modelAttributeField;
+    private String dbFieldName;
 
     private int parentId;
 
-    private int modelId;
+    private int coreModelId;
 
     private int attributeId;
 
-    private int required;
-
     private String showName;
+
+    private int required;
 
     private String validationExpression;
 
     private int forceValidation;
-
-    private String fieldName;
 
     private String defaultValue;
 }

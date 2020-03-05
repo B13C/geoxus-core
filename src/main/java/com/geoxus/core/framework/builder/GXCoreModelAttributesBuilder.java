@@ -8,16 +8,15 @@ import org.apache.ibatis.jdbc.SQL;
 public class GXCoreModelAttributesBuilder implements GXBaseBuilder {
     @Override
     public String listOrSearch(Dict param) {
-        final SQL sql = new SQL().SELECT(
-                "ca.attribute_name", "ca.attribute_id", "ca.show_name", "ca.category", "ca.data_type",
-                "ca.front_type", "ca.validation_desc", "ca.validation_expression", "cma.force_validation",
-                "cma.field_name", "cma.default_value", "cma.model_attribute_field", "cma.required")
-                .FROM("core_model_attributes cma");
-        sql.INNER_JOIN("core_model ON cma.model_id = core_model.model_id");
-        sql.INNER_JOIN("core_attributes ca ON cma.attribute_id = ca.attribute_id");
-        sql.WHERE(StrUtil.format("core_model.model_id = {model_id}", param));
-        if (StrUtil.isNotBlank(param.getStr("model_attribute_field"))) {
-            sql.WHERE(StrUtil.format("cma.model_attribute_field = '{model_attribute_field}'", param));
+        final SQL sql = new SQL().SELECT("core_model.table_name ,ca.attribute_name, ca.attribute_id, ca.show_name, ca.category, ca.data_type,\n" +
+                "ca.front_type, ca.validation_desc, ca.validation_expression, cmaa.force_validation,cmaa.default_value, cmaa.db_field_name, cmaa.required")
+                .FROM("core_model_attributes as cmaa");
+        sql.LEFT_OUTER_JOIN("core_attributes ca on cmaa.attribute_id = ca.attribute_id");
+        sql.INNER_JOIN("core_model on  core_model.model_id = cmaa.core_model_id");
+        sql.WHERE(StrUtil.format("cmaa.core_model_id={core_model_id}", param));
+        if (StrUtil.isNotBlank(param.getStr("db_field_name"))) {
+            sql.INNER_JOIN("core_model_attributes as cmab on cmab.model_attributes_id = cmaa.parent_id");
+            sql.WHERE(StrUtil.format("cmab.db_field_name = '{db_field_name}'", param));
         }
         return sql.toString();
     }
@@ -37,7 +36,7 @@ public class GXCoreModelAttributesBuilder implements GXBaseBuilder {
         String mainSql = "SELECT IFNULL(({}), 0)";
         String subSql = "SELECT 1 FROM core_attributes";
         subSql = subSql.concat("\nINNER JOIN core_model_attributes on core_model_attributes.attribute_id=core_attributes.attribute_id");
-        subSql = subSql.concat("\nWHERE (core_attributes.attribute_name = '{attribute_name}' AND core_model_attributes.model_id = {core_model_id}) LIMIT 1");
+        subSql = subSql.concat("\nWHERE (core_attributes.attribute_name = '{attribute_name}' AND core_model_attributes.core_model_id = {core_model_id}) LIMIT 1");
         return StrUtil.format(mainSql, StrUtil.format(subSql, param));
     }
 

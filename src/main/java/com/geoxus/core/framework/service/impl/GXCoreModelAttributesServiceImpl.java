@@ -49,7 +49,7 @@ public class GXCoreModelAttributesServiceImpl extends ServiceImpl<GXCoreModelAtt
     @Override
     @Cacheable(value = "__DEFAULT__", key = "targetClass + methodName + #modelId + #attributeId")
     public Dict getModelAttributeByModelIdAndAttributeId(int modelId, int attributeId) {
-        final Dict condition = Dict.create().set("model_id", modelId).set("attribute_id", attributeId);
+        final Dict condition = Dict.create().set(GXCommonConstants.CORE_MODEL_PRIMARY_NAME, modelId).set("attribute_id", attributeId);
         final HashSet<String> fieldSet = CollUtil.newHashSet("validation_expression", "force_validation", "required");
         return getFieldBySQL(GXCoreModelAttributesEntity.class, fieldSet, condition);
     }
@@ -96,7 +96,7 @@ public class GXCoreModelAttributesServiceImpl extends ServiceImpl<GXCoreModelAtt
         }
         final Dict sourceDict = JSONUtil.toBean(jsonStr, Dict.class);
         final String cacheKey = gxCacheKeysUtils.getCacheKey("", StrUtil.format("{}.{}", coreModelId, modelAttributeField));
-        final Dict condition = Dict.create().set("model_id", coreModelId).set("model_attribute_field", modelAttributeField);
+        final Dict condition = Dict.create().set(GXCommonConstants.CORE_MODEL_PRIMARY_NAME, coreModelId).set("db_field_name", modelAttributeField);
         try {
             final Dict retDict = Dict.create();
             final List<Dict> list = LIST_DICT_CACHE.get(cacheKey, () -> baseMapper.listOrSearch(condition));

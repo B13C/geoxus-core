@@ -1,5 +1,6 @@
 package com.geoxus.core.common.interceptor;
 
+import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.convert.Convert;
 import cn.hutool.core.io.IoUtil;
 import cn.hutool.core.lang.Dict;
@@ -30,6 +31,7 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.Set;
 
 @Component
 public class GXRequestToBeanHandlerMethodArgumentResolver implements HandlerMethodArgumentResolver {
@@ -60,10 +62,17 @@ public class GXRequestToBeanHandlerMethodArgumentResolver implements HandlerMeth
         final String[] jsonFields = gxRequestBodyToEntityAnnotation.jsonFields();
         final Integer coreModelId = dict.getInt(GXCommonConstants.CORE_MODEL_PRIMARY_NAME);
         for (String jsonField : jsonFields) {
-            final String json = Optional.ofNullable(dict.getStr(jsonField)).orElse("{}");
+            final String json = dict.getStr(jsonField);
+            if (StrUtil.isBlankIfStr(json)) {
+                continue;
+            }
             final Dict targetDict = gxCoreModelAttributesService.getModelAttributesDefaultValue(coreModelId, jsonField, json);
             if (targetDict.isEmpty()) {
                 continue;
+            }
+            final Set<String> tmpDictKey = JSONUtil.toBean(json, Dict.class).keySet();
+            if (!tmpDictKey.isEmpty() && !CollUtil.containsAll(targetDict.keySet(), tmpDictKey)) {
+                throw new GXException(StrUtil.format("请求参数不匹配(System Preferences : {} , Request Data : {})", targetDict.keySet(), tmpDictKey), GXResultCode.PARSE_REQUEST_JSON_ERROR.getCode());
             }
             dict.set(jsonField, JSONUtil.toJsonStr(targetDict));
         }
