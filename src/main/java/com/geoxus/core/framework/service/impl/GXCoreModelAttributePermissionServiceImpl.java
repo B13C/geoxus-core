@@ -40,57 +40,74 @@ public class GXCoreModelAttributePermissionServiceImpl extends ServiceImpl<GXCor
 
     @Override
     @Cacheable(value = "__DEFAULT__", key = "targetClass + methodName + #coreModelId + #param")
-    public List<Dict> getModelAttributePermissionAllow(int coreModelId, Dict param) {
+    public Dict getModelAttributePermissionAllow(int coreModelId, Dict param) {
+        final String ROLES_KEY = "roles";
+        final String USERS_KEY = "users";
         final List<Dict> attributes = baseMapper.getModelAttributePermissionByModelId(Dict.create().set(GXCommonConstants.CORE_MODEL_PRIMARY_NAME, coreModelId));
         final List<Integer> roles = Convert.convert(new TypeReference<List<Integer>>() {
-        }, param.getObj("roles"));
+        }, param.getObj(ROLES_KEY));
         final List<Integer> users = Convert.convert(new TypeReference<List<Integer>>() {
-        }, param.getObj("users"));
-        final ArrayList<Dict> retList = CollUtil.newArrayList();
+        }, param.getObj(USERS_KEY));
+        final Dict retDict = Dict.create();
         for (Dict dict : attributes) {
             if (null != dict.getStr("allow")) {
                 final Dict allowDict = JSONUtil.toBean(dict.getStr("allow"), Dict.class);
-                final String rolesStr = Optional.ofNullable(allowDict.getStr("roles")).orElse("");
-                final String usersStr = Optional.ofNullable(allowDict.getStr("users")).orElse("");
+                final String rolesStr = Optional.ofNullable(allowDict.getStr(ROLES_KEY)).orElse("");
+                final String usersStr = Optional.ofNullable(allowDict.getStr(USERS_KEY)).orElse("");
                 final List<Integer> allowRoles = Convert.convert(new TypeReference<List<Integer>>() {
                 }, Strings.split(rolesStr, ','));
                 final List<Integer> allowUsers = Convert.convert(new TypeReference<List<Integer>>() {
                 }, Strings.split(usersStr, ','));
-                if (allowRoles.containsAll(roles) || allowUsers.containsAll(users)) {
-                    retList.add(dict);
+                if (CollUtil.containsAny(allowRoles, roles) || CollUtil.containsAny(allowUsers, users)) {
+                    final String dbFieldName = dict.getStr("db_field_name");
+                    if (StrUtil.contains(dbFieldName, "::")) {
+                        final String[] strings = StrUtil.split(dbFieldName, "::");
+                        final Dict convertDict = Convert.convert(Dict.class, retDict.getOrDefault(strings[0], Dict.create()));
+                        convertDict.set(StrUtil.format("{}->>'$.{}'", strings[0], strings[1]), String.join("_", strings));
+                        retDict.set(strings[0], convertDict);
+                    } else {
+                        retDict.set(dbFieldName, dbFieldName);
+                    }
                 }
-            } else {
-                retList.add(dict);
             }
         }
-        return retList;
+        return retDict;
     }
 
     @Override
     @Cacheable(value = "__DEFAULT__", key = "targetClass + methodName + #coreModelId + #param")
-    public List<Dict> getModelAttributePermissionDeny(int coreModelId, Dict param) {
+    public Dict getModelAttributePermissionDeny(int coreModelId, Dict param) {
+        final String ROLES_KEY = "roles";
+        final String USERS_KEY = "users";
         final List<Dict> attributes = baseMapper.getModelAttributePermissionByModelId(Dict.create().set(GXCommonConstants.CORE_MODEL_PRIMARY_NAME, coreModelId));
         final List<Integer> roles = Convert.convert(new TypeReference<List<Integer>>() {
-        }, param.getObj("roles"));
+        }, param.getObj(ROLES_KEY));
         final List<Integer> users = Convert.convert(new TypeReference<List<Integer>>() {
-        }, param.getObj("users"));
-        final ArrayList<Dict> retList = CollUtil.newArrayList();
+        }, param.getObj(USERS_KEY));
+        final Dict retDict = Dict.create();
         for (Dict dict : attributes) {
             if (null != dict.getStr("deny")) {
                 final Dict denyDict = JSONUtil.toBean(dict.getStr("deny"), Dict.class);
-                final String rolesStr = Optional.ofNullable(denyDict.getStr("roles")).orElse("");
-                final String usersStr = Optional.ofNullable(denyDict.getStr("users")).orElse("");
+                final String rolesStr = Optional.ofNullable(denyDict.getStr(ROLES_KEY)).orElse("");
+                final String usersStr = Optional.ofNullable(denyDict.getStr(USERS_KEY)).orElse("");
                 final List<Integer> denyRoles = Convert.convert(new TypeReference<List<Integer>>() {
                 }, Strings.split(rolesStr, ','));
                 final List<Integer> denyUsers = Convert.convert(new TypeReference<List<Integer>>() {
                 }, Strings.split(usersStr, ','));
-                if (!denyRoles.containsAll(roles) && !denyUsers.containsAll(users)) {
-                    retList.add(dict);
+                if (CollUtil.containsAny(denyRoles, roles) || CollUtil.containsAny(denyUsers, users)) {
+                    continue;
                 }
-            } else {
-                retList.add(dict);
+                final String dbFieldName = dict.getStr("db_field_name");
+                if (StrUtil.contains(dbFieldName, "::")) {
+                    final String[] strings = StrUtil.split(dbFieldName, "::");
+                    final Dict convertDict = Convert.convert(Dict.class, retDict.getOrDefault(strings[0], Dict.create()));
+                    convertDict.set(StrUtil.format("{}->>'$.{}'", strings[0], strings[1]), String.join("_", strings));
+                    retDict.set(strings[0], convertDict);
+                } else {
+                    retDict.set(dbFieldName, dbFieldName);
+                }
             }
         }
-        return retList;
+        return retDict;
     }
 }

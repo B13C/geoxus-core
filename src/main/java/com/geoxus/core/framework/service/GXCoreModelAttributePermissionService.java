@@ -21,7 +21,7 @@ public interface GXCoreModelAttributePermissionService extends GXBaseService<GXC
      * @param param       附加参数
      * @return
      */
-    List<Dict> getModelAttributePermissionAllow(int coreModelId, Dict param);
+    Dict getModelAttributePermissionAllow(int coreModelId, Dict param);
 
     /**
      * 获取扩展字段的拒绝访问列表
@@ -30,5 +30,5 @@ public interface GXCoreModelAttributePermissionService extends GXBaseService<GXC
      * @param param       附加参数
      * @return
      */
-    List<Dict> getModelAttributePermissionDeny(int coreModelId, Dict param);
+    Dict getModelAttributePermissionDeny(int coreModelId, Dict param);
 }

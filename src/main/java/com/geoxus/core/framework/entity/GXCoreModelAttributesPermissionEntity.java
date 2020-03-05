@@ -14,21 +14,12 @@ public class GXCoreModelAttributesPermissionEntity extends GXBaseEntity {
     @TableId
     private Integer attributePermissionId;
 
-    @GXFieldCommentAnnotation(zh = "模型的字段名字,只能是JSON类型的字段名字 比如: ext、info、other")
-    private Integer modelAttributeField;
+    @GXFieldCommentAnnotation(zh = "模型组的ID")
+    private Integer modelAttributesId;
 
-    @GXFieldCommentAnnotation(zh = "属性ID")
-    private Integer attributeId;
-
-    @GXFieldCommentAnnotation(zh = "核心模型ID")
-    private int coreModelId;
-
-    @GXFieldCommentAnnotation(zh = "允许的人员或者角色({\"role\":[],\"user\":[]})")
+    @GXFieldCommentAnnotation(zh = "允许的人员或者角色({\"role\":\"1\",\"user\":\"1\"})")
     private String allow;
 
-    @GXFieldCommentAnnotation(zh = "拒绝的人员或者角色({\"role\":[],\"user\":[]})")
+    @GXFieldCommentAnnotation(zh = "拒绝的人员或者角色({\"role\":\"1\",\"user\":\"1\"})")
     private String deny;
-
-    @GXFieldCommentAnnotation(zh = "是否是JSON字段 0: 不是 1: 是")
-    private Integer isJsonField = 1;
 }
