@@ -1,13 +1,16 @@
 package com.geoxus.core.framework.service.impl;
 
 import cn.hutool.core.collection.CollUtil;
+import cn.hutool.core.convert.Convert;
 import cn.hutool.core.lang.Dict;
 import cn.hutool.core.util.ArrayUtil;
 import cn.hutool.core.util.StrUtil;
 import com.geoxus.core.common.annotation.GXFieldCommentAnnotation;
-import com.geoxus.core.common.util.GXSpringContextUtils;
+import com.geoxus.core.framework.service.GXCoreModelAttributePermissionService;
+import com.geoxus.core.framework.service.GXCoreModelService;
 import com.geoxus.core.framework.service.GXDBSchemaService;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
@@ -29,7 +32,15 @@ public class GXDBSchemaServiceImpl implements GXDBSchemaService {
     private static final String DROP_INDEX_SQL = "DROP INDEX `{}` on `{}`";
 
     @GXFieldCommentAnnotation(zh = "数据源对象")
-    private static DataSource dataSource = GXSpringContextUtils.getBean(DataSource.class);
+    @Autowired
+    private DataSource dataSource;
+
+    @GXFieldCommentAnnotation(zh = "字段权限对象")
+    @Autowired
+    private GXCoreModelAttributePermissionService gxCoreModelAttributePermissionService;
+
+    @Autowired
+    private GXCoreModelService gxCoreModelService;
 
     @Override
     @Cacheable(value = "__DEFAULT__", key = "targetClass + methodName +#tableName")
@@ -170,6 +181,9 @@ public class GXDBSchemaServiceImpl implements GXDBSchemaService {
         for (TableField tableField : tableFields) {
             tmpResult.add(tableField.getColumnName());
         }
+        int coreModelId = gxCoreModelService.getCoreModelIdByTableName(tableName);
+        final Dict permissions = gxCoreModelAttributePermissionService.getModelAttributePermissionByCoreModelId(coreModelId, Dict.create());
+        final Dict dict = Convert.convert(Dict.class, permissions.getObj("db_field"));
         final Dict tmpTargetDict = Dict.create();
         for (String key : targetSet) {
             if (StrUtil.contains(key, " ")) {
@@ -187,7 +201,11 @@ public class GXDBSchemaServiceImpl implements GXDBSchemaService {
                 tmpResult.retainAll(tmpTargetDict.keySet());
             }
         }
+        final Set<String> strings = dict.keySet();
         for (String field : tmpResult) {
+            if (CollUtil.contains(strings, field)) {
+                continue;
+            }
             if (1 == targetSet.size() && targetSet.contains("*")) {
                 result.add(StrUtil.format("{}.{}", tableAlias, field));
             } else {

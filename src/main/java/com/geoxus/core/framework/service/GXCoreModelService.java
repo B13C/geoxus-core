@@ -59,4 +59,12 @@ public interface GXCoreModelService extends GXBaseService<GXCoreModelEntity>, GX
      * @return Dict
      */
     Dict getSearchCondition(Dict condition);
+
+    /**
+     * 通过表名获取核心模型ID
+     *
+     * @param tableName 真实表名
+     * @return int
+     */
+    int getCoreModelIdByTableName(String tableName);
 }

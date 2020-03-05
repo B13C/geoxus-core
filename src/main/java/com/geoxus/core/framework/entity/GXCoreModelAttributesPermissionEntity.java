@@ -17,9 +17,6 @@ public class GXCoreModelAttributesPermissionEntity extends GXBaseEntity {
     @GXFieldCommentAnnotation(zh = "模型组的ID")
     private Integer modelAttributesId;
 
-    @GXFieldCommentAnnotation(zh = "允许的人员或者角色({\"role\":\"1\",\"user\":\"1\"})")
-    private String allow;
-
     @GXFieldCommentAnnotation(zh = "拒绝的人员或者角色({\"role\":\"1\",\"user\":\"1\"})")
     private String deny;
 }

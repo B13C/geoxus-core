@@ -1,6 +1,7 @@
 package com.geoxus.core.framework.handler;
 
 import cn.hutool.core.convert.Convert;
+import cn.hutool.core.lang.Dict;
 import cn.hutool.core.lang.TypeReference;
 import cn.hutool.json.JSONArray;
 import cn.hutool.json.JSONObject;
@@ -24,6 +25,9 @@ public class GXJsonToListTypeHandler extends BaseTypeHandler<List<Map<String, Ob
     @GXFieldCommentAnnotation(zh = "标识核心模型主键名字")
     private static final String CORE_MODEL_PRIMARY_NAME = GXCommonConstants.CORE_MODEL_PRIMARY_NAME;
 
+    @GXFieldCommentAnnotation(zh = "当前字段的名字")
+    private String columnName;
+
     @Override
     public void setNonNullParameter(PreparedStatement ps, int i, List<Map<String, Object>> parameter, JdbcType jdbcType) throws SQLException {
         final String parameterString = listToJson(parameter);
@@ -40,6 +44,7 @@ public class GXJsonToListTypeHandler extends BaseTypeHandler<List<Map<String, Ob
             value = clob.getSubString(1L, size);
         }
         coreModelId = rs.getInt(CORE_MODEL_PRIMARY_NAME);
+        this.columnName = columnName;
         return jsonToList(value, coreModelId);
     }
 
@@ -73,10 +78,12 @@ public class GXJsonToListTypeHandler extends BaseTypeHandler<List<Map<String, Ob
         if (JSONUtil.isJsonObj(from)) {
             from = '[' + from + ']';
         }
-        List<String> attributes = coreModelAttributePermissionService.getModelAttributePermissionByCoreModelId(coreModelId);
+        assert coreModelAttributePermissionService != null;
+        Dict tmpDict = coreModelAttributePermissionService.getModelAttributePermissionByCoreModelId(coreModelId, Dict.create());
+        final Dict dict = Convert.convert(Dict.class, Convert.convert(Dict.class, tmpDict.getObj("json_field")).getObj(this.columnName));
         final JSONArray jsonArray = JSONUtil.parseArray(from);
         for (Object object : jsonArray) {
-            for (String attribute : attributes) {
+            for (String attribute : dict.keySet()) {
                 ((JSONObject) object).remove(attribute);
             }
         }

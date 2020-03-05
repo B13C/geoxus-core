@@ -13,13 +13,15 @@ import org.apache.ibatis.type.MappedTypes;
 
 import java.io.StringReader;
 import java.sql.*;
-import java.util.List;
 import java.util.Map;
 
 @MappedTypes({Map.class})
 public class GXJsonToMapTypeHandler extends BaseTypeHandler<Map<String, Object>> {
     @GXFieldCommentAnnotation(zh = "标识核心模型主键名字")
     private static final String CORE_MODEL_PRIMARY_NAME = GXCommonConstants.CORE_MODEL_PRIMARY_NAME;
+
+    @GXFieldCommentAnnotation(zh = "当前字段的名字")
+    private String columnName;
 
     @Override
     public void setNonNullParameter(PreparedStatement ps, int i, Map<String, Object> parameter, JdbcType jdbcType) throws SQLException {
@@ -36,6 +38,7 @@ public class GXJsonToMapTypeHandler extends BaseTypeHandler<Map<String, Object>>
             value = clob.getSubString(1L, size);
         }
         final int coreModelId = rs.getInt(CORE_MODEL_PRIMARY_NAME);
+        this.columnName = columnName;
         return jsonToMap(value, coreModelId);
     }
 
@@ -63,9 +66,11 @@ public class GXJsonToMapTypeHandler extends BaseTypeHandler<Map<String, Object>>
     private Map<String, Object> jsonToMap(String from, int coreModelId) {
         from = from.isEmpty() ? "{}" : from;
         GXCoreModelAttributePermissionService coreModelAttributePermissionService = GXSpringContextUtils.getBean(GXCoreModelAttributePermissionService.class);
-        List<String> attributes = coreModelAttributePermissionService.getModelAttributePermissionByCoreModelId(coreModelId);
+        assert coreModelAttributePermissionService != null;
+        Dict tmpDict = coreModelAttributePermissionService.getModelAttributePermissionByCoreModelId(coreModelId, Dict.create());
+        Dict dict = Convert.convert(Dict.class, Convert.convert(Dict.class, tmpDict.getObj("json_field")).getObj(this.columnName));
         final Dict map = Convert.convert(Dict.class, JSONUtil.toBean(from, Dict.class));
-        for (String attribute : attributes) {
+        for (String attribute : dict.keySet()) {
             map.remove(attribute);
         }
         return map;

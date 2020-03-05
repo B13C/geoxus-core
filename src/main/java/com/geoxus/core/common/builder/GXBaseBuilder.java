@@ -359,8 +359,7 @@ public interface GXBaseBuilder {
     default String getSelectFieldStr(String tableName, Set<String> targetSet, String tableAlias, boolean remove) {
         final GXDBSchemaService schemaService = GXSpringContextUtils.getBean(GXDBSchemaService.class);
         assert schemaService != null;
-        final String fieldStr = schemaService.getSqlFieldStr(tableName, targetSet, tableAlias, remove);
-        return fieldStr;
+        return schemaService.getSqlFieldStr(tableName, targetSet, tableAlias, remove);
     }
 
     /**
@@ -374,8 +373,7 @@ public interface GXBaseBuilder {
     default String getSelectFieldStr(String tableName, Set<String> targetSet, boolean remove) {
         final GXDBSchemaService schemaService = GXSpringContextUtils.getBean(GXDBSchemaService.class);
         assert schemaService != null;
-        final String sqlFieldStr = schemaService.getSqlFieldStr(tableName, targetSet, remove);
-        return sqlFieldStr;
+        return schemaService.getSqlFieldStr(tableName, targetSet, remove);
     }
 
     /**
