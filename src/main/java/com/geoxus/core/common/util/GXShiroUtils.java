@@ -7,8 +7,6 @@ import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.session.Session;
 import org.apache.shiro.subject.Subject;
 
-import java.util.Optional;
-
 public class GXShiroUtils {
     private GXShiroUtils() {
     }
@@ -22,11 +20,22 @@ public class GXShiroUtils {
     }
 
     public static Dict getAdminData() {
-        return (Dict) SecurityUtils.getSubject().getPrincipal();
+        final Object principal = SecurityUtils.getSubject().getPrincipal();
+        if (null != principal) {
+            return Dict.parse(principal);
+        }
+        return Dict.create();
     }
 
     public static Long getAdminId() {
-        return Optional.ofNullable(getAdminData().getLong(GXTokenManager.ADMIN_ID)).orElse(getAdminData().getLong(StrUtil.toCamelCase(GXTokenManager.ADMIN_ID)));
+        if (getAdminData().isEmpty()) {
+            return 0L;
+        }
+        Long adminId = getAdminData().getLong(GXTokenManager.ADMIN_ID);
+        if (null == adminId) {
+            adminId = getAdminData().getLong(StrUtil.toCamelCase(GXTokenManager.ADMIN_ID));
+        }
+        return null == adminId ? 0 : adminId;
     }
 
     public static void setSessionAttribute(Object key, Object value) {

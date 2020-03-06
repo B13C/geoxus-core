@@ -134,8 +134,11 @@ public class GXDBSchemaServiceImpl implements GXDBSchemaService {
     }
 
     @Override
-    @Cacheable(value = "__DEFAULT__", key = "targetClass + methodName +#tableName")
+    @Cacheable(value = "__DEFAULT__", key = "targetClass + methodName + #tableName")
     public String getSqlFieldStr(String tableName, Set<String> targetSet, boolean remove) {
+        if (targetSet.size() == 1 && targetSet.contains("*") && remove) {
+            return "";
+        }
         final List<TableField> tableFields = getTableColumn(tableName);
         final HashSet<String> result = new HashSet<>();
         for (TableField tableField : tableFields) {
@@ -170,7 +173,11 @@ public class GXDBSchemaServiceImpl implements GXDBSchemaService {
     }
 
     @Override
+    @Cacheable(value = "__DEFAULT__", key = "targetClass + methodName + #tableName")
     public String getSqlFieldStr(String tableName, Set<String> targetSet, String tableAlias, boolean remove) {
+        if (targetSet.size() == 1 && targetSet.contains("*") && remove) {
+            return "";
+        }
         if (StrUtil.isBlank(tableAlias)) {
             log.error("表的别名不能为空");
             return "";
