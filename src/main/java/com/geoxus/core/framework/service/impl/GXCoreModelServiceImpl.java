@@ -97,11 +97,16 @@ public class GXCoreModelServiceImpl extends ServiceImpl<GXCoreModelMapper, GXCor
     @Cacheable(value = "__DEFAULT__", key = "targetClass + methodName + #tableName")
     public int getCoreModelIdByTableName(String tableName) {
         final Dict condition = Dict.create().set("table_name", tableName);
-        final Dict dict = getFieldBySQL(GXCoreModelEntity.class, CollUtil.newHashSet("model_id"), condition);
+        final QueryWrapper<GXCoreModelEntity> queryWrapper = new QueryWrapper<GXCoreModelEntity>().select("model_id").allEq(condition);
+        final GXCoreModelEntity entity = getOne(queryWrapper);
+        if (null == entity) {
+            return 0;
+        }
+        final Dict dict = Dict.parse(entity);
         if (dict.isEmpty()) {
             return 0;
         }
-        return dict.getInt("model_id");
+        return dict.getInt("modelId");
     }
 
     @Override

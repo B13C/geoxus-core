@@ -3,7 +3,6 @@ package com.geoxus.core.framework.service.impl;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.convert.Convert;
 import cn.hutool.core.lang.Dict;
-import cn.hutool.core.util.ArrayUtil;
 import cn.hutool.core.util.StrUtil;
 import com.geoxus.core.common.annotation.GXFieldCommentAnnotation;
 import com.geoxus.core.framework.service.GXCoreModelAttributePermissionService;
@@ -142,32 +141,25 @@ public class GXDBSchemaServiceImpl implements GXDBSchemaService {
         final List<TableField> tableFields = getTableColumn(tableName);
         final HashSet<String> result = new HashSet<>();
         for (TableField tableField : tableFields) {
-            result.add(tableField.getColumnName());
-        }
-        final Dict tmpTargetDict = Dict.create();
-        for (String key : targetSet) {
-            if (StrUtil.contains(key, " ")) {
-                final String[] split = StrUtil.split(StrUtil.replace(key, " ", "::"), "::");
-                String tmpKey = String.join("", ArrayUtil.sub(split, 0, 1));
-                tmpTargetDict.set(tmpKey, key);
-            } else {
-                tmpTargetDict.set(key, key);
+            final String columnName = tableField.getColumnName();
+            if (remove && targetSet.contains(columnName)) {
+                continue;
             }
+            result.add(columnName);
         }
-        if (remove) {
-            result.removeAll(tmpTargetDict.keySet());
-        } else {
-            if (!(1 == targetSet.size() && targetSet.contains("*"))) {
-                result.retainAll(tmpTargetDict.keySet());
-            }
+        int coreModelId = gxCoreModelService.getCoreModelIdByTableName(tableName);
+        final Dict permissions = gxCoreModelAttributePermissionService.getModelAttributePermissionByCoreModelId(coreModelId, Dict.create());
+        Dict dict = Dict.create();
+        if (!permissions.isEmpty() && null != permissions.getObj("db_field")) {
+            dict = Convert.convert(Dict.class, permissions.getObj("db_field"));
         }
+        final Set<String> strings = dict.keySet();
         final HashSet<String> lastResult = CollUtil.newHashSet();
         for (String field : result) {
-            if (1 == targetSet.size() && targetSet.contains("*")) {
-                lastResult.add(StrUtil.format("{}", field));
-            } else {
-                lastResult.add(StrUtil.format("{}", tmpTargetDict.getStr(field)));
+            if (CollUtil.contains(strings, field)) {
+                continue;
             }
+            lastResult.add(StrUtil.format("{}", field));
         }
         return String.join(",", lastResult);
     }
@@ -186,7 +178,11 @@ public class GXDBSchemaServiceImpl implements GXDBSchemaService {
         final HashSet<String> tmpResult = new HashSet<>();
         final HashSet<String> result = new HashSet<>();
         for (TableField tableField : tableFields) {
-            tmpResult.add(tableField.getColumnName());
+            final String columnName = tableField.getColumnName();
+            if (remove && targetSet.contains(columnName)) {
+                continue;
+            }
+            tmpResult.add(columnName);
         }
         int coreModelId = gxCoreModelService.getCoreModelIdByTableName(tableName);
         final Dict permissions = gxCoreModelAttributePermissionService.getModelAttributePermissionByCoreModelId(coreModelId, Dict.create());
@@ -194,33 +190,12 @@ public class GXDBSchemaServiceImpl implements GXDBSchemaService {
         if (!permissions.isEmpty() && null != permissions.getObj("db_field")) {
             dict = Convert.convert(Dict.class, permissions.getObj("db_field"));
         }
-        final Dict tmpTargetDict = Dict.create();
-        for (String key : targetSet) {
-            if (StrUtil.contains(key, " ")) {
-                final String[] split = StrUtil.split(StrUtil.replace(key, " ", "::"), "::");
-                String tmpKey = String.join("", ArrayUtil.sub(split, 0, 1));
-                tmpTargetDict.set(tmpKey, key);
-            } else {
-                tmpTargetDict.set(key, key);
-            }
-        }
-        if (remove) {
-            tmpResult.removeAll(tmpTargetDict.keySet());
-        } else {
-            if (!(1 == targetSet.size() && targetSet.contains("*"))) {
-                tmpResult.retainAll(tmpTargetDict.keySet());
-            }
-        }
         final Set<String> strings = dict.keySet();
         for (String field : tmpResult) {
             if (CollUtil.contains(strings, field)) {
                 continue;
             }
-            if (1 == targetSet.size() && targetSet.contains("*")) {
-                result.add(StrUtil.format("{}.{}", tableAlias, field));
-            } else {
-                result.add(StrUtil.format("{}.{}", tableAlias, tmpTargetDict.getStr(field)));
-            }
+            result.add(StrUtil.format("{}.{}", tableAlias, field));
         }
         return String.join(",", result);
     }

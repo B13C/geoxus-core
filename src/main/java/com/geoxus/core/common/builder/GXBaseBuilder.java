@@ -172,8 +172,11 @@ public interface GXBaseBuilder {
      * @param condition 条件
      * @return String
      */
-    static String getFieldBySQL(String tableName, Set<String> fieldSet, Dict condition) {
-        final SQL sql = new SQL().SELECT(CollUtil.join(fieldSet, ",")).FROM(tableName);
+    static String getFieldBySQL(String tableName, Set<String> fieldSet, Dict condition, boolean remove) {
+        final GXDBSchemaService schemaService = GXSpringContextUtils.getBean(GXDBSchemaService.class);
+        assert schemaService != null;
+        final String sqlFieldStr = schemaService.getSqlFieldStr(tableName, fieldSet, remove);
+        final SQL sql = new SQL().SELECT(sqlFieldStr).FROM(tableName);
         final Set<String> conditionKeys = condition.keySet();
         for (String conditionKey : conditionKeys) {
             String template = "{} = '{}'";

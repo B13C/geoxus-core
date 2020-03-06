@@ -22,7 +22,7 @@ public class GXShiroUtils {
     public static Dict getAdminData() {
         final Object principal = SecurityUtils.getSubject().getPrincipal();
         if (null != principal) {
-            return Dict.parse(principal);
+            return (Dict) SecurityUtils.getSubject().getPrincipal();
         }
         return Dict.create();
     }

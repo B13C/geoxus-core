@@ -94,7 +94,7 @@ public interface GXBaseService<T> extends IService<T> {
             path = StrUtil.format("{} as `{}`", path, aliasName);
         }
         GXBaseMapper<T> baseMapper = (GXBaseMapper<T>) getBaseMapper();
-        final Dict dict = baseMapper.getFieldBySQL(getTableName(clazz), CollUtil.newHashSet(path), condition);
+        final Dict dict = baseMapper.getFieldBySQL(getTableName(clazz), CollUtil.newHashSet(path), condition, false);
         if (null == dict) {
             return defaultValue;
         }
@@ -124,7 +124,7 @@ public interface GXBaseService<T> extends IService<T> {
             }
             dataKey.set(aliasName, key);
         }
-        final Dict dict = baseMapper.getFieldBySQL(getTableName(clazz), fieldSet, condition);
+        final Dict dict = baseMapper.getFieldBySQL(getTableName(clazz), fieldSet, condition, false);
         final Dict retDict = Dict.create();
         for (Map.Entry<String, Object> entry : dataKey.entrySet()) {
             Object value = dict.getObj(entry.getKey());
@@ -447,8 +447,20 @@ public interface GXBaseService<T> extends IService<T> {
      * @return
      */
     default Dict getFieldBySQL(Class<T> clazz, Set<String> fieldSet, Dict condition) {
+        return getFieldBySQL(clazz, fieldSet, condition, false);
+    }
+
+    /**
+     * 获取表中的指定字段
+     *
+     * @param clazz
+     * @param fieldSet
+     * @param condition
+     * @return
+     */
+    default Dict getFieldBySQL(Class<T> clazz, Set<String> fieldSet, Dict condition, boolean remove) {
         GXBaseMapper<T> baseMapper = (GXBaseMapper<T>) getBaseMapper();
-        return baseMapper.getFieldBySQL(getTableName(clazz), fieldSet, condition);
+        return baseMapper.getFieldBySQL(getTableName(clazz), fieldSet, condition, remove);
     }
 
     /**
@@ -464,7 +476,7 @@ public interface GXBaseService<T> extends IService<T> {
     default boolean recordModificationHistory(String originTableName, String historyTableName, Dict condition, Dict appendData) {
         GXBaseMapper<T> baseMapper = (GXBaseMapper<T>) getBaseMapper();
         assert baseMapper != null;
-        final Dict targetDict = baseMapper.getFieldBySQL(originTableName, CollUtil.newHashSet("*"), condition);
+        final Dict targetDict = baseMapper.getFieldBySQL(originTableName, CollUtil.newHashSet("*"), condition, false);
         if (targetDict.isEmpty()) {
             return false;
         }
