@@ -52,25 +52,6 @@ public class GXBaseBuilderConstants {
     @GXFieldCommentAnnotation(zh = "IN条件")
     public static final String IN = " IN ({})";
 
-    @GXFieldCommentAnnotation(zh = "数据库操作的或操作符")
-    public static final String OR_OPERATOR = "|";
-
-    @GXFieldCommentAnnotation(zh = "数据库操作的与操作符")
-    public static final String AND_OPERATOR = "&";
-
-    @GXFieldCommentAnnotation(zh = "数据库操作的取反操作符")
-    public static final String NEGATION_OPERATOR = "~";
-
-    @GXFieldCommentAnnotation(zh = "直接修改数据的status值")
-    public static final String NON_OPERATOR = "";
-
-    @GXFieldCommentAnnotation(zh = "时间字段")
-    public static final Dict TIME_FIELDS = Dict.create()
-            .set("created_at", GXBaseBuilderConstants.TIME_RANGE_WITH_EQ)
-            .set("updated_at", GXBaseBuilderConstants.TIME_RANGE_WITH_EQ)
-            .set("cancel_at", GXBaseBuilderConstants.TIME_RANGE_WITH_EQ)
-            .set("complete_at", GXBaseBuilderConstants.TIME_RANGE_WITH_EQ);
-
     private GXBaseBuilderConstants() {
     }
 }

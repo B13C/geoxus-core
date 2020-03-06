@@ -21,7 +21,7 @@ public interface GXBaseMapper<T> extends BaseMapper<T> {
     List<Dict> listOrSearchPage(IPage<Dict> page, Dict param);
 
     @UpdateProvider(type = GXBaseBuilder.class, method = "updateStatus")
-    boolean updateStatusByCondition(String tableName, int status, Dict condition, String operator);
+    boolean updateStatusByCondition(String tableName, int status, Dict condition);
 
     @SelectProvider(type = GXBaseBuilder.class, method = "getFieldBySQL")
     Dict getFieldBySQL(String tableName, Set<String> fieldSet, Dict condition, boolean remove);

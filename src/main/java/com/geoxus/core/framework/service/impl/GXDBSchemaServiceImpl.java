@@ -145,15 +145,19 @@ public class GXDBSchemaServiceImpl implements GXDBSchemaService {
         if (targetSet.size() == 1 && targetSet.contains("*") && remove) {
             throw new GXException("请指定要删除的字段名字!");
         }
-        if (targetSet.size() == 1 && targetSet.contains("*")) {
-            return StrUtil.format("{}.*", tableAlias);
-        }
         if (StrUtil.isBlank(tableAlias)) {
             log.error("表的别名不能为空");
             return "";
         }
         if (tableAlias.equals("gx_system_table_mark")) {
             tableAlias = "";
+        }
+        if (targetSet.size() == 1 && targetSet.contains("*")) {
+            if (StrUtil.isEmpty(tableAlias)) {
+                return StrUtil.format("{}.*", tableName);
+            } else {
+                return StrUtil.format("{}.*", tableAlias);
+            }
         }
         final List<TableField> tableFields = getTableColumn(tableName);
         final HashSet<String> tmpResult = new HashSet<>();

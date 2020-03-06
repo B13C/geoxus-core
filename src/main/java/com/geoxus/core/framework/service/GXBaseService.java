@@ -389,14 +389,13 @@ public interface GXBaseService<T> extends IService<T> {
      *
      * @param status    状态
      * @param condition 条件
-     * @param operator  操作
      * @return
      */
-    default boolean modifyStatus(int status, Dict condition, String operator) {
+    default boolean modifyStatus(int status, Dict condition) {
         final Type type = ((ParameterizedType) getClass().getGenericSuperclass()).getActualTypeArguments()[1];
         Class<T> clazz = Convert.convert(new TypeReference<Class<T>>() {
         }, type);
-        return updateStatusBySQL(clazz, status, condition, operator);
+        return updateStatusBySQL(clazz, status, condition);
     }
 
     /**
@@ -420,9 +419,9 @@ public interface GXBaseService<T> extends IService<T> {
      * @param condition
      * @return
      */
-    default boolean updateStatusBySQL(Class<T> clazz, int status, Dict condition, String operator) {
+    default boolean updateStatusBySQL(Class<T> clazz, int status, Dict condition) {
         GXBaseMapper<T> baseMapper = (GXBaseMapper<T>) getBaseMapper();
-        return baseMapper.updateStatusByCondition(getTableName(clazz), status, condition, operator);
+        return baseMapper.updateStatusByCondition(getTableName(clazz), status, condition);
     }
 
     /**
@@ -469,6 +468,7 @@ public interface GXBaseService<T> extends IService<T> {
      * @param tableName
      * @param fieldSet
      * @param condition
+     * @param remove
      * @return
      */
     default Dict getFieldBySQL(String tableName, Set<String> fieldSet, Dict condition, boolean remove) {
@@ -481,9 +481,16 @@ public interface GXBaseService<T> extends IService<T> {
         final Dict permissions = permissionService.getModelAttributePermissionByCoreModelId(coreModelId, Dict.create());
         final Dict dict = baseMapper.getFieldBySQL(tableName, fieldSet, condition, remove);
         final Dict jsonFieldDict = Convert.convert(Dict.class, permissions.getObj("json_field"));
-        for (Map.Entry<String, Object> entry : dict.entrySet()) {
+        final Dict dbFieldDict = Convert.convert(Dict.class, permissions.getObj("db_field"));
+        assert dict != null;
+        final Set<Map.Entry<String, Object>> entries = dict.entrySet();
+        final Dict retDict = Dict.create();
+        for (Map.Entry<String, Object> entry : entries) {
             final String key = entry.getKey();
             final Object object = entry.getValue();
+            if (null == object) {
+                continue;
+            }
             if ((object instanceof String) && JSONUtil.isJson((String) object)) {
                 final Dict removeField = Convert.convert(Dict.class, jsonFieldDict.getObj(key));
                 final Dict bean = JSONUtil.toBean((String) object, Dict.class);
@@ -492,10 +499,12 @@ public interface GXBaseService<T> extends IService<T> {
                         bean.remove(removeKey);
                     }
                 }
-                dict.set(key, bean);
+                retDict.set(key, bean);
+            } else if (null == dbFieldDict.getObj(key)) {
+                retDict.set(key, dict.getObj(key));
             }
         }
-        return dict;
+        return retDict;
     }
 
     /**

@@ -96,19 +96,12 @@ public interface GXBaseBuilder {
      *
      * @param tableName 数据表明
      * @param status    状态值
-     * @param operator  操作
      * @param condition 更新条件
      * @return String
      */
-    static String updateStatus(String tableName, int status, Dict condition, String operator) {
+    static String updateStatus(String tableName, int status, Dict condition) {
         final SQL sql = new SQL().UPDATE(tableName);
-        if (GXBaseBuilderConstants.OR_OPERATOR.equals(operator)) {
-            sql.SET(StrUtil.format("`status` = `status` | {}", status));
-        } else if (GXBaseBuilderConstants.NEGATION_OPERATOR.equals(operator)) {
-            sql.SET(StrUtil.format("`status` = `status` & ~{}", status));
-        } else {
-            sql.SET(StrUtil.format("`status` = {}", status));
-        }
+        sql.SET(StrUtil.format("`status` = {}", status));
         final Set<String> conditionKeys = condition.keySet();
         for (String conditionKey : conditionKeys) {
             String template = "{} = '{}'";
@@ -408,7 +401,11 @@ public interface GXBaseBuilder {
      * @return
      */
     default Dict getTimeFields() {
-        return GXBaseBuilderConstants.TIME_FIELDS;
+        return Dict.create()
+                .set("created_at", GXBaseBuilderConstants.TIME_RANGE_WITH_EQ)
+                .set("updated_at", GXBaseBuilderConstants.TIME_RANGE_WITH_EQ)
+                .set("cancel_at", GXBaseBuilderConstants.TIME_RANGE_WITH_EQ)
+                .set("complete_at", GXBaseBuilderConstants.TIME_RANGE_WITH_EQ);
     }
 
     /**
