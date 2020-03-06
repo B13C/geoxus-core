@@ -6,6 +6,7 @@ import cn.hutool.core.lang.Dict;
 import cn.hutool.core.lang.TypeReference;
 import cn.hutool.core.util.ReflectUtil;
 import cn.hutool.core.util.StrUtil;
+import cn.hutool.json.JSONUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
@@ -233,47 +234,69 @@ public interface GXBusinessService<T> extends GXBaseService<T>, GXValidateDBExis
     /**
      * 获取分页信息
      *
-     * @param param
-     * @return
+     * @param param       查询参数
+     * @param removeField 需要移除的数据
+     * @return GXPagination
      */
-    default GXPagination generatePage(Dict param) {
+    default GXPagination generatePage(Dict param, Dict removeField) {
         final IPage<Dict> riPage = constructPageObjectFromParam(param);
         GXBaseMapper<Dict> baseMapper = (GXBaseMapper<Dict>) getBaseMapper();
         final List<Dict> list = baseMapper.listOrSearchPage(riPage, param);
-        riPage.setRecords(list);
+        riPage.setRecords(processingListData(list, removeField));
         return new GXPagination(riPage.getRecords(), riPage.getTotal(), riPage.getSize(), riPage.getCurrent());
+    }
+
+    /**
+     * 处理列表数据,主要用于删除指定的字段值
+     *
+     * @param list        数据列表
+     * @param removeField 需要移除的数据
+     * @return List
+     */
+    default List<Dict> processingListData(List<Dict> list, Dict removeField) {
+        if (list.isEmpty()) {
+            return Collections.emptyList();
+        }
+        final List<Dict> retList = CollUtil.newArrayList();
+        for (Dict dict : list) {
+            final Set<Map.Entry<String, Object>> entries = dict.entrySet();
+            final Dict retDict = Dict.create();
+            for (Map.Entry<String, Object> entry : entries) {
+                final String key = entry.getKey();
+                final Object value = entry.getValue();
+                if (null != value && (value instanceof Dict || JSONUtil.isJson(value.toString())) && null != removeField.getObj(key)) {
+                    Dict beanDict = Dict.create();
+                    if (value instanceof Dict) {
+                        beanDict = (Dict) value;
+                    } else if (JSONUtil.isJson(value.toString())) {
+                        beanDict = JSONUtil.toBean(value.toString(), Dict.class);
+                    }
+                    final Dict tmpExtData = Dict.create();
+                    final Dict removeDict = Convert.convert(Dict.class, removeField.getObj(key));
+                    for (Map.Entry<String, Object> tmpEntry : beanDict.entrySet()) {
+                        if (null == removeDict.get(tmpEntry.getKey())) {
+                            tmpExtData.set(tmpEntry.getKey(), tmpEntry.getValue());
+                        }
+                    }
+                    retDict.set(key, tmpExtData);
+                } else if (null == removeField.get(key)) {
+                    retDict.set(key, value);
+                }
+            }
+            retList.add(retDict);
+        }
+        return retList;
     }
 
     /**
      * 将IPage信息转换成Pagination对象
      *
      * @param iPage
-     * @param <R>
      * @return
      */
-    default <R> GXPagination generatePage(IPage<R> iPage) {
-        return new GXPagination(iPage.getRecords(), iPage.getTotal(), iPage.getSize(), iPage.getCurrent());
-    }
-
-    /**
-     * 分页  返回Dict对象
-     *
-     * <pre>
-     *     {@code
-     *     final Dict param = Dict.create().set("paging_info", Dict.create().set("current", 1).set("size", 2));
-     *     IPage<Dict> iPage = generatePage(param , "BannerMapper.listOrSearch",Dict.class);
-     *     }
-     * </pre>
-     *
-     * @param param
-     * @param mapperMethodName
-     * @return
-     */
-    default GXPagination generatePage(Dict param, String mapperMethodName) {
-        final IPage<Dict> iPage = constructPageObjectFromParam(param);
-        final List<Dict> list = ReflectUtil.invoke(getBaseMapper(), mapperMethodName, iPage, param);
-        iPage.setRecords(list);
-        return new GXPagination(iPage.getRecords(), iPage.getTotal(), iPage.getSize(), iPage.getCurrent());
+    default GXPagination generatePage(IPage<Dict> iPage, Dict removeField) {
+        final List<Dict> records = processingListData(iPage.getRecords(), removeField);
+        return new GXPagination(records, iPage.getTotal(), iPage.getSize(), iPage.getCurrent());
     }
 
     /**
@@ -281,17 +304,14 @@ public interface GXBusinessService<T> extends GXBaseService<T>, GXValidateDBExis
      *
      * @param param
      * @param mapperMethodName
-     * @param isEntity
+     * @param removeField
      * @return
      */
-    default GXPagination generatePage(Dict param, String mapperMethodName, boolean isEntity) {
-        if (!isEntity) {
-            return generatePage(param, mapperMethodName);
-        }
+    default GXPagination generatePage(Dict param, String mapperMethodName, Dict removeField) {
         final Dict pageParam = getPageInfoFromParam(param);
-        final IPage<T> iPage = new Page<>(pageParam.getInt("current"), pageParam.getInt("size"));
-        final List<T> list = ReflectUtil.invoke(getBaseMapper(), mapperMethodName, iPage, param);
-        iPage.setRecords(list);
+        final IPage<Dict> iPage = new Page<>(pageParam.getInt("current"), pageParam.getInt("size"));
+        final List<Dict> list = ReflectUtil.invoke(getBaseMapper(), mapperMethodName, iPage, param);
+        iPage.setRecords(processingListData(list, removeField));
         return new GXPagination(iPage.getRecords(), iPage.getTotal(), iPage.getSize(), iPage.getCurrent());
     }
 
