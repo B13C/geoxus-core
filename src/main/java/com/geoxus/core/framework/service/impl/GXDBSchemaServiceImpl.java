@@ -5,6 +5,7 @@ import cn.hutool.core.convert.Convert;
 import cn.hutool.core.lang.Dict;
 import cn.hutool.core.util.StrUtil;
 import com.geoxus.core.common.annotation.GXFieldCommentAnnotation;
+import com.geoxus.core.common.exception.GXException;
 import com.geoxus.core.framework.service.GXCoreModelAttributePermissionService;
 import com.geoxus.core.framework.service.GXCoreModelService;
 import com.geoxus.core.framework.service.GXDBSchemaService;
@@ -135,50 +136,24 @@ public class GXDBSchemaServiceImpl implements GXDBSchemaService {
     @Override
     @Cacheable(value = "__DEFAULT__", key = "targetClass + methodName + #tableName")
     public String getSqlFieldStr(String tableName, Set<String> targetSet, boolean remove) {
-        if (targetSet.size() == 1 && targetSet.contains("*") && remove) {
-            return "*";
-        }
-        final List<TableField> tableFields = getTableColumn(tableName);
-        HashSet<String> result = new HashSet<>();
-        for (TableField tableField : tableFields) {
-            final String columnName = tableField.getColumnName();
-            if (remove) {
-                if (targetSet.contains(columnName)) {
-                    continue;
-                }
-                result.add(columnName);
-            } else {
-                if (targetSet.contains(columnName)) {
-                    result.add(columnName);
-                }
-            }
-        }
-        int coreModelId = gxCoreModelService.getCoreModelIdByTableName(tableName);
-        final Dict permissions = gxCoreModelAttributePermissionService.getModelAttributePermissionByCoreModelId(coreModelId, Dict.create());
-        Dict dict = Dict.create();
-        if (!permissions.isEmpty() && null != permissions.getObj("db_field")) {
-            dict = Convert.convert(Dict.class, permissions.getObj("db_field"));
-        }
-        final Set<String> strings = dict.keySet();
-        final HashSet<String> lastResult = CollUtil.newHashSet();
-        for (String field : result) {
-            if (CollUtil.contains(strings, field)) {
-                continue;
-            }
-            lastResult.add(StrUtil.format("{}", field));
-        }
-        return String.join(",", lastResult);
+        return getSqlFieldStr(tableName, targetSet, "gx_system_table_mark", remove);
     }
 
     @Override
     @Cacheable(value = "__DEFAULT__", key = "targetClass + methodName + #tableName")
     public String getSqlFieldStr(String tableName, Set<String> targetSet, String tableAlias, boolean remove) {
         if (targetSet.size() == 1 && targetSet.contains("*") && remove) {
-            return "*";
+            throw new GXException("请指定要删除的字段名字!");
+        }
+        if (targetSet.size() == 1 && targetSet.contains("*")) {
+            return StrUtil.format("{}.*", tableAlias);
         }
         if (StrUtil.isBlank(tableAlias)) {
             log.error("表的别名不能为空");
             return "";
+        }
+        if (tableAlias.equals("gx_system_table_mark")) {
+            tableAlias = "";
         }
         final List<TableField> tableFields = getTableColumn(tableName);
         final HashSet<String> tmpResult = new HashSet<>();
@@ -207,7 +182,11 @@ public class GXDBSchemaServiceImpl implements GXDBSchemaService {
             if (CollUtil.contains(strings, field)) {
                 continue;
             }
-            result.add(StrUtil.format("{}.{}", tableAlias, field));
+            if (StrUtil.isEmpty(tableAlias)) {
+                result.add(StrUtil.format("{}", field));
+            } else {
+                result.add(StrUtil.format("{}.{}", tableAlias, field));
+            }
         }
         return String.join(",", result);
     }
