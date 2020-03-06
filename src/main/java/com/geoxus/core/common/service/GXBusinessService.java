@@ -10,6 +10,7 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.geoxus.core.common.constant.GXCommonConstants;
+import com.geoxus.core.common.exception.GXException;
 import com.geoxus.core.common.mapper.GXBaseMapper;
 import com.geoxus.core.common.util.GXSpringContextUtils;
 import com.geoxus.core.common.validator.GXValidateDBExists;
@@ -20,9 +21,8 @@ import com.geoxus.core.framework.service.GXBaseService;
 import com.geoxus.core.framework.service.GXCoreMediaLibraryService;
 
 import javax.validation.ConstraintValidatorContext;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
+import java.util.stream.Collectors;
 
 public interface GXBusinessService<T> extends GXBaseService<T>, GXValidateDBExists, GXValidateDBUnique {
     /**
@@ -68,7 +68,13 @@ public interface GXBusinessService<T> extends GXBaseService<T>, GXValidateDBExis
      * 内容详情
      */
     default Dict detail(Dict param) {
-        return Dict.create();
+        final String tableName = (String) param.remove("table_name");
+        if (StrUtil.isBlank(tableName)) {
+            throw new GXException("请提供表名!");
+        }
+        final String fields = (String) Optional.ofNullable(param.remove("fields")).orElse("*");
+        final Boolean remove = (Boolean) Optional.ofNullable(param.remove("remove")).orElse(false);
+        return getFieldBySQL(tableName, Arrays.stream(StrUtil.replace(fields, " ", "").split(",")).collect(Collectors.toSet()), param, remove);
     }
 
     /**

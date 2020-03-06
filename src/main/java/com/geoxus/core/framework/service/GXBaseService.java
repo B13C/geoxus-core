@@ -459,8 +459,43 @@ public interface GXBaseService<T> extends IService<T> {
      * @return
      */
     default Dict getFieldBySQL(Class<T> clazz, Set<String> fieldSet, Dict condition, boolean remove) {
+        final String tableName = getTableName(clazz);
+        return getFieldBySQL(tableName, fieldSet, condition, remove);
+    }
+
+    /**
+     * 获取表中的指定字段
+     *
+     * @param tableName
+     * @param fieldSet
+     * @param condition
+     * @return
+     */
+    default Dict getFieldBySQL(String tableName, Set<String> fieldSet, Dict condition, boolean remove) {
         GXBaseMapper<T> baseMapper = (GXBaseMapper<T>) getBaseMapper();
-        return baseMapper.getFieldBySQL(getTableName(clazz), fieldSet, condition, remove);
+        final GXCoreModelService modelService = GXSpringContextUtils.getBean(GXCoreModelService.class);
+        assert modelService != null;
+        final int coreModelId = modelService.getCoreModelIdByTableName(tableName);
+        final GXCoreModelAttributePermissionService permissionService = GXSpringContextUtils.getBean(GXCoreModelAttributePermissionService.class);
+        assert permissionService != null;
+        final Dict permissions = permissionService.getModelAttributePermissionByCoreModelId(coreModelId, Dict.create());
+        final Dict dict = baseMapper.getFieldBySQL(tableName, fieldSet, condition, remove);
+        final Dict jsonFieldDict = Convert.convert(Dict.class, permissions.getObj("json_field"));
+        for (Map.Entry<String, Object> entry : dict.entrySet()) {
+            final String key = entry.getKey();
+            final Object object = entry.getValue();
+            if ((object instanceof String) && JSONUtil.isJson((String) object)) {
+                final Dict removeField = Convert.convert(Dict.class, jsonFieldDict.getObj(key));
+                final Dict bean = JSONUtil.toBean((String) object, Dict.class);
+                if (null != removeField) {
+                    for (String removeKey : removeField.keySet()) {
+                        bean.remove(removeKey);
+                    }
+                }
+                dict.set(key, bean);
+            }
+        }
+        return dict;
     }
 
     /**

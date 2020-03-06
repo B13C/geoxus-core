@@ -136,16 +136,22 @@ public class GXDBSchemaServiceImpl implements GXDBSchemaService {
     @Cacheable(value = "__DEFAULT__", key = "targetClass + methodName + #tableName")
     public String getSqlFieldStr(String tableName, Set<String> targetSet, boolean remove) {
         if (targetSet.size() == 1 && targetSet.contains("*") && remove) {
-            return "";
+            return "*";
         }
         final List<TableField> tableFields = getTableColumn(tableName);
-        final HashSet<String> result = new HashSet<>();
+        HashSet<String> result = new HashSet<>();
         for (TableField tableField : tableFields) {
             final String columnName = tableField.getColumnName();
-            if (remove && targetSet.contains(columnName)) {
-                continue;
+            if (remove) {
+                if (targetSet.contains(columnName)) {
+                    continue;
+                }
+                result.add(columnName);
+            } else {
+                if (targetSet.contains(columnName)) {
+                    result.add(columnName);
+                }
             }
-            result.add(columnName);
         }
         int coreModelId = gxCoreModelService.getCoreModelIdByTableName(tableName);
         final Dict permissions = gxCoreModelAttributePermissionService.getModelAttributePermissionByCoreModelId(coreModelId, Dict.create());
@@ -168,7 +174,7 @@ public class GXDBSchemaServiceImpl implements GXDBSchemaService {
     @Cacheable(value = "__DEFAULT__", key = "targetClass + methodName + #tableName")
     public String getSqlFieldStr(String tableName, Set<String> targetSet, String tableAlias, boolean remove) {
         if (targetSet.size() == 1 && targetSet.contains("*") && remove) {
-            return "";
+            return "*";
         }
         if (StrUtil.isBlank(tableAlias)) {
             log.error("表的别名不能为空");
@@ -179,10 +185,16 @@ public class GXDBSchemaServiceImpl implements GXDBSchemaService {
         final HashSet<String> result = new HashSet<>();
         for (TableField tableField : tableFields) {
             final String columnName = tableField.getColumnName();
-            if (remove && targetSet.contains(columnName)) {
-                continue;
+            if (remove) {
+                if (targetSet.contains(columnName)) {
+                    continue;
+                }
+                tmpResult.add(columnName);
+            } else {
+                if (targetSet.contains(columnName)) {
+                    tmpResult.add(columnName);
+                }
             }
-            tmpResult.add(columnName);
         }
         int coreModelId = gxCoreModelService.getCoreModelIdByTableName(tableName);
         final Dict permissions = gxCoreModelAttributePermissionService.getModelAttributePermissionByCoreModelId(coreModelId, Dict.create());

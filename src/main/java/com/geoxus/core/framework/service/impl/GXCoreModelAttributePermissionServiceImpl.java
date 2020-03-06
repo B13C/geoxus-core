@@ -37,7 +37,7 @@ public class GXCoreModelAttributePermissionServiceImpl extends ServiceImpl<GXCor
         if (superAdminId > 0 && null != currentAdminId && currentAdminId.equals(superAdminId)) {
             return Dict.create();
         }
-        if (null != currentAdminId) {
+        if (null != currentAdminId && currentAdminId > 0) {
             users.add(currentAdminId.toString());
             final Dict adminRoles = Objects.requireNonNull(GXSpringContextUtils.getBean(GXSAdminHasRolesService.class)).getAdminRoles(currentAdminId);
             roles = adminRoles.keySet().stream().map(r -> Convert.toStr(r, "0")).collect(Collectors.toList());
