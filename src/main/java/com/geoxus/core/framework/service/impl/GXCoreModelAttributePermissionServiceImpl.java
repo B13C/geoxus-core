@@ -7,6 +7,7 @@ import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.geoxus.core.common.constant.GXCommonConstants;
 import com.geoxus.core.common.service.GXSAdminHasRolesService;
+import com.geoxus.core.common.util.GXCommonUtils;
 import com.geoxus.core.common.util.GXShiroUtils;
 import com.geoxus.core.common.util.GXSpringContextUtils;
 import com.geoxus.core.framework.entity.GXCoreModelAttributesPermissionEntity;
@@ -32,6 +33,10 @@ public class GXCoreModelAttributePermissionServiceImpl extends ServiceImpl<GXCor
         List<String> roles = CollUtil.newArrayList();
         final List<String> users = CollUtil.newArrayList();
         final Long currentAdminId = GXShiroUtils.getAdminId();
+        final Long superAdminId = GXCommonUtils.getEnvironmentValue("super.admin.id", Long.class);
+        if (superAdminId > 0 && null != currentAdminId && currentAdminId.equals(superAdminId)) {
+            return Dict.create();
+        }
         if (null != currentAdminId) {
             users.add(currentAdminId.toString());
             final Dict adminRoles = Objects.requireNonNull(GXSpringContextUtils.getBean(GXSAdminHasRolesService.class)).getAdminRoles(currentAdminId);

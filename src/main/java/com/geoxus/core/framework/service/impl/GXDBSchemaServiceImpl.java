@@ -183,7 +183,10 @@ public class GXDBSchemaServiceImpl implements GXDBSchemaService {
         }
         int coreModelId = gxCoreModelService.getCoreModelIdByTableName(tableName);
         final Dict permissions = gxCoreModelAttributePermissionService.getModelAttributePermissionByCoreModelId(coreModelId, Dict.create());
-        final Dict dict = Convert.convert(Dict.class, permissions.getObj("db_field"));
+        Dict dict = Dict.create();
+        if (!permissions.isEmpty() && null != permissions.getObj("db_field")) {
+            dict = Convert.convert(Dict.class, permissions.getObj("db_field"));
+        }
         final Dict tmpTargetDict = Dict.create();
         for (String key : targetSet) {
             if (StrUtil.contains(key, " ")) {

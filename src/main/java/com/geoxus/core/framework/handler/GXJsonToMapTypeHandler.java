@@ -70,7 +70,7 @@ public class GXJsonToMapTypeHandler extends BaseTypeHandler<Map<String, Object>>
         Dict tmpDict = coreModelAttributePermissionService.getModelAttributePermissionByCoreModelId(coreModelId, Dict.create());
         final Dict jsonFieldDict = Convert.convert(Dict.class, tmpDict.getObj("json_field"));
         Dict dict = Dict.create();
-        if (!jsonFieldDict.isEmpty() && null != jsonFieldDict.getObj(this.columnName)) {
+        if (null != jsonFieldDict && !jsonFieldDict.isEmpty() && null != jsonFieldDict.getObj(this.columnName)) {
             dict = Convert.convert(Dict.class, jsonFieldDict.getObj(this.columnName));
         }
         final Dict map = Convert.convert(Dict.class, JSONUtil.toBean(from, Dict.class));

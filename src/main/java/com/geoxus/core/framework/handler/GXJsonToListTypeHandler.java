@@ -82,7 +82,7 @@ public class GXJsonToListTypeHandler extends BaseTypeHandler<List<Map<String, Ob
         Dict tmpDict = coreModelAttributePermissionService.getModelAttributePermissionByCoreModelId(coreModelId, Dict.create());
         final Dict jsonFieldDict = Convert.convert(Dict.class, tmpDict.getObj("json_field"));
         Dict dict = Dict.create();
-        if (!jsonFieldDict.isEmpty() && null != jsonFieldDict.getObj(this.columnName)) {
+        if (null != jsonFieldDict && !jsonFieldDict.isEmpty() && null != jsonFieldDict.getObj(this.columnName)) {
             dict = Convert.convert(Dict.class, jsonFieldDict.getObj(this.columnName));
         }
         final JSONArray jsonArray = JSONUtil.parseArray(from);
