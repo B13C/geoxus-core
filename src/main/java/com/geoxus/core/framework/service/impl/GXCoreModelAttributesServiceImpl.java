@@ -40,8 +40,11 @@ public class GXCoreModelAttributesServiceImpl extends ServiceImpl<GXCoreModelAtt
     private GXCacheKeysUtils gxCacheKeysUtils;
 
     @Override
-    @Cacheable(value = "__DEFAULT__", key = "targetClass + methodName + #p0.getStr('model_id') + #p0.getStr('model_attribute_field')")
+    @Cacheable(value = "__DEFAULT__", key = "targetClass + methodName + #p0.getStr('core_model_id') + #p0.getStr('model_attribute_field')")
     public List<Dict> getModelAttributesByModelId(Dict param) {
+        if (null == param.getInt(GXCommonConstants.CORE_MODEL_PRIMARY_NAME)) {
+            param.set(GXCommonConstants.CORE_MODEL_PRIMARY_NAME, 0);
+        }
         final List<Dict> attributes = baseMapper.getModelAttributesByModelId(param);
         return attributes;
     }
