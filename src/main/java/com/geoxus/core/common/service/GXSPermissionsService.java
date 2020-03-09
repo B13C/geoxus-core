@@ -9,7 +9,11 @@ import java.util.Set;
 
 public interface GXSPermissionsService<T extends GXSPermissionsEntity> extends GXBusinessService<T> {
     /**
-     * 获取当前登录人的权限Code
+     * 获取管理员的所有权限列表
+     * 权限包括:
+     * <p>
+     * 1、分配给角色的权限
+     * 2、直接分配给管理员的权限
      *
      * @param adminId 为NULL是获取当前登录人的
      * @return
