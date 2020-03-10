@@ -2,7 +2,7 @@
 * 0、 ~~框架依赖的统一(去掉apache commons依赖)~~
 * 1、 日志的分门别类存储(user_log、funding_log.....), 便于后期数据的使用(例如 : 统计...)
 * 2、 RPC的功能完善(错误的显示) 调用超时的处理(基于RabbitMQ) 考虑使用DUBBO或者SpringCloud
-* 3、 框架底层的功能完善(针对一些公共的功能, 比如(CoreConfig)在不同环境采用不同的缓存处理策略等...)
+* 3、 ~~框架底层的功能完善(针对一些公共的功能, 比如(CoreConfig)在不同环境采用不同的缓存处理策略等...)~~
 * 4、 ~~getJSONFieldValue() 处理 ext.xxx = null的情况~~
 * 5、 ~~修改TokenManager.generateUserToken 不能在这个方法中查询数据库~~
 * 6、 以太坊平台账户转入以太币到用户账户改为异步(需要保证数据的正确性,如何保证???)
