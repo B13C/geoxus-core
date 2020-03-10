@@ -154,6 +154,7 @@ public interface GXBaseBuilder {
             }
             sql.WHERE(StrUtil.format(template, conditionKey, value));
         }
+        sql.LIMIT(5);
         return sql.toString();
     }
 

@@ -129,7 +129,7 @@ public interface GXBusinessService<T> extends GXBaseService<T>, GXValidateDBExis
     }
 
     /**
-     * 实现验证注解
+     * 实现验证注解(返回true表示数据已经存在)
      *
      * @param value                      The value to check for
      * @param field                      The name of the field for which to check if the value exists
@@ -143,7 +143,7 @@ public interface GXBusinessService<T> extends GXBaseService<T>, GXValidateDBExis
     }
 
     /**
-     * 验证数据的唯一性
+     * 验证数据的唯一性 (返回true表示数据已经存在)
      *
      * @param value                      值
      * @param field                      字段名字
