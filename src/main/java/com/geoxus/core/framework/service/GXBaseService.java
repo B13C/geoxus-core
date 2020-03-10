@@ -21,7 +21,6 @@ import com.geoxus.core.common.mapper.GXBaseMapper;
 import com.geoxus.core.common.util.GXCommonUtils;
 import com.geoxus.core.common.util.GXHttpContextUtils;
 import com.geoxus.core.common.util.GXSpringContextUtils;
-import com.geoxus.core.common.util.GXSyncEventBusCenterUtils;
 import com.geoxus.core.framework.entity.GXCoreMediaLibraryEntity;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -331,12 +330,13 @@ public interface GXBaseService<T> extends IService<T> {
      * @param param
      */
     default void handleMedia(T target, long modelId, @NotNull Dict param) {
-        final List media = GXHttpContextUtils.getHttpParam("media_info", List.class);
+        final List<Integer> media = Convert.convert(new TypeReference<List<Integer>>() {
+        }, GXHttpContextUtils.getHttpParam("media_info", List.class));
         if (null != media) {
             param.set("media", media);
             param.set("model_id", modelId);
-            final GXMediaLibraryEvent<T> event = new GXMediaLibraryEvent<>(target, param);
-            GXSyncEventBusCenterUtils.getInstance().post(event);
+            final GXMediaLibraryEvent event = new GXMediaLibraryEvent(target, param);
+            postEvent(event);
         }
     }
 
@@ -573,17 +573,8 @@ public interface GXBaseService<T> extends IService<T> {
      *
      * @param event
      */
-    default void postSyncEvent(GXBaseEvent<T> event) {
-        GXCommonUtils.postSyncEvent(event);
-    }
-
-    /**
-     * 派发异步事件
-     *
-     * @param event
-     */
-    default void postAsyncEvent(GXBaseEvent<T> event) {
-        GXCommonUtils.postAsyncEvent(event);
+    default <T> void postEvent(GXBaseEvent<T> event) {
+        GXCommonUtils.postEvent(event);
     }
 
     /**

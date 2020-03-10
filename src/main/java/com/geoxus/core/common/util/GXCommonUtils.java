@@ -224,21 +224,12 @@ public class GXCommonUtils {
     }
 
     /**
-     * 派发同步事件
+     * 派发事件
      *
      * @param event
      */
-    public static <T> void postSyncEvent(GXBaseEvent<T> event) {
-        GXSyncEventBusCenterUtils.getInstance().post(event);
-    }
-
-    /**
-     * 派发异步事件
-     *
-     * @param event
-     */
-    public static <T> void postAsyncEvent(GXBaseEvent<T> event) {
-        GXAsyncEventBusCenterUtils.getInstance().post(event);
+    public static <T> void postEvent(GXBaseEvent<T> event) {
+        GXSpringContextUtils.getApplicationContext().publishEvent(event);
     }
 
     /**

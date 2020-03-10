@@ -1,13 +1,24 @@
 package com.geoxus.core.common.event;
 
-import cn.hutool.core.lang.Dict;
-import lombok.Data;
+import com.geoxus.core.common.annotation.GXFieldCommentAnnotation;
+import org.springframework.context.ApplicationEvent;
 
-@Data
-public class GXBaseEvent<T> {
-    protected String eventName;
+public abstract class GXBaseEvent<T> extends ApplicationEvent {
+    @GXFieldCommentAnnotation(zh = "附加参数")
+    protected transient T param;
 
-    protected Dict param;
+    /**
+     * Create a new {@code ApplicationEvent}.
+     *
+     * @param source the object on which the event initially occurred or with
+     *               which the event is associated (never {@code null})
+     */
+    public GXBaseEvent(Object source, T param) {
+        super(source);
+        this.param = param;
+    }
 
-    protected T target;
+    public T getParam() {
+        return param;
+    }
 }
