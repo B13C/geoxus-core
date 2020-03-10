@@ -1,6 +1,5 @@
 package com.geoxus.core.common.oauth;
 
-import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.lang.Dict;
 import cn.hutool.crypto.SecureUtil;
 import cn.hutool.json.JSONUtil;
@@ -61,8 +60,8 @@ public class GXTokenManager {
      */
     public static String generateAdminToken(long adminId, Dict param) {
         param.putIfAbsent(ADMIN_ID, adminId);
-        final long expiry = DateUtil.currentSeconds() + ADMIN_EXPIRES_REFRESH;
-        return GXAuthCodeUtils.authCodeEncode(JSONUtil.toJsonStr(param), KEY, (int) expiry);
+        param.put("platform", "GEO_XUS");
+        return GXAuthCodeUtils.authCodeEncode(JSONUtil.toJsonStr(param), KEY, ADMIN_EXPIRES_REFRESH);
     }
 
     /**
@@ -113,13 +112,13 @@ public class GXTokenManager {
                 String s = GXAuthCodeUtils.authCodeDecode(source, KEY);
                 Dict dict = JSONUtil.toBean(s, Dict.class);
                 if (dict.isEmpty()) {
-                    return null;
+                    return Dict.create();
                 }
                 return dict;
             });
         } catch (JSONException | ExecutionException exception) {
             log.error(exception.getMessage());
         }
-        return null;
+        return Dict.create();
     }
 }

@@ -9,5 +9,5 @@ public class GXBaseEvent<T> {
 
     protected Dict param;
 
-    protected T targetEntity;
+    protected T target;
 }

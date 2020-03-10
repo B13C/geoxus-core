@@ -17,13 +17,6 @@ import java.security.NoSuchAlgorithmException;
  */
 public class GXAuthCodeUtils {
     /**
-     * 操作类型
-     */
-    public enum DisCuzAuthCodeMode {
-        ENCODE, DECODE
-    }
-
-    /**
      * private static MD5 md5 = new MD5();
      * private static BASE64 base64 = new BASE64();
      * 从字符串的指定位置截取指定长度的子字符串
@@ -33,7 +26,7 @@ public class GXAuthCodeUtils {
      * @param length     子字符串的长度
      * @return 子字符串
      */
-    private static String CutString(String str, int startIndex, int length) {
+    private static String cutString(String str, int startIndex, int length) {
         if (startIndex >= 0) {
             if (length < 0) {
                 length = length * -1;
@@ -72,8 +65,8 @@ public class GXAuthCodeUtils {
      * @param startIndex 子字符串的起始位置
      * @return 子字符串
      */
-    private static String CutString(String str, int startIndex) {
-        return CutString(str, startIndex, str.length());
+    private static String cutString(String str, int startIndex) {
+        return cutString(str, startIndex, str.length());
     }
 
     /**
@@ -82,7 +75,7 @@ public class GXAuthCodeUtils {
      * @param filename 文件名
      * @return boolean
      */
-    public static boolean FileExists(String filename) {
+    public static boolean fileExists(String filename) {
         File f = new File(filename);
         return f.exists();
     }
@@ -93,7 +86,7 @@ public class GXAuthCodeUtils {
      * @param str 原始字符串
      * @return MD5结果
      */
-    private static String MD5(String str) {
+    private static String md5(String str) {
         return SecureUtil.md5(str);
     }
 
@@ -103,7 +96,7 @@ public class GXAuthCodeUtils {
      * @param str
      * @return
      */
-    public static boolean StrIsNullOrEmpty(String str) {
+    public static boolean strIsNullOrEmpty(String str) {
         return str == null || str.trim().equals("");
     }
 
@@ -114,7 +107,7 @@ public class GXAuthCodeUtils {
      * @param kLen 密钥长度，一般为256
      * @return
      */
-    static private byte[] GetKey(byte[] pass, int kLen) {
+    private static byte[] getKey(byte[] pass, int kLen) {
         byte[] mBox = new byte[kLen];
         for (int i = 0; i < kLen; i++) {
             mBox[i] = (byte) i;
@@ -135,16 +128,16 @@ public class GXAuthCodeUtils {
      * @param lens 随机字符长度
      * @return 随机字符
      */
-    private static String RandomString(int lens) throws NoSuchAlgorithmException {
-        char[] CharArray = {'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'j', 'k',
+    private static String randomString(int lens) throws NoSuchAlgorithmException {
+        char[] chars = {'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'j', 'k',
                 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w',
                 'x', 'y', 'z', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9'};
-        int cLens = CharArray.length;
-        String sCode = "";
+        int cLens = chars.length;
+        StringBuilder sCode = new StringBuilder();
         for (int i = 0; i < lens; i++) {
-            sCode += CharArray[RandomUtil.randomInt(cLens)];
+            sCode.append(chars[RandomUtil.randomInt(cLens)]);
         }
-        return sCode;
+        return sCode.toString();
     }
 
     /**
@@ -201,27 +194,27 @@ public class GXAuthCodeUtils {
             String keyC;
             String cryptKey;
             String result;
-            key = MD5(key);
-            keyA = MD5(CutString(key, 0, 16));
-            keyB = MD5(CutString(key, 16, 16));
-            keyC = operation == DisCuzAuthCodeMode.DECODE ? CutString(source, 0, cKeyLength) : RandomString(cKeyLength);
-            cryptKey = keyA + MD5(keyA + keyC);
+            key = md5(key);
+            keyA = md5(cutString(key, 0, 16));
+            keyB = md5(cutString(key, 16, 16));
+            keyC = operation == DisCuzAuthCodeMode.DECODE ? cutString(source, 0, cKeyLength) : randomString(cKeyLength);
+            cryptKey = keyA + md5(keyA + keyC);
             if (operation == DisCuzAuthCodeMode.DECODE) {
                 byte[] temp;
-                temp = Base64Utils.decode(CutString(source, cKeyLength).getBytes());
+                temp = Base64Utils.decode(cutString(source, cKeyLength).getBytes());
                 result = new String(RC4(temp, cryptKey));
                 if ((result.indexOf("0000000000") == 0
-                        || Integer.parseInt(CutString(result, 0, 10)) - DateUtil.currentSeconds() > 0)
-                        && CutString(result, 10, 16).equals(
-                        CutString(MD5(CutString(result, 26) + keyB), 0, 16))) {
-                    return CutString(result, 26);
+                        || Integer.parseInt(cutString(result, 0, 10)) - DateUtil.currentSeconds() > 0)
+                        && cutString(result, 10, 16).equals(
+                        cutString(md5(cutString(result, 26) + keyB), 0, 16))) {
+                    return cutString(result, 26);
                 }
                 return "{}";
             } else {
                 expiry = expiry > 0 ? (int) (DateUtil.currentSeconds() + expiry) : 0;
-                source = String.format("%010d", expiry) + CutString(MD5(source + keyB), 0, 16) + source;
+                source = String.format("%010d", expiry) + cutString(md5(source + keyB), 0, 16) + source;
                 byte[] temp = RC4(source.getBytes(StandardCharsets.UTF_8), cryptKey);
-                return keyC + Base64Utils.encodeToString(temp);
+                return String.format("%s%s", keyC, Base64Utils.encodeToString(temp));
             }
         } catch (Exception e) {
             return "{}";
@@ -237,10 +230,10 @@ public class GXAuthCodeUtils {
      */
     private static byte[] RC4(byte[] input, String pass) {
         if (input == null || pass == null) {
-            return null;
+            return new byte[0];
         }
         byte[] output = new byte[input.length];
-        byte[] mBox = GetKey(pass.getBytes(), 256);
+        byte[] mBox = getKey(pass.getBytes(), 256);
         // 加密
         int i = 0;
         int j = 0;
@@ -267,5 +260,12 @@ public class GXAuthCodeUtils {
      */
     private static int toInt(byte b) {
         return (b + 256) % 256;
+    }
+
+    /**
+     * 操作类型
+     */
+    public enum DisCuzAuthCodeMode {
+        ENCODE, DECODE
     }
 }

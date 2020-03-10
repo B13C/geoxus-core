@@ -56,7 +56,7 @@ public class GXOAuth2Realm extends AuthorizingRealm {
         // 根据accessToken,获取token中的值
         Dict dict = GXTokenManager.decodeAdminToken(accessToken);
         // 判断token是否失效
-        if (dict == null) {
+        if (null == dict || dict.isEmpty()) {
             throw new IncorrectCredentialsException("长时间未操作，请重新登录");
         }
         // 从TOKEN中获取用户ID
