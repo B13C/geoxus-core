@@ -335,7 +335,7 @@ public interface GXBaseService<T> extends IService<T> {
         if (null != media) {
             param.set("media", media);
             param.set("model_id", modelId);
-            final GXMediaLibraryEvent event = new GXMediaLibraryEvent(target, param);
+            final GXMediaLibraryEvent<T> event = new GXMediaLibraryEvent<>(target, param);
             postEvent(event);
         }
     }
@@ -573,7 +573,7 @@ public interface GXBaseService<T> extends IService<T> {
      *
      * @param event
      */
-    default <T> void postEvent(GXBaseEvent<T> event) {
+    default <E> void postEvent(GXBaseEvent<E> event) {
         GXCommonUtils.postEvent(event);
     }
 

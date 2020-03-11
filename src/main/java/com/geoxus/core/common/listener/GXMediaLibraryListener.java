@@ -17,12 +17,12 @@ import java.util.Optional;
 
 @Component
 @Slf4j
-public class GXMediaLibraryListener extends GXBaseListener<GXMediaLibraryEvent, Dict> {
+public class GXMediaLibraryListener<T> implements GXBaseListener<GXMediaLibraryEvent<T>> {
     @Autowired
     private GXCoreMediaLibraryService coreMediaLibraryService;
 
     @Override
-    public void onApplicationEvent(GXMediaLibraryEvent event) {
+    public void listen(GXMediaLibraryEvent<T> event) {
         final Dict param = event.getParam();
         final Object o = event.getSource();
         final long coreModelId = Convert.convert(Long.class, Optional.ofNullable(param.getInt(GXCommonConstants.CORE_MODEL_PRIMARY_NAME))
