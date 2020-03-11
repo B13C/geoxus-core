@@ -11,7 +11,6 @@ import com.geoxus.core.framework.service.GXCoreMediaLibraryService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationListener;
-import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
@@ -23,8 +22,12 @@ public class GXMediaLibraryListener<T> implements ApplicationListener<GXMediaLib
     @Autowired
     private GXCoreMediaLibraryService coreMediaLibraryService;
 
-    @EventListener
-    public void listen(GXMediaLibraryEvent<T> event) {
+    @Override
+    public void onApplicationEvent(GXMediaLibraryEvent<T> event) {
+        dealData(event);
+    }
+
+    public void dealData(GXMediaLibraryEvent<T> event) {
         final Dict param = event.getParam();
         final Object o = event.getSource();
         final long coreModelId = Convert.convert(Long.class, Optional.ofNullable(param.getInt(GXCommonConstants.CORE_MODEL_PRIMARY_NAME))
@@ -34,9 +37,5 @@ public class GXMediaLibraryListener<T> implements ApplicationListener<GXMediaLib
             coreMediaLibraryService.updateOwner(modelId, coreModelId, Convert.convert(new TypeReference<List<JSONObject>>() {
             }, param.getObj("media")));
         }
-    }
-
-    @Override
-    public void onApplicationEvent(GXMediaLibraryEvent<T> event) {
     }
 }
