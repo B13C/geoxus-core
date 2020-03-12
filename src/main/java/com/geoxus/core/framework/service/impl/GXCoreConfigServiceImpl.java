@@ -48,6 +48,6 @@ public class GXCoreConfigServiceImpl extends ServiceImpl<GXCoreConfigMapper, GXC
     @Override
     public boolean updateValueByParamKey(String key, String value) {
         Dict condition = Dict.create().set("param_key", key);
-        return updateFieldByCondition(condition, "param_value", value);
+        return updateFieldBySQL(GXCoreConfigEntity.class, Dict.create().set("param_value", value), condition);
     }
 }

@@ -9,8 +9,6 @@ import cn.hutool.core.util.RandomUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.json.JSON;
 import cn.hutool.json.JSONUtil;
-import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
-import com.baomidou.mybatisplus.core.toolkit.StringUtils;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.geoxus.core.common.annotation.GXFieldCommentAnnotation;
 import com.geoxus.core.common.constant.GXCommonConstants;
@@ -28,7 +26,6 @@ import org.springframework.cache.Cache;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.validation.constraints.NotNull;
-import java.lang.reflect.Field;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.nio.charset.StandardCharsets;
@@ -39,8 +36,7 @@ import java.util.*;
  * 业务基础Service
  *
  * @param <T>
- * @author britton chen
- * @email <britton@126.com>
+ * @author britton chen <britton@126.com>
  */
 public interface GXBaseService<T> extends IService<T> {
     @GXFieldCommentAnnotation(zh = "日志对象")
@@ -49,8 +45,9 @@ public interface GXBaseService<T> extends IService<T> {
     /**
      * 获取当前接口的常量字段信息
      *
-     * @return
+     * @return Dict
      */
+    @SuppressWarnings("unused")
     default Dict getConstantsFields() {
         final Dict data = Dict.create();
         final ArrayList<Class<?>> clazzInterfaces = new ArrayList<>();
@@ -64,10 +61,10 @@ public interface GXBaseService<T> extends IService<T> {
     /**
      * 获取实体中指定指定的值
      *
-     * @param clazz
-     * @param path
-     * @param condition
-     * @return
+     * @param clazz     Class对象
+     * @param path      路径
+     * @param condition 条件
+     * @return R
      * @example {
      * "entity":GoodsEntity,
      * "path":"ext.name",
@@ -81,11 +78,11 @@ public interface GXBaseService<T> extends IService<T> {
     /**
      * 获取实体中指定指定的值
      *
-     * @param clazz
-     * @param path
-     * @param condition
-     * @param defaultValue
-     * @return
+     * @param clazz        Class对象
+     * @param path         路径
+     * @param condition    条件
+     * @param defaultValue 默认值
+     * @return R
      */
     default <R> R getSingleJSONFieldValueByDB(Class<T> clazz, String path, Dict condition, Class<R> type, R defaultValue) {
         String aliasName = "";
@@ -104,11 +101,12 @@ public interface GXBaseService<T> extends IService<T> {
     /**
      * 获取JSON中的多个值
      *
-     * @param clazz
-     * @param fields
-     * @param condition
-     * @return
+     * @param clazz     Class 对象
+     * @param fields    字段
+     * @param condition 条件
+     * @return Dict
      */
+    @SuppressWarnings("unused")
     default Dict getMultiJSONFieldValueByDB(Class<T> clazz, Map<String, Class<?>> fields, Dict condition) {
         GXBaseMapper<T> baseMapper = (GXBaseMapper<T>) getBaseMapper();
         final HashSet<String> fieldSet = CollUtil.newHashSet();
@@ -140,9 +138,9 @@ public interface GXBaseService<T> extends IService<T> {
     /**
      * 获取实体中指定指定的值
      *
-     * @param entity
-     * @param path
-     * @return
+     * @param entity 实体对象
+     * @param path   路径
+     * @return R
      * @example {
      * "entity":GoodsEntity,
      * "path":"ext.name",
@@ -156,10 +154,10 @@ public interface GXBaseService<T> extends IService<T> {
     /**
      * 获取实体中指定指定的值
      *
-     * @param entity
-     * @param path
-     * @param defaultValue
-     * @return
+     * @param entity       实体对象
+     * @param path         路径
+     * @param defaultValue 默认值
+     * @return R
      * @example {
      * "entity":GoodsEntity,
      * "path":"ext.name",
@@ -188,13 +186,12 @@ public interface GXBaseService<T> extends IService<T> {
         return Convert.convert(type, parse.getByPath(subField), defaultValue);
     }
 
-
     /**
      * 获取实体的多个JSON值
      *
-     * @param entity
-     * @param dict
-     * @return
+     * @param entity 实体对象
+     * @param dict   需要获取的数据
+     * @return Dict
      */
     default Dict getMultiJSONFieldValueByEntity(T entity, Dict dict) {
         final Set<String> keySet = dict.keySet();
@@ -213,45 +210,22 @@ public interface GXBaseService<T> extends IService<T> {
      * @param modelId     实体对象模型ID
      * @param coreModelId 实体模型ID
      * @param param       其他参数
-     * @return
+     * @return Collection
      */
     default Collection<GXCoreMediaLibraryEntity> getMedia(int modelId, int coreModelId, Dict param) {
         final GXCoreMediaLibraryService mediaLibraryService = GXSpringContextUtils.getBean(GXCoreMediaLibraryService.class);
+        assert mediaLibraryService != null;
         return mediaLibraryService.listByMap(param.set("model_id", modelId).set(GXCommonConstants.CORE_MODEL_PRIMARY_NAME, coreModelId));
-    }
-
-    /**
-     * 更新实体字段,不能更新虚拟字段
-     *
-     * @param condition
-     * @param fieldName
-     * @param value
-     * @return
-     */
-    default boolean updateFieldByCondition(Dict condition, String fieldName, Object value) {
-        final T target = getOne(new QueryWrapper<T>().allEq(condition));
-        if (null == target) {
-            return false;
-        }
-        try {
-            final Field field = target.getClass().getDeclaredField(StringUtils.underlineToCamel(fieldName));
-            field.setAccessible(true);
-            field.set(target, value);
-            return updateById(target);
-        } catch (NoSuchFieldException | IllegalAccessException e) {
-            log.error("updateFieldByCondition", e);
-        }
-        return false;
     }
 
     /**
      * 更新JSON字段中的某一个值
      *
-     * @param clazz
-     * @param path
-     * @param value
-     * @param condition
-     * @return
+     * @param clazz     Class对象
+     * @param path      路径
+     * @param value     值
+     * @param condition 条件
+     * @return boolean
      */
     @Transactional(rollbackFor = Exception.class)
     default boolean updateJSONFieldSingleValue(Class<T> clazz, String path, Object value, Dict condition) {
@@ -278,52 +252,6 @@ public interface GXBaseService<T> extends IService<T> {
     }
 
     /**
-     * 获取模型指定字段
-     *
-     * @param condition
-     * @param fieldName
-     * @return
-     */
-    default Object getEntitySingleField(Dict condition, String fieldName) {
-        final T t = getOne(new QueryWrapper<T>().allEq(condition));
-        final Dict dict = Dict.parse(t);
-        return dict.get(fieldName);
-    }
-
-    /**
-     * 获取模型指定字段
-     *
-     * @param condition
-     * @param fieldName
-     * @return
-     */
-    default <R> R getEntitySingleField(Dict condition, String fieldName, Class<R> type, R defaultValue) {
-        final T t = getOne(new QueryWrapper<T>().allEq(condition));
-        if (null == t) {
-            return defaultValue;
-        }
-        final Dict dict = Dict.parse(t);
-        return Convert.convert(type, dict.get(fieldName), defaultValue);
-    }
-
-    /**
-     * 获取模型指定字段
-     *
-     * @param condition
-     * @param fieldNames
-     * @return
-     */
-    default Dict getEntityMultiFields(Dict condition, String... fieldNames) {
-        final T t = getOne(new QueryWrapper<T>().allEq(condition));
-        final Dict beanDict = Dict.parse(t);
-        final Dict dict = Dict.create();
-        for (String key : fieldNames) {
-            dict.set(key, beanDict.get(key));
-        }
-        return dict;
-    }
-
-    /**
      * 获取Cache对象
      *
      * @param cacheName 缓存名字
@@ -336,9 +264,9 @@ public interface GXBaseService<T> extends IService<T> {
     /**
      * 处理用户上传的资源文件
      *
-     * @param target
-     * @param modelId
-     * @param param
+     * @param target  目标对象
+     * @param modelId 模型ID
+     * @param param   参数
      */
     default void handleMedia(T target, long modelId, @NotNull Dict param) {
         final List<Integer> media = Convert.convert(new TypeReference<List<Integer>>() {
@@ -354,9 +282,12 @@ public interface GXBaseService<T> extends IService<T> {
     /**
      * 根据条件获取一条记录
      *
-     * @param condition
-     * @return
+     * @param clazz     Class对象
+     * @param fieldSet  字段集合
+     * @param condition 查询条件
+     * @return Dict
      */
+    @SuppressWarnings("unused")
     default Dict getOneByCondition(Class<T> clazz, Set<String> fieldSet, Dict condition) {
         return getFieldBySQL(clazz, fieldSet, condition);
     }
@@ -366,7 +297,7 @@ public interface GXBaseService<T> extends IService<T> {
      *
      * @param clazz     实体的Class
      * @param condition 条件
-     * @return
+     * @return int
      */
     default Integer checkRecordIsExists(Class<T> clazz, Dict condition) {
         GXBaseMapper<T> baseMapper = (GXBaseMapper<T>) getBaseMapper();
@@ -378,7 +309,7 @@ public interface GXBaseService<T> extends IService<T> {
      *
      * @param clazz     实体的Class
      * @param condition 条件
-     * @return
+     * @return int
      */
     default Integer checkRecordIsUnique(Class<T> clazz, Dict condition) {
         GXBaseMapper<T> baseMapper = (GXBaseMapper<T>) getBaseMapper();
@@ -388,8 +319,8 @@ public interface GXBaseService<T> extends IService<T> {
     /**
      * 获取实体的表明
      *
-     * @param clazz
-     * @return
+     * @param clazz Class对象
+     * @return String
      */
     default String getTableName(Class<T> clazz) {
         return GXCommonUtils.getTableName(clazz);
@@ -400,7 +331,7 @@ public interface GXBaseService<T> extends IService<T> {
      *
      * @param status    状态
      * @param condition 条件
-     * @return
+     * @return boolean
      */
     default boolean modifyStatus(int status, Dict condition) {
         final Type type = ((ParameterizedType) getClass().getGenericSuperclass()).getActualTypeArguments()[1];
@@ -412,10 +343,10 @@ public interface GXBaseService<T> extends IService<T> {
     /**
      * 通过SQL更新表中的数据
      *
-     * @param clazz
-     * @param data
-     * @param condition
-     * @return
+     * @param clazz     Class 对象
+     * @param data      需要更新的数据
+     * @param condition 更新条件
+     * @return boolean
      */
     default boolean updateFieldBySQL(Class<T> clazz, Dict data, Dict condition) {
         GXBaseMapper<T> baseMapper = (GXBaseMapper<T>) getBaseMapper();
@@ -425,10 +356,10 @@ public interface GXBaseService<T> extends IService<T> {
     /**
      * 通过SQL更新表中的数据
      *
-     * @param clazz
-     * @param status
-     * @param condition
-     * @return
+     * @param clazz     Class 对象
+     * @param status    状态
+     * @param condition 更新条件
+     * @return boolean
      */
     default boolean updateStatusBySQL(Class<T> clazz, int status, Dict condition) {
         GXBaseMapper<T> baseMapper = (GXBaseMapper<T>) getBaseMapper();
@@ -441,8 +372,9 @@ public interface GXBaseService<T> extends IService<T> {
      * @param clazz    实体的Class
      * @param fieldSet 字段集合
      * @param dataList 数据集合
-     * @return
+     * @return int
      */
+    @SuppressWarnings("unused")
     default Integer batchInsertBySQL(Class<T> clazz, Set<String> fieldSet, List<Dict> dataList) {
         GXBaseMapper<T> baseMapper = (GXBaseMapper<T>) getBaseMapper();
         return baseMapper.batchInsertBySQL(getTableName(clazz), fieldSet, dataList);
@@ -451,10 +383,10 @@ public interface GXBaseService<T> extends IService<T> {
     /**
      * 获取表中的指定字段
      *
-     * @param clazz
-     * @param fieldSet
-     * @param condition
-     * @return
+     * @param clazz     Class对象
+     * @param fieldSet  字段集合
+     * @param condition 查询条件
+     * @return Dict
      */
     default Dict getFieldBySQL(Class<T> clazz, Set<String> fieldSet, Dict condition) {
         return getFieldBySQL(clazz, fieldSet, condition, false);
@@ -463,10 +395,10 @@ public interface GXBaseService<T> extends IService<T> {
     /**
      * 获取表中的指定字段
      *
-     * @param clazz
-     * @param fieldSet
-     * @param condition
-     * @return
+     * @param clazz     Class对象
+     * @param fieldSet  字段集合
+     * @param condition 查询条件
+     * @return Dict
      */
     default Dict getFieldBySQL(Class<T> clazz, Set<String> fieldSet, Dict condition, boolean remove) {
         final String tableName = getTableName(clazz);
@@ -476,11 +408,11 @@ public interface GXBaseService<T> extends IService<T> {
     /**
      * 获取表中的指定字段
      *
-     * @param tableName
-     * @param fieldSet
-     * @param condition
-     * @param remove
-     * @return
+     * @param tableName 表名
+     * @param fieldSet  字段集合
+     * @param condition 更新条件
+     * @param remove    是否移除
+     * @return Dict
      */
     default Dict getFieldBySQL(String tableName, Set<String> fieldSet, Dict condition, boolean remove) {
         GXBaseMapper<T> baseMapper = (GXBaseMapper<T>) getBaseMapper();
@@ -527,6 +459,7 @@ public interface GXBaseService<T> extends IService<T> {
      * @param appendData       附加信息
      * @return boolean
      */
+    @SuppressWarnings("unused")
     @Transactional(rollbackFor = Exception.class)
     default boolean recordModificationHistory(String originTableName, String historyTableName, Dict condition, Dict appendData) {
         GXBaseMapper<T> baseMapper = (GXBaseMapper<T>) getBaseMapper();
@@ -582,26 +515,16 @@ public interface GXBaseService<T> extends IService<T> {
     /**
      * 派发同步事件
      *
-     * @param event
+     * @param event ApplicationEvent对象
      */
     default <E> void postEvent(GXBaseEvent<E> event) {
         GXCommonUtils.postEvent(event);
     }
 
     /**
-     * 记录日志信息到数据库
-     * 不同类别的日志信心记录到不同的数据库中
-     *
-     * @return
-     */
-    default Dict logInfoToDB(Dict param) {
-        return Dict.create();
-    }
-
-    /**
      * 获取 Primary Key
      *
-     * @return
+     * @return String
      */
     default String getPrimaryKey() {
         return "id";
