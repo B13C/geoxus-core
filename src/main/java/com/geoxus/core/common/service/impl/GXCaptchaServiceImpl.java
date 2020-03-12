@@ -21,10 +21,10 @@ import java.util.Map;
 @Slf4j
 public class GXCaptchaServiceImpl implements GXCaptchaService {
     @GXFieldCommentAnnotation(zh = "Guava缓存组件")
-    private static final Cache<String, String> captchaCache;
+    private static final Cache<String, String> CAPTCHA_CACHE;
 
     static {
-        captchaCache = CacheBuilder.newBuilder().maximumSize(10000).expireAfterWrite(Duration.ofSeconds(300L)).build();
+        CAPTCHA_CACHE = CacheBuilder.newBuilder().maximumSize(10000).expireAfterWrite(Duration.ofSeconds(300L)).build();
     }
 
     @Autowired
@@ -38,8 +38,8 @@ public class GXCaptchaServiceImpl implements GXCaptchaService {
     @Override
     public boolean checkCaptcha(String uuid, String code) {
         String cacheKey = cacheKeysUtils.getCaptchaConfigKey(uuid);
-        if (code.equalsIgnoreCase(captchaCache.getIfPresent(cacheKey))) {
-            captchaCache.invalidate(cacheKey);
+        if (code.equalsIgnoreCase(CAPTCHA_CACHE.getIfPresent(cacheKey))) {
+            CAPTCHA_CACHE.invalidate(cacheKey);
             return true;
         }
         return false;
@@ -65,7 +65,7 @@ public class GXCaptchaServiceImpl implements GXCaptchaService {
         final String base64Img = lineCaptcha.getImageBase64();
         final String code = lineCaptcha.getCode();
         final String cacheKey = cacheKeysUtils.getCaptchaConfigKey(uuid);
-        captchaCache.put(cacheKey, code);
+        CAPTCHA_CACHE.put(cacheKey, code);
         result.put("uuid", uuid);
         result.put("base64", "data:image/png;base64," + base64Img);
         return result;
