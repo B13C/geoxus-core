@@ -60,16 +60,21 @@ public interface GXBaseService<T> extends IService<T> {
 
     /**
      * 获取实体中指定指定的值
+     * <pre>
+     *     {@code
+     *     getSingleJSONFieldValueByDB(
+     *      GoodsEntity,
+     *      "ext.name",
+     *      Integer.class,
+     *      Dict.create().set("user_id" , 1111)
+     *      )
+     *     }
+     * </pre>
      *
      * @param clazz     Class对象
      * @param path      路径
      * @param condition 条件
      * @return R
-     * @example {
-     * "entity":GoodsEntity,
-     * "path":"ext.name",
-     * "type":Integer.class
-     * }
      */
     default <R> R getSingleJSONFieldValueByDB(Class<T> clazz, String path, Class<R> type, Dict condition) {
         return getSingleJSONFieldValueByDB(clazz, path, condition, type, GXCommonUtils.getClassDefaultValue(type));
@@ -137,15 +142,19 @@ public interface GXBaseService<T> extends IService<T> {
 
     /**
      * 获取实体中指定指定的值
+     * <pre>
+     *     {@code
+     *     getSingleJSONFieldValueByEntity(
+     *       GoodsEntity,
+     *       "ext.name",
+     *       Integer.class
+     *       )
+     *     }
+     * </pre>
      *
      * @param entity 实体对象
      * @param path   路径
      * @return R
-     * @example {
-     * "entity":GoodsEntity,
-     * "path":"ext.name",
-     * "type":Integer.class
-     * }
      */
     default <R> R getSingleJSONFieldValueByEntity(T entity, String path, Class<R> type) {
         return getSingleJSONFieldValueByEntity(entity, path, type, GXCommonUtils.getClassDefaultValue(type));
@@ -153,17 +162,21 @@ public interface GXBaseService<T> extends IService<T> {
 
     /**
      * 获取实体中指定指定的值
+     * <pre>
+     *     {@code
+     *     getSingleJSONFieldValueByEntity(
+     *       GoodsEntity,
+     *       "ext.name",
+     *       Integer.class
+     *       0
+     *       )
+     *     }
+     * </pre>
      *
      * @param entity       实体对象
      * @param path         路径
      * @param defaultValue 默认值
      * @return R
-     * @example {
-     * "entity":GoodsEntity,
-     * "path":"ext.name",
-     * "type":Integer.class
-     * "defaultValue":0
-     * }
      */
     default <R> R getSingleJSONFieldValueByEntity(T entity, String path, Class<R> type, R defaultValue) {
         JSON json = JSONUtil.parse(JSONUtil.toJsonStr(entity));
@@ -258,7 +271,7 @@ public interface GXBaseService<T> extends IService<T> {
      * @return Cache
      */
     default Cache getCache(String cacheName) {
-        return GXCommonUtils.getCache(cacheName);
+        return GXCommonUtils.getSpringCache(cacheName);
     }
 
     /**

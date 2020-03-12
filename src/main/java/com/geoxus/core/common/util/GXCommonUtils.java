@@ -45,12 +45,16 @@ public class GXCommonUtils {
 
     /**
      * 根据key获取配置文件中的配置信息
+     * <pre>
+     *     {@code
+     *     getEnvironmentValue(" alipay.appId ", String.class)
+     *     }
+     * </pre>
      *
      * @param key       key
      * @param clazzType 返回类型
      * @param <R>       泛型类型
      * @return <R>
-     * @example getEnvironmentValue(" alipay.appId ", String.class)
      */
     public static <R> R getEnvironmentValue(String key, Class<R> clazzType) {
         final R envValue = GXSpringContextUtils.getEnvironment().getProperty(key, clazzType);
@@ -62,13 +66,15 @@ public class GXCommonUtils {
 
     /**
      * 根据key获取配置文件中的配置信息
+     * <pre>{@<code>
+     *     getEnvironmentValue(" alipay.appId ", String.class, " ")
+     *     }</pre>
      *
      * @param key          KEY
      * @param clazzType    返回类型
      * @param defaultValue 泛型类型
      * @param <R>          <R>
      * @return <R>
-     * @example getEnvironmentValue(" alipay.appId ", String.class, " ")
      */
     public static <R> R getEnvironmentValue(String key, Class<R> clazzType, R defaultValue) {
         final R envValue = GXSpringContextUtils.getEnvironment().getProperty(key, clazzType);
@@ -76,18 +82,6 @@ public class GXCommonUtils {
             return defaultValue;
         }
         return envValue;
-    }
-
-    /**
-     * 获取Spring Cache 对象
-     *
-     * @param cacheName 缓存名字
-     * @return Cache
-     */
-    public static Cache getCache(String cacheName) {
-        final CacheManager cacheManager = GXSpringContextUtils.getBean(CacheManager.class);
-        assert cacheManager != null;
-        return cacheManager.getCache(cacheName);
     }
 
     /**
@@ -107,8 +101,8 @@ public class GXCommonUtils {
     /**
      * JSON字符串转Dict
      *
-     * @param jsonStr
-     * @return
+     * @param jsonStr JSON字符串
+     * @return Dict
      */
     public static Dict jsonToDict(String jsonStr) {
         return jsonToAnyObject(jsonStr, Dict.class);
@@ -117,8 +111,8 @@ public class GXCommonUtils {
     /**
      * JSON转换为List<Dict>
      *
-     * @param jsonStr
-     * @return
+     * @param jsonStr JSON字符串
+     * @return List
      */
     public static List<Dict> jsonToListDict(String jsonStr) {
         if (!JSONUtil.isJson(jsonStr)) {
@@ -135,9 +129,9 @@ public class GXCommonUtils {
     /**
      * 获取Class的JVM默认值
      *
-     * @param clazzType
-     * @param <R>
-     * @return
+     * @param clazzType Class 对象
+     * @param <R>       R
+     * @return R
      */
     public static <R> R getClassDefaultValue(Class<R> clazzType) {
         if (ClassUtil.isBasicType(clazzType) && !ClassUtil.isPrimitiveWrapper(clazzType)) {
@@ -149,9 +143,9 @@ public class GXCommonUtils {
     /**
      * 获取Class的JVM默认值
      *
-     * @param clazzType
-     * @param <R>
-     * @return
+     * @param clazzType Class 对象
+     * @param <R>       R
+     * @return R
      */
     public static <R> R getClassDefaultValue(TypeReference<R> clazzType) {
         final Class<R> aClass = (Class<R>) TypeUtil.getClass(clazzType.getType());
@@ -163,13 +157,16 @@ public class GXCommonUtils {
 
     /**
      * 通过路径获取对象中的值
+     * <pre>{@code
+     *     getDataByPath(Dict.create ().set(" aaa ", " bbbb "),"aaa" ,String.class)
+     *     }
+     * </pre>
      *
-     * @param obj
-     * @param key
-     * @param clazzType
-     * @param <R>
-     * @return
-     * @example getDataByPath(Dict.create ().set(" aaa ", " bbbb "),"aaa" ,String.class)
+     * @param obj       对象
+     * @param key       键
+     * @param clazzType Class对象
+     * @param <R>       R
+     * @return R
      */
     public static <R> R getObjectFieldValueByPath(Object obj, String key, Class<R> clazzType) {
         final JSON parse = JSONUtil.parse(obj);
@@ -182,10 +179,13 @@ public class GXCommonUtils {
 
     /**
      * 获取一个接口实现的所有接口
+     * <pre>{@code
+     * getInterfaces(UUserService.class, targetList)
+     * }
+     * </pre>
      *
-     * @param clazz
-     * @param targetList
-     * @example getInterfaces(UUserService.class, targetList)
+     * @param clazz      Class 对象
+     * @param targetList 目标Class列表
      */
     public static void getInterfaces(Class<?> clazz, List<Class<?>> targetList) {
         for (Class<?> clz : clazz.getInterfaces()) {
@@ -199,8 +199,8 @@ public class GXCommonUtils {
     /**
      * 处理Class的字段信息
      *
-     * @param clz
-     * @param data
+     * @param clz  Class 对象
+     * @param data 数据
      */
     public static void clazzFields(Class<?> clz, Dict data) {
         final Field[] fields = ReflectUtil.getFields(clz);
@@ -222,7 +222,8 @@ public class GXCommonUtils {
     /**
      * 获取当前接口的常量字段信息
      *
-     * @return
+     * @param clazz Class对象
+     * @return Dict
      */
     public static Dict getConstantsFields(Class<?> clazz) {
         final Dict data = Dict.create();
@@ -238,7 +239,7 @@ public class GXCommonUtils {
     /**
      * 派发事件
      *
-     * @param event
+     * @param event 事件对象
      */
     public static <T> void postEvent(GXBaseEvent<T> event) {
         GXSpringContextUtils.getApplicationContext().publishEvent(event);
@@ -247,8 +248,8 @@ public class GXCommonUtils {
     /**
      * 转换Map.toString()到Map
      *
-     * @param mapString
-     * @return
+     * @param mapString map的String表示
+     * @return Map
      */
     public static Map<String, Object> convertStrToMap(String mapString) {
         return Arrays.stream(mapString.replace("{", "").replace("}", "").split(","))
@@ -259,9 +260,9 @@ public class GXCommonUtils {
     /**
      * 将实体的某个JSON字段转换为一个Dict
      *
-     * @param entity
-     * @param mainField
-     * @return
+     * @param entity    实体对象
+     * @param mainField 主字段 (数据库字段)
+     * @return Dict
      */
     public static Dict entityJSONFieldToDict(Object entity, String mainField) {
         return Convert.convert(Dict.class, Convert.convert(Dict.class, entity).get(mainField));
@@ -270,11 +271,11 @@ public class GXCommonUtils {
     /**
      * 将一个新key放入已经存在的json字符串中
      *
-     * @param jsonStr
-     * @param jsonPath
-     * @param object
-     * @param override
-     * @return
+     * @param jsonStr  JSON字符串
+     * @param jsonPath JSON路径
+     * @param object   Object
+     * @param override 是否复写已经存在的值
+     * @return JSONObject
      */
     public static JSONObject putDataToJSONStr(String jsonStr, String jsonPath, Object object, boolean override) {
         if (!JSONUtil.isJsonObj(jsonStr)) {
@@ -292,11 +293,11 @@ public class GXCommonUtils {
     /**
      * 将一个新key放入已经存在的json字符串中
      *
-     * @param jsonObject
-     * @param jsonPath
-     * @param object
-     * @param override
-     * @return
+     * @param jsonObject JSON对象
+     * @param jsonPath   JSON路径
+     * @param object     Object
+     * @param override   是否复写已经存在的值
+     * @return JSONObject
      */
     public static JSONObject putDataToJSONStr(JSONObject jsonObject, String jsonPath, Object object, boolean override) {
         if (override) {
@@ -310,11 +311,10 @@ public class GXCommonUtils {
     /**
      * 将json字符串转换为任意对象
      *
-     * @param jsonStr
-     * @param clazz
-     * @param <R>
-     * @return
-     * @throws JsonProcessingException
+     * @param jsonStr JSON字符串
+     * @param clazz   Class 对象
+     * @param <R>     R
+     * @return R
      */
     public static <R> R jsonToAnyObject(String jsonStr, Class<R> clazz) {
         if (!JSONUtil.isJson(jsonStr)) {
@@ -334,11 +334,10 @@ public class GXCommonUtils {
     /**
      * 将json字符串转换为任意对象
      *
-     * @param jsonStr
-     * @param reference
-     * @param <R>
-     * @return
-     * @throws JsonProcessingException
+     * @param jsonStr   JSON字符串
+     * @param reference 需要转换的到类型
+     * @param <R>       R
+     * @return R
      */
     public static <R> R jsonToAnyObject(String jsonStr, TypeReference<R> reference) {
         if (!JSONUtil.isJson(jsonStr)) {
@@ -367,11 +366,11 @@ public class GXCommonUtils {
      *     }
      * </pre>
      *
-     * @param jsonStr
-     * @param path
-     * @param clazz
-     * @param <R>
-     * @return
+     * @param jsonStr JSON字符串
+     * @param path    路径
+     * @param clazz   Class 对象
+     * @param <R>     R
+     * @return R
      */
     public static <R> R getJSONValueByAnyPath(String jsonStr, String path, Class<R> clazz) {
         if (!JSONUtil.isJson(jsonStr)) {
@@ -423,11 +422,11 @@ public class GXCommonUtils {
      *     }
      * </pre>
      *
-     * @param jsonStr
-     * @param path
-     * @param reference
-     * @param <R>
-     * @return
+     * @param jsonStr   JSON字符串
+     * @param path      路径
+     * @param reference 需要转换到的类型
+     * @param <R>       泛型类型
+     * @return R
      */
     public static <R> R getJSONValueByAnyPath(String jsonStr, String path, TypeReference<R> reference) {
         return getJSONValueByAnyPath(jsonStr, path, (Class<R>) reference.getType());
@@ -436,11 +435,11 @@ public class GXCommonUtils {
     /**
      * 移除JSON中任意路径的值
      *
-     * @param jsonStr
-     * @param path
-     * @param clazz
-     * @param <R>
-     * @return
+     * @param jsonStr JSON字符串
+     * @param path    路径
+     * @param clazz   Class 对象
+     * @param <R>     泛型类型
+     * @return R
      */
     public static <R> R removeJSONStrAnyPath(String jsonStr, String path, Class<R> clazz) {
         final JSONObject parse = JSONUtil.parseObj(jsonStr);
@@ -469,9 +468,8 @@ public class GXCommonUtils {
     /**
      * 移除JSON中任意路径的值
      *
-     * @param jsonStr
-     * @param path
-     * @return
+     * @param jsonStr JSON字符串
+     * @param path    路径
      */
     public static void removeJSONStrAnyPath(String jsonStr, String path) {
         final JSONObject parse = JSONUtil.parseObj(jsonStr);
@@ -597,7 +595,7 @@ public class GXCommonUtils {
      * 获取Spring的Cache实例
      *
      * @param cacheName cache的名字
-     * @return
+     * @return Cache
      */
     public static Cache getSpringCache(String cacheName) {
         final CacheManager cacheManager = GXSpringContextUtils.getBean(CacheManager.class);
@@ -621,7 +619,7 @@ public class GXCommonUtils {
      * @param key                添加的key
      * @param value              添加的value
      * @param returnRequestParam 是否返回requestParam
-     * @return
+     * @return Dict
      */
     public static Dict addConditionToSearchCondition(Dict requestParam, String key, Object value, boolean returnRequestParam) {
         final Object obj = requestParam.getObj(GXBaseBuilderConstants.SEARCH_CONDITION_NAME);
@@ -644,7 +642,7 @@ public class GXCommonUtils {
      * @param requestParam       请求参数
      * @param sourceData         需要添加的map
      * @param returnRequestParam 是否返回requestParam
-     * @return
+     * @return Dict
      */
     public static Dict addConditionToSearchCondition(Dict requestParam, Dict sourceData, boolean returnRequestParam) {
         final Object obj = requestParam.getObj(GXBaseBuilderConstants.SEARCH_CONDITION_NAME);
