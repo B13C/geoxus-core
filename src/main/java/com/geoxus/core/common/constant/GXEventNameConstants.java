@@ -8,4 +8,9 @@ public class GXEventNameConstants {
     public static final String CREATING = "creating";
 
     public static final String UPDATE = "update";
+    
+    public static final String BEFORE = "before";
+
+    private GXEventNameConstants() {
+    }
 }
