@@ -661,6 +661,21 @@ public class GXCommonUtils {
     }
 
     /**
+     * 获取当前登录用户的ID
+     * 0  : 表示普通用户
+     * >0 : 确定管理员
+     *
+     * @return Long
+     */
+    public static long getCurrentSessionUserId() {
+        try {
+            return GXShiroUtils.getAdminId();
+        } catch (Exception ignored) {
+        }
+        return 0;
+    }
+
+    /**
      * 获取实体的表名字
      *
      * @param clazz Class

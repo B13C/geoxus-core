@@ -85,7 +85,7 @@ public interface GXBaseService<T> extends IService<T> {
      * @return R
      */
     default <R> R getSingleJSONFieldValueByDB(Class<T> clazz, String path, Dict condition, Class<R> type, R defaultValue) {
-        String aliasName = "";
+        String aliasName = path;
         if (StrUtil.contains(path, ".")) {
             aliasName = StrUtil.split(path, ".")[1].replace("'", "");
             path = StrUtil.format("{} as `{}`", path, aliasName);
@@ -95,7 +95,7 @@ public interface GXBaseService<T> extends IService<T> {
         if (null == dict) {
             return defaultValue;
         }
-        return Convert.convert(type, new String((byte[]) dict.getObj(aliasName), StandardCharsets.UTF_8), defaultValue);
+        return Convert.convert(type, dict.get(aliasName, defaultValue));
     }
 
     /**

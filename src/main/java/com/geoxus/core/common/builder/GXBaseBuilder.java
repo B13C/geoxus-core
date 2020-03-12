@@ -61,7 +61,7 @@ public interface GXBaseBuilder {
                     if (entryKey.startsWith("-")) {
                         sql.SET(StrUtil.format("{} = JSON_REMOVE({} , '$.{}')", dataKey, dataKey, entryKey.substring(1)));
                     } else {
-                        if (entryValue instanceof Number) {
+                        if (ReUtil.isMatch("^[+-]?(0|([1-9]\\d*))(\\.\\d+)?$", entryValue.toString())) {
                             sql.SET(StrUtil.format("{} = JSON_SET({} , '$.{}' , {})", dataKey, dataKey, entryKey, entryValue));
                         } else {
                             if (!ClassUtil.isPrimitiveWrapper(entryValue.getClass()) && !ClassUtil.equals(entryValue.getClass(), "String", true) && (entryValue instanceof Map || entryValue instanceof GXBaseEntity)) {
@@ -81,8 +81,8 @@ public interface GXBaseBuilder {
         final Set<String> conditionKeys = whereData.keySet();
         for (String conditionKey : conditionKeys) {
             String template = "{} = '{}'";
-            final Object value = whereData.getObj(conditionKey);
-            if (value instanceof Number) {
+            final String value = whereData.getStr(conditionKey);
+            if (ReUtil.isMatch("^[+-]?(0|([1-9]\\d*))(\\.\\d+)?$", value)) {
                 template = "{} = {}";
             }
             sql.WHERE(StrUtil.format(template, conditionKey, value));
@@ -105,8 +105,8 @@ public interface GXBaseBuilder {
         final Set<String> conditionKeys = condition.keySet();
         for (String conditionKey : conditionKeys) {
             String template = "{} = '{}'";
-            final Object value = condition.getObj(conditionKey);
-            if (value instanceof Number) {
+            final String value = condition.getStr(conditionKey);
+            if (ReUtil.isMatch("^[+-]?(0|([1-9]\\d*))(\\.\\d+)?$", value)) {
                 template = "{} = {}";
             }
             sql.WHERE(StrUtil.format(template, conditionKey, value));
@@ -174,8 +174,8 @@ public interface GXBaseBuilder {
         final Set<String> conditionKeys = condition.keySet();
         for (String conditionKey : conditionKeys) {
             String template = "{} = '{}'";
-            final Object value = condition.getObj(conditionKey);
-            if (value instanceof Number) {
+            final String value = condition.getStr(conditionKey);
+            if (ReUtil.isMatch("^[+-]?(0|([1-9]\\d*))(\\.\\d+)?$", value)) {
                 template = "{} = {}";
             }
             sql.WHERE(StrUtil.format(template, conditionKey, value));

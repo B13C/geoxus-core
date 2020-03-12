@@ -8,7 +8,6 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.geoxus.core.common.constant.GXCommonConstants;
 import com.geoxus.core.common.service.GXSAdminHasRolesService;
 import com.geoxus.core.common.util.GXCommonUtils;
-import com.geoxus.core.common.util.GXShiroUtils;
 import com.geoxus.core.common.util.GXSpringContextUtils;
 import com.geoxus.core.framework.entity.GXCoreModelAttributesPermissionEntity;
 import com.geoxus.core.framework.mapper.GXCoreModelAttributesPermissionMapper;
@@ -32,12 +31,12 @@ public class GXCoreModelAttributePermissionServiceImpl extends ServiceImpl<GXCor
         final Dict dbFieldDict = Dict.create();
         List<String> roles = CollUtil.newArrayList();
         final List<String> users = CollUtil.newArrayList();
-        final Long currentAdminId = GXShiroUtils.getAdminId();
+        final Long currentAdminId = GXCommonUtils.getCurrentSessionUserId();
         final Long superAdminId = GXCommonUtils.getEnvironmentValue("super.admin.id", Long.class);
-        if (superAdminId > 0 && null != currentAdminId && currentAdminId.equals(superAdminId)) {
+        if (superAdminId > 0 && currentAdminId.equals(superAdminId)) {
             return Dict.create();
         }
-        if (null != currentAdminId && currentAdminId > 0) {
+        if (currentAdminId > 0) {
             users.add(currentAdminId.toString());
             final Dict adminRoles = Objects.requireNonNull(GXSpringContextUtils.getBean(GXSAdminHasRolesService.class)).getAdminRoles(currentAdminId);
             roles = adminRoles.keySet().stream().map(r -> Convert.toStr(r, "0")).collect(Collectors.toList());
