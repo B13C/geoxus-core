@@ -24,6 +24,7 @@ import com.geoxus.core.common.util.GXSpringContextUtils;
 import com.geoxus.core.framework.entity.GXCoreMediaLibraryEntity;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.cache.Cache;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.validation.constraints.NotNull;
@@ -320,6 +321,16 @@ public interface GXBaseService<T> extends IService<T> {
             dict.set(key, beanDict.get(key));
         }
         return dict;
+    }
+
+    /**
+     * 获取Cache对象
+     *
+     * @param cacheName 缓存名字
+     * @return Cache
+     */
+    default Cache getCache(String cacheName) {
+        return GXCommonUtils.getCache(cacheName);
     }
 
     /**

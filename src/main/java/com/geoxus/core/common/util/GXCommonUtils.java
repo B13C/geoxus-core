@@ -79,6 +79,18 @@ public class GXCommonUtils {
     }
 
     /**
+     * 获取Spring Cache 对象
+     *
+     * @param cacheName 缓存名字
+     * @return Cache
+     */
+    public static Cache getCache(String cacheName) {
+        final CacheManager cacheManager = GXSpringContextUtils.getBean(CacheManager.class);
+        assert cacheManager != null;
+        return cacheManager.getCache(cacheName);
+    }
+
+    /**
      * 根据key获取配置文件中的配置信息
      *
      * @param key Key
@@ -241,7 +253,7 @@ public class GXCommonUtils {
     public static Map<String, Object> convertStrToMap(String mapString) {
         return Arrays.stream(mapString.replace("{", "").replace("}", "").split(","))
                 .map(arrayData -> arrayData.split("="))
-                .collect(Collectors.toMap(d -> d[0].trim(), d -> (String) d[1]));
+                .collect(Collectors.toMap(d -> d[0].trim(), d -> d[1]));
     }
 
     /**
@@ -311,6 +323,7 @@ public class GXCommonUtils {
         }
         final ObjectMapper objectMapper = GXSpringContextUtils.getBean(ObjectMapper.class);
         try {
+            assert objectMapper != null;
             return objectMapper.readValue(jsonStr, clazz);
         } catch (JsonProcessingException e) {
             LOG.error(e.getMessage(), e);
@@ -334,6 +347,7 @@ public class GXCommonUtils {
         }
         final ObjectMapper objectMapper = GXSpringContextUtils.getBean(ObjectMapper.class);
         try {
+            assert objectMapper != null;
             return objectMapper.readValue(jsonStr, reference);
         } catch (JsonProcessingException e) {
             LOG.error(e.getMessage(), e);
@@ -366,6 +380,7 @@ public class GXCommonUtils {
         }
         final ObjectMapper objectMapper = GXSpringContextUtils.getBean(ObjectMapper.class);
         try {
+            assert objectMapper != null;
             Dict data = objectMapper.readValue(jsonStr, Dict.class);
             String[] paths = StrUtil.split(path, ".");
             final Object firstObj = data.getObj(paths[0]);
@@ -565,6 +580,7 @@ public class GXCommonUtils {
      */
     public static String getRemoteRPCServerValueByKey(String serverName, String key) {
         final GXRabbitMQRPCRemoteServersConfig serverConfigBean = GXSpringContextUtils.getBean(GXRabbitMQRPCRemoteServersConfig.class);
+        assert serverConfigBean != null;
         final Map<String, Map<String, Object>> servers = serverConfigBean.getServers();
         final Map<String, Object> server = servers.get(serverName);
         if (null == server) {
