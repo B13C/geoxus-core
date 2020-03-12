@@ -12,11 +12,15 @@ public abstract class GXBaseEvent<T> extends ApplicationEvent implements Resolva
 
     @GXFieldCommentAnnotation(zh = "场景值,用于区分同一个事件的不同使用场景")
     protected transient Object scene;
-    
-    public GXBaseEvent(T source, Dict param, Object scene) {
+
+    @GXFieldCommentAnnotation(zh = "事件名字")
+    protected transient String eventName;
+
+    public GXBaseEvent(T source, String eventName, Dict param, Object scene) {
         super(source);
         this.param = param;
         this.scene = scene;
+        this.eventName = eventName;
     }
 
     public Dict getParam() {
@@ -25,6 +29,10 @@ public abstract class GXBaseEvent<T> extends ApplicationEvent implements Resolva
 
     public Object getScene() {
         return scene;
+    }
+
+    public String getEventName() {
+        return eventName;
     }
 
     @Override
