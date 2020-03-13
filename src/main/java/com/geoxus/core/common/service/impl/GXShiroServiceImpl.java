@@ -18,7 +18,7 @@ public class GXShiroServiceImpl implements GXShiroService {
     /**
      * 获取用户权限列表
      *
-     * @param adminId
+     * @param adminId 管理员ID
      */
     public Set<String> getAdminAllPermissions(Long adminId) {
         return GXSpringContextUtils.getBean(GXSPermissionsService.class).getAdminAllPermissions(adminId);
@@ -26,6 +26,7 @@ public class GXShiroServiceImpl implements GXShiroService {
 
     /**
      * 获取用户角色列表
+     *
      * @return
      */
     public Dict getAdminRoles(long adminId) {
