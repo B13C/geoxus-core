@@ -110,7 +110,7 @@ public class GXExceptionHandler {
     @ExceptionHandler(AuthorizationException.class)
     public GXResultUtils handleException(AuthorizationException e) {
         log.error(e.getMessage(), e);
-        return GXResultUtils.error(403, "没有权限不能进行该操作");
+        return GXResultUtils.error(403, "没有权限进行此操作");
     }
 
     @ExceptionHandler(MultipartException.class)
