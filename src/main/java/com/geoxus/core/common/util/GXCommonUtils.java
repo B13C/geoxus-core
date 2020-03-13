@@ -66,9 +66,11 @@ public class GXCommonUtils {
 
     /**
      * 根据key获取配置文件中的配置信息
-     * <pre>{@<code>
+     * <pre>
+     *     {@code
      *     getEnvironmentValue(" alipay.appId ", String.class, " ")
-     *     }</pre>
+     *     }
+     *     </pre>
      *
      * @param key          KEY
      * @param clazzType    返回类型
@@ -402,7 +404,7 @@ public class GXCommonUtils {
             }
             if (!tempDict.isEmpty()) {
                 final Object obj = tempDict.getObj(paths[length - 1]);
-                if (null != obj) {
+                if (Objects.nonNull(obj)) {
                     return Convert.convert(clazz, obj);
                 }
             }
@@ -448,7 +450,7 @@ public class GXCommonUtils {
             String mainPath = StrUtil.sub(path, 0, StrUtil.lastIndexOfIgnoreCase(path, "."));
             String subPath = StrUtil.sub(path, StrUtil.lastIndexOfIgnoreCase(path, ".") + 1, path.length());
             final Object o = parse.get(mainPath);
-            if (null != o) {
+            if (Objects.nonNull(o)) {
                 if (JSONUtil.isJsonArray(o.toString()) && NumberUtil.isInteger(subPath)) {
                     final int delIndex = Integer.parseInt(subPath);
                     if (null != parse.getByPath(mainPath, JSONArray.class)) {
@@ -478,7 +480,7 @@ public class GXCommonUtils {
             String mainPath = StrUtil.sub(path, 0, StrUtil.lastIndexOfIgnoreCase(path, "."));
             String subPath = StrUtil.sub(path, StrUtil.lastIndexOfIgnoreCase(path, ".") + 1, path.length());
             final Object o = parse.get(mainPath);
-            if (null != o) {
+            if (Objects.nonNull(o)) {
                 if (JSONUtil.isJsonArray(o.toString()) && NumberUtil.isInteger(subPath)) {
                     final int delIndex = Integer.parseInt(subPath);
                     if (null != parse.getByPath(mainPath, JSONArray.class)) {
@@ -508,7 +510,7 @@ public class GXCommonUtils {
             String mainPath = StrUtil.sub(path, 0, StrUtil.lastIndexOfIgnoreCase(path, "."));
             String subPath = StrUtil.sub(path, StrUtil.lastIndexOfIgnoreCase(path, ".") + 1, path.length());
             final Object o = parse.getByPath(mainPath);
-            if (null != o) {
+            if (Objects.nonNull(o)) {
                 if (JSONUtil.isJsonArray(o.toString()) && NumberUtil.isInteger(subPath)) {
                     final int delIndex = Integer.parseInt(subPath);
                     if (null != parse.getByPath(mainPath, JSONArray.class)) {
@@ -536,7 +538,7 @@ public class GXCommonUtils {
             String mainPath = StrUtil.sub(path, 0, StrUtil.lastIndexOfIgnoreCase(path, "."));
             String subPath = StrUtil.sub(path, StrUtil.lastIndexOfIgnoreCase(path, ".") + 1, path.length());
             final Object o = parse.getByPath(mainPath);
-            if (null != o) {
+            if (Objects.nonNull(o)) {
                 if (JSONUtil.isJsonArray(o.toString()) && NumberUtil.isInteger(subPath)) {
                     final int delIndex = Integer.parseInt(subPath);
                     if (null != parse.getByPath(mainPath, JSONArray.class)) {

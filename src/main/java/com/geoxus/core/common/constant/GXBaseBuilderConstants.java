@@ -1,6 +1,5 @@
 package com.geoxus.core.common.constant;
 
-import cn.hutool.core.lang.Dict;
 import com.geoxus.core.common.annotation.GXFieldCommentAnnotation;
 
 public class GXBaseBuilderConstants {
@@ -22,8 +21,14 @@ public class GXBaseBuilderConstants {
     @GXFieldCommentAnnotation(zh = "字符串相等")
     public static final String STR_EQ = " = '{}'";
 
+    @GXFieldCommentAnnotation(zh = "字符串相等")
+    public static final String STR_NOT_EQ = " != '{}'";
+
     @GXFieldCommentAnnotation(zh = "数字相等")
     public static final String NUMBER_EQ = " = {}";
+
+    @GXFieldCommentAnnotation(zh = "数字不相等")
+    public static final String NUMBER_NOT_EQ = " != {}";
 
     @GXFieldCommentAnnotation(zh = "数字小于")
     public static final String NUMBER_LT = " < {}";
@@ -51,6 +56,9 @@ public class GXBaseBuilderConstants {
 
     @GXFieldCommentAnnotation(zh = "IN条件")
     public static final String IN = " IN ({})";
+
+    @GXFieldCommentAnnotation(zh = "NOT IN条件")
+    public static final String NOT_IN = " NOT IN ({})";
 
     private GXBaseBuilderConstants() {
     }

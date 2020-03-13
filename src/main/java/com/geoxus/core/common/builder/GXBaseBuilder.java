@@ -282,7 +282,7 @@ public interface GXBaseBuilder {
      * @param sql          SQL对象
      * @param requestParam 请求参数
      * @param aliasPrefix  别名
-     * @return
+     * @return Dict
      */
     default Dict mergeSearchConditionToSQL(SQL sql, Dict requestParam, String aliasPrefix) {
         final String modelIdentificationValue = getModelIdentificationValue();
@@ -292,11 +292,12 @@ public interface GXBaseBuilder {
         final Dict condition = Dict.create().set(GXBaseBuilderConstants.MODEL_IDENTIFICATION_NAME, modelIdentificationValue);
         Dict searchField = Objects.requireNonNull(GXSpringContextUtils.getBean(GXCoreModelService.class)).getSearchCondition(condition);
         searchField.putAll(getDefaultSearchField());
-        Dict searchCondition = getRequestSearchCondition(requestParam);
+        Dict requestSearchCondition = getRequestSearchCondition(requestParam);
         final Dict timeFields = getTimeFields();
-        Set<String> keySet = searchCondition.keySet();
+        Set<String> keySet = requestSearchCondition.keySet();
         for (String key : keySet) {
-            Object value = searchCondition.getObj(key);
+            Object value = requestSearchCondition.getObj(key);
+            String lastKey = ReUtil.replaceAll(key, "[!<>*^$@#%&]", "");
             if (null != value) {
                 String operator = searchField.getStr(key);
                 if (null == operator && StrUtil.isNotBlank(aliasPrefix)) {
@@ -320,12 +321,12 @@ public interface GXBaseBuilder {
                     value = CollUtil.join((Collection<?>) value, ",");
                 }
                 if (StrUtil.isNotBlank(aliasPrefix) && !StrUtil.contains(key, ".")) {
-                    sql.WHERE(StrUtil.format("`{}`.`{}` ".concat(operator), aliasPrefix, key, value));
+                    sql.WHERE(StrUtil.format("`{}`.`{}` ".concat(operator), aliasPrefix, lastKey, value));
                 } else {
                     if (StrUtil.contains(key, ".")) {
-                        sql.WHERE(StrUtil.format("{} ".concat(operator), key, value));
+                        sql.WHERE(StrUtil.format("{} ".concat(operator), lastKey, value));
                     } else {
-                        sql.WHERE(StrUtil.format("`{}` ".concat(operator), key, value));
+                        sql.WHERE(StrUtil.format("`{}` ".concat(operator), lastKey, value));
                     }
                 }
             }
