@@ -530,7 +530,7 @@ public interface GXBaseService<T> extends IService<T> {
      *
      * @param event ApplicationEvent对象
      */
-    default <E> void publishEvent(GXBaseEvent<E> event) {
+    default <R> void publishEvent(GXBaseEvent<R> event) {
         GXCommonUtils.publishEvent(event);
     }
 

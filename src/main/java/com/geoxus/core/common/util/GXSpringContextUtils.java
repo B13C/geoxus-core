@@ -7,6 +7,7 @@ import org.springframework.beans.factory.NoSuchBeanDefinitionException;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 import org.springframework.core.env.Environment;
+import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Component;
 
 import java.util.Map;
@@ -16,7 +17,7 @@ import java.util.Map;
  */
 @Component
 public class GXSpringContextUtils implements ApplicationContextAware {
-    private static final Logger log = LoggerFactory.getLogger(GXSpringContextUtils.class);
+    private static final Logger log = GXCommonUtils.getLogger(GXSpringContextUtils.class);
 
     private static ApplicationContext applicationContext;
 
@@ -72,7 +73,7 @@ public class GXSpringContextUtils implements ApplicationContextAware {
     }
 
     @Override
-    public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
+    public void setApplicationContext(@NonNull ApplicationContext applicationContext) throws BeansException {
         GXSpringContextUtils.applicationContext = applicationContext;
     }
 }
