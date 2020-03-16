@@ -32,4 +32,6 @@ public class GXCoreModelAttributesEntity extends GXBaseEntity implements Seriali
     private int forceValidation;
 
     private String defaultValue;
+
+    private String ext;
 }
