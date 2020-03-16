@@ -397,14 +397,14 @@ public class GXCommonUtils {
      *
      * @param jsonStr JSON字符串
      * @param path    路径
-     * @param type    Type 对象
+     * @param clazz   Class 对象
      * @param <R>     R
      * @return R
      */
-    public static <R> R getJSONValueByAnyPath(String jsonStr, String path, Type type) {
+    public static <R> R getJSONValueByAnyPath(String jsonStr, String path, Class<R> clazz) {
         if (!JSONUtil.isJson(jsonStr)) {
             LOG.error("不合法的JSON字符串");
-            return getClassDefaultValue(type);
+            return getClassDefaultValue(clazz);
         }
         final ObjectMapper objectMapper = GXSpringContextUtils.getBean(ObjectMapper.class);
         try {
@@ -413,12 +413,15 @@ public class GXCommonUtils {
             String[] paths = StrUtil.split(path, ".");
             final Object firstObj = data.getObj(paths[0]);
             if (null == firstObj) {
-                return getClassDefaultValue(type);
+                return getClassDefaultValue(clazz);
+            }
+            if (!(firstObj instanceof Map)) {
+                return Convert.convert(clazz, firstObj);
             }
             Dict tempDict = Convert.convert(Dict.class, firstObj);
             int length = paths.length;
             if (length < 2) {
-                return Convert.convert(type, tempDict);
+                return Convert.convert(clazz, tempDict);
             }
             for (int i = 1; i < length - 1; i++) {
                 final Object obj = tempDict.getObj(paths[i]);
@@ -432,14 +435,14 @@ public class GXCommonUtils {
             if (!tempDict.isEmpty()) {
                 final Object obj = tempDict.getObj(paths[length - 1]);
                 if (Objects.nonNull(obj)) {
-                    return Convert.convert(type, obj);
+                    return Convert.convert(clazz, obj);
                 }
             }
         } catch (Exception e) {
             LOG.error("从JSON字符串中获取数据出错 , 错误信息 : {}", e.getMessage());
-            return getClassDefaultValue(type);
+            return getClassDefaultValue(clazz);
         }
-        return getClassDefaultValue(type);
+        return getClassDefaultValue(clazz);
     }
 
     /**
@@ -457,8 +460,9 @@ public class GXCommonUtils {
      * @param <R>       泛型类型
      * @return R
      */
+    @SuppressWarnings("unchecked")
     public static <R> R getJSONValueByAnyPath(String jsonStr, String path, TypeReference<R> reference) {
-        return getJSONValueByAnyPath(jsonStr, path, reference.getType());
+        return (R) getJSONValueByAnyPath(jsonStr, path, TypeUtil.getClass(reference.getType()));
     }
 
     /**
@@ -466,11 +470,11 @@ public class GXCommonUtils {
      *
      * @param jsonStr JSON字符串
      * @param path    路径
-     * @param type    Type 对象
+     * @param clazz   Type 对象
      * @param <R>     泛型类型
      * @return R
      */
-    public static <R> R removeJSONStrAnyPath(String jsonStr, String path, Type type) {
+    public static <R> R removeJSONStrAnyPath(String jsonStr, String path, Class<R> clazz) {
         final JSONObject parse = JSONUtil.parseObj(jsonStr);
         int index = StrUtil.indexOf(path, '.');
         if (index != -1) {
@@ -485,12 +489,12 @@ public class GXCommonUtils {
                     }
                 } else if (null != parse.getByPath(mainPath, JSONObject.class)) {
                     final Object remove = parse.getByPath(mainPath, JSONObject.class).remove(subPath);
-                    return Convert.convert(type, remove);
+                    return Convert.convert(clazz, remove);
                 }
             }
-            return getClassDefaultValue(type);
+            return getClassDefaultValue(clazz);
         }
-        return Convert.convert(type, parse.remove(path));
+        return Convert.convert(clazz, parse.remove(path));
     }
 
 
@@ -527,11 +531,11 @@ public class GXCommonUtils {
      *
      * @param parse JSON对象
      * @param path  路径
-     * @param type  Type对象
+     * @param clazz Type对象
      * @param <R>   泛型
      * @return R
      */
-    public static <R> R removeJSONObjectAnyPath(JSONObject parse, String path, Type type) {
+    public static <R> R removeJSONObjectAnyPath(JSONObject parse, String path, Class<R> clazz) {
         int index = StrUtil.indexOf(path, '.');
         if (index != -1) {
             String mainPath = StrUtil.sub(path, 0, StrUtil.lastIndexOfIgnoreCase(path, "."));
@@ -545,12 +549,12 @@ public class GXCommonUtils {
                     }
                 } else if (null != parse.getByPath(mainPath, JSONObject.class)) {
                     final Object remove = parse.getByPath(mainPath, JSONObject.class).remove(subPath);
-                    return Convert.convert(type, remove);
+                    return Convert.convert(clazz, remove);
                 }
             }
-            return getClassDefaultValue(type);
+            return getClassDefaultValue(clazz);
         }
-        return Convert.convert(type, parse.remove(path));
+        return Convert.convert(clazz, parse.remove(path));
     }
 
     /**
