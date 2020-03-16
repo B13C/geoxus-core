@@ -150,11 +150,24 @@ public class GXCommonUtils {
      * @return R
      */
     public static <R> R getClassDefaultValue(TypeReference<R> clazzType) {
-        final Class<R> aClass = (Class<R>) TypeUtil.getClass(clazzType.getType());
-        if (ClassUtil.isBasicType(aClass) && !ClassUtil.isPrimitiveWrapper(aClass)) {
-            return Convert.convert(aClass, ClassUtil.getDefaultValue(aClass));
+        Class<?> aClass = TypeUtil.getClass(clazzType.getType());
+        Object o = ReflectUtil.newInstanceIfPossible(aClass);
+        return Convert.convert(clazzType.getType(), o);
+    }
+
+    /**
+     * 获取Class的JVM默认值
+     *
+     * @param clazzType Class 对象
+     * @param <R>       R
+     * @return R
+     */
+    public static <R> R getClassDefaultValue(TypeReference<R> clazzType, R defaultValue) {
+        R classDefaultValue = getClassDefaultValue(clazzType);
+        if (Objects.isNull(classDefaultValue)) {
+            return defaultValue;
         }
-        return ReflectUtil.newInstanceIfPossible(aClass);
+        return classDefaultValue;
     }
 
     /**
