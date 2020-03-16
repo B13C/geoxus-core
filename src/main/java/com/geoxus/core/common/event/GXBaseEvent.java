@@ -1,10 +1,13 @@
 package com.geoxus.core.common.event;
 
+import cn.hutool.core.convert.Convert;
 import cn.hutool.core.lang.Dict;
 import com.geoxus.core.common.annotation.GXFieldCommentAnnotation;
 import org.springframework.context.ApplicationEvent;
 import org.springframework.core.ResolvableType;
 import org.springframework.core.ResolvableTypeProvider;
+
+import java.lang.reflect.Type;
 
 public abstract class GXBaseEvent<T> extends ApplicationEvent implements ResolvableTypeProvider {
     @GXFieldCommentAnnotation(zh = "附加参数")
@@ -38,5 +41,10 @@ public abstract class GXBaseEvent<T> extends ApplicationEvent implements Resolva
     @Override
     public ResolvableType getResolvableType() {
         return ResolvableType.forClassWithGenerics(getClass(), ResolvableType.forInstance(getSource()));
+    }
+
+    @Override
+    public T getSource() {
+        return Convert.convert((Type) source.getClass(), super.getSource());
     }
 }
