@@ -1,5 +1,6 @@
 package com.geoxus.core.framework.service.impl;
 
+import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.lang.Dict;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.json.JSONObject;
@@ -14,7 +15,6 @@ import com.geoxus.core.framework.entity.GXCoreMediaLibraryEntity;
 import com.geoxus.core.framework.mapper.GXCoreMediaLibraryMapper;
 import com.geoxus.core.framework.service.GXCoreMediaLibraryService;
 import com.geoxus.core.framework.service.GXCoreModelService;
-import com.google.common.collect.Sets;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -23,9 +23,10 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service(value = "coreMediaLibraryService")
@@ -46,21 +47,34 @@ public class GXCoreMediaLibraryServiceImpl extends ServiceImpl<GXCoreMediaLibrar
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public boolean updateOwner(long modelId, long coreModelId, List<JSONObject> param) {
+    public boolean updateOwner(long objectId, long coreModelId, List<JSONObject> param) {
         if (param.isEmpty()) {
             return true;
         }
         final ArrayList<GXCoreMediaLibraryEntity> newMediaList = new ArrayList<>();
-        final List<GXCoreMediaLibraryEntity> oldMediaList = list(new QueryWrapper<GXCoreMediaLibraryEntity>().allEq(Dict.create().set("model_id", modelId).set(GXCommonConstants.CORE_MODEL_PRIMARY_NAME, coreModelId)));
+        final List<GXCoreMediaLibraryEntity> oldMediaList = list(new QueryWrapper<GXCoreMediaLibraryEntity>().allEq(Dict.create().set("object_id", objectId).set(GXCommonConstants.CORE_MODEL_PRIMARY_NAME, coreModelId)));
+        Set<Integer> saveOldData = CollUtil.newHashSet();
         for (JSONObject dict : param) {
-            if (null != dict.getLong("id")) {
-                final long targetModelId = Optional.ofNullable(dict.getLong("model_id")).orElse(modelId);
+            Integer mediaId = dict.getInt("id");
+            if (null != mediaId) {
+                if (null != dict.getLong("object_id")) {
+                    objectId = dict.getLong("object_id");
+                }
                 final long itemCoreModelId = Optional.ofNullable(dict.getLong(GXCommonConstants.CORE_MODEL_PRIMARY_NAME)).orElse(coreModelId);
                 final String resourceType = Optional.ofNullable(dict.getStr("resource_type")).orElse("");
-                final GXCoreMediaLibraryEntity entity = getOne(new QueryWrapper<GXCoreMediaLibraryEntity>().eq("id", dict.getLong("id")));
-                final String customProperties = StrUtil.format("[{}]", Optional.ofNullable(dict.getStr("custom_properties")).orElse(""));
+                final GXCoreMediaLibraryEntity entity = getOne(new QueryWrapper<GXCoreMediaLibraryEntity>().eq("id", mediaId));
+                String customProperties = StrUtil.format("{}", Optional.ofNullable(dict.getStr("custom_properties")).orElse("{}"));
+                Integer saveOld = dict.getInt("save_old");
+                if (null != saveOld) {
+                    saveOldData.add(mediaId);
+                    if (JSONUtil.isJson(customProperties)) {
+                        Dict bean = JSONUtil.toBean(customProperties, Dict.class);
+                        bean.put("save_old", saveOld);
+                        customProperties = JSONUtil.toJsonStr(bean);
+                    }
+                }
                 if (null != entity) {
-                    entity.setTargetId(targetModelId);
+                    entity.setObjectId(objectId);
                     entity.setModelType(coreModelService.getModelTypeByModelId(itemCoreModelId, "defaultModelType"));
                     entity.setCoreModelId(itemCoreModelId);
                     entity.setCustomProperties(JSONUtil.toJsonStr(customProperties));
@@ -69,19 +83,15 @@ public class GXCoreMediaLibraryServiceImpl extends ServiceImpl<GXCoreMediaLibrar
                 }
             }
         }
-        final LinkedHashSet<GXCoreMediaLibraryEntity> newListHashSet = Sets.newLinkedHashSet(newMediaList);
-        final LinkedHashSet<GXCoreMediaLibraryEntity> oldListHashSet = Sets.newLinkedHashSet(oldMediaList);
-        final ArrayList<Integer> deleteMediaIds = new ArrayList<>();
-        Sets.difference(oldListHashSet, newListHashSet).forEach(item -> deleteMediaIds.add(item.getId()));
-        if (!newListHashSet.isEmpty()) {
+        List<GXCoreMediaLibraryEntity> deleteMedia = CollUtil.filter(oldMediaList, (GXCoreMediaLibraryEntity t) -> !saveOldData.contains(t.getId()) && !newMediaList.contains(t));
+        if (!newMediaList.isEmpty()) {
             boolean b = true;
-            if (!deleteMediaIds.isEmpty()) {
-                // TODO
-                // 此处可以加入删除策略
-                // 例如 : 软删除  硬删除等...
-                b = removeByIds(deleteMediaIds);
+            if (!deleteMedia.isEmpty()) {
+                // TODO : 此处可以加入删除策略
+                // TODO : 例如 : 软删除  硬删除等...
+                b = removeByIds(deleteMedia.stream().map(GXCoreMediaLibraryEntity::getId).collect(Collectors.toList()));
             }
-            return updateBatchById(newListHashSet) && b;
+            return updateBatchById(newMediaList) && b;
         }
         return true;
     }
@@ -98,11 +108,12 @@ public class GXCoreMediaLibraryServiceImpl extends ServiceImpl<GXCoreMediaLibrar
             entity.setMimeType(file.getContentType());
             entity.setName(file.getOriginalFilename());
             entity.setFilePath(fileName);
-            entity.setCollectionName(Optional.ofNullable(param.getStr("collection_name")).orElse("default"));
-            entity.setResourceType(Optional.ofNullable(param.getStr("resource_type")).orElse("defaultResourceType"));
-            entity.setModelType(Optional.ofNullable(param.getStr("model_type")).orElse("defaultModelType"));
-            entity.setTargetId(Optional.ofNullable(param.getLong("model_id")).orElse(0L));
-            entity.setCoreModelId(Optional.ofNullable(param.getLong(GXCommonConstants.CORE_MODEL_PRIMARY_NAME)).orElse(0L));
+            entity.setCollectionName((String) param.getOrDefault("collection_name", "default"));
+            entity.setResourceType((String) param.getOrDefault("resource_type", "defaultResourceType"));
+            entity.setModelType((String) param.getOrDefault("model_type", "defaultModelType"));
+            entity.setObjectId((Long) param.getOrDefault("object_id", 0L));
+            entity.setCoreModelId((Long) param.getOrDefault(GXCommonConstants.CORE_MODEL_PRIMARY_NAME, 0L));
+            entity.setCustomProperties((String) param.getOrDefault("custom_properties", "{}"));
             save(entity);
             return entity;
         } catch (IOException e) {

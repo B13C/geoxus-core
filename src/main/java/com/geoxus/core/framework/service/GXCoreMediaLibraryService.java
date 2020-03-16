@@ -18,12 +18,24 @@ public interface GXCoreMediaLibraryService extends GXBaseService<GXCoreMediaLibr
 
     /**
      * 更新条目所关联的模块ID
+     * <pre>
+     *     {@code
+     *    Dict param =  Dict.create()
+     *    .set(" id ", 1)
+     *    .set(" core_model_id ", 8)
+     *    .set(" custom_properties ", Dict.create ()
+     *    .set(" name ", " tom ")
+     *    .set(" age ", 12));
+     *    updateOwner(1,1,param);
+     *     }
+     * </pre>
      *
-     * @param param
-     * @return
-     * @example Dict.create().set(" id ", 1).set(" core_model_id ", 8).set(" custom_properties ", Dict.create ().set(" name ", " tom ").set(" age ", 12))
+     * @param objectId    对象记录ID
+     * @param coreModelId 　核心模型ID
+     * @param param       　参数
+     * @return boolean
      */
-    boolean updateOwner(long modelId, long coreModelId, List<JSONObject> param);
+    boolean updateOwner(long objectId, long coreModelId, List<JSONObject> param);
 
     /**
      * 保存文件

@@ -9,8 +9,8 @@ import cn.hutool.core.util.RandomUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.json.JSON;
 import cn.hutool.json.JSONUtil;
+import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.extension.service.IService;
-import com.geoxus.core.common.annotation.GXFieldCommentAnnotation;
 import com.geoxus.core.common.constant.GXCommonConstants;
 import com.geoxus.core.common.event.GXBaseEvent;
 import com.geoxus.core.common.event.GXMediaLibraryEvent;
@@ -20,7 +20,6 @@ import com.geoxus.core.common.util.GXCommonUtils;
 import com.geoxus.core.common.util.GXHttpContextUtils;
 import com.geoxus.core.common.util.GXSpringContextUtils;
 import com.geoxus.core.framework.entity.GXCoreMediaLibraryEntity;
-import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.cache.Cache;
 import org.springframework.transaction.annotation.Transactional;
@@ -39,9 +38,6 @@ import java.util.*;
  * @author britton chen <britton@126.com>
  */
 public interface GXBaseService<T> extends IService<T> {
-    @GXFieldCommentAnnotation(zh = "日志对象")
-    Logger log = LoggerFactory.getLogger(GXBaseService.class);
-
     /**
      * 获取当前接口的常量字段信息
      *
@@ -265,29 +261,39 @@ public interface GXBaseService<T> extends IService<T> {
     }
 
     /**
-     * 获取Cache对象
+     * 获取Spring Cache对象
      *
      * @param cacheName 缓存名字
      * @return Cache
      */
-    default Cache getCache(String cacheName) {
+    default Cache getSpringCache(String cacheName) {
         return GXCommonUtils.getSpringCache(cacheName);
     }
 
     /**
      * 处理用户上传的资源文件
      *
-     * @param target  目标对象
-     * @param modelId 模型ID
-     * @param param   参数
+     * @param target   目标对象
+     * @param objectId 模型ID
+     * @param param    参数
      */
-    default void handleMedia(T target, long modelId, @NotNull Dict param) {
-        final List<Integer> media = Convert.convert(new TypeReference<List<Integer>>() {
-        }, GXHttpContextUtils.getHttpParam("media_info", List.class));
+    default void handleMedia(T target, @NotNull long objectId, @NotNull Dict param) {
+        if (param.getInt(GXCommonConstants.CORE_MODEL_PRIMARY_NAME) == null) {
+            throw new GXException(StrUtil.format("请在param参数中传递{}字段", GXCommonConstants.CORE_MODEL_PRIMARY_NAME));
+        }
+        final String mediaFieldName = "media_info";
+        Object mediaObj = param.getObj(mediaFieldName);
+        if (null == mediaObj) {
+            mediaObj = GXHttpContextUtils.getHttpParam(mediaFieldName, List.class);
+        }
+        final List<JSONObject> media = Convert.convert(new TypeReference<List<JSONObject>>() {
+        }, mediaObj);
         if (null != media) {
-            param.set("media", media);
-            param.set("model_id", modelId);
-            final GXMediaLibraryEvent<T> event = new GXMediaLibraryEvent<>(target, param);
+            Dict data = Dict.create()
+                    .set("media", media)
+                    .set("object_id", objectId)
+                    .set(GXCommonConstants.CORE_MODEL_PRIMARY_NAME, param.getInt(GXCommonConstants.CORE_MODEL_PRIMARY_NAME));
+            final GXMediaLibraryEvent<T> event = new GXMediaLibraryEvent<>(target, data);
             publishEvent(event);
         }
     }
@@ -487,7 +493,7 @@ public interface GXBaseService<T> extends IService<T> {
         try {
             tableColumns = gxAlterTableService.getTableColumns(historyTableName);
         } catch (SQLException e) {
-            log.error(e.getMessage(), e);
+            LoggerFactory.getLogger(GXBaseService.class).error(e.getMessage(), e);
         }
         if (tableColumns.isEmpty()) {
             return false;
@@ -526,7 +532,7 @@ public interface GXBaseService<T> extends IService<T> {
     }
 
     /**
-     * 派发同步事件
+     * 派发事件 (异步事件可以通过在监听器上面添加@Async注解实现)
      *
      * @param event ApplicationEvent对象
      */
