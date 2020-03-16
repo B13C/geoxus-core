@@ -32,7 +32,8 @@ public class GXCoreAttributesServiceImpl extends ServiceImpl<GXCoreAttributesMap
 
     @Override
     public boolean checkFieldIsExists(String attributeName) {
-        return getOne(new QueryWrapper<GXCoreAttributesEntity>().eq("attribute_name", attributeName)) != null;
+        Dict condition = Dict.create().set("attribute_name", attributeName);
+        return 1 == checkRecordIsExists(GXCoreAttributesEntity.class, condition);
     }
 
     @Override
