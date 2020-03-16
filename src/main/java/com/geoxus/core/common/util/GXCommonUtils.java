@@ -243,7 +243,7 @@ public class GXCommonUtils {
      *
      * @param event 事件对象
      */
-    public static <T> void postEvent(GXBaseEvent<T> event) {
+    public static <T> void publishEvent(GXBaseEvent<T> event) {
         GXSpringContextUtils.getApplicationContext().publishEvent(event);
     }
 

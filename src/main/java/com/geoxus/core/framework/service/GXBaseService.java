@@ -288,7 +288,7 @@ public interface GXBaseService<T> extends IService<T> {
             param.set("media", media);
             param.set("model_id", modelId);
             final GXMediaLibraryEvent<T> event = new GXMediaLibraryEvent<>(target, param);
-            postEvent(event);
+            publishEvent(event);
         }
     }
 
@@ -530,8 +530,8 @@ public interface GXBaseService<T> extends IService<T> {
      *
      * @param event ApplicationEvent对象
      */
-    default <E> void postEvent(GXBaseEvent<E> event) {
-        GXCommonUtils.postEvent(event);
+    default <E> void publishEvent(GXBaseEvent<E> event) {
+        GXCommonUtils.publishEvent(event);
     }
 
     /**
