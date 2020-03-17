@@ -106,11 +106,11 @@ public class GXCoreModelAttributesServiceImpl extends ServiceImpl<GXCoreModelAtt
             for (Dict data : list) {
                 final String attributeName = data.getStr("attribute_name");
                 Object value = sourceDict.getObj(attributeName);
-                if (null == value) {
-                    value = data.getObj("default_value");
-                }
                 if (StrUtil.isBlankIfStr(value)) {
-                    value = RandomUtil.randomString(5);
+                    value = data.getObj("default_value");
+                    if (StrUtil.isBlankIfStr(value)) {
+                        value = RandomUtil.randomString(5);
+                    }
                 }
                 retDict.set(attributeName, value);
             }
