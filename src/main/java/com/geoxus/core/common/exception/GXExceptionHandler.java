@@ -34,20 +34,13 @@ public class GXExceptionHandler {
     @ExceptionHandler(GXException.class)
     public GXResultUtils handleRRException(GXException e) {
         log.error(e.getMessage(), e);
-        GXResultUtils r = new GXResultUtils();
-        r.put("code", e.getCode());
-        r.put("msg", e.getMessage());
-        return r;
+        return GXResultUtils.error(e.getCode(), e.getMsg());
     }
 
     @ExceptionHandler(GXBeanValidateException.class)
     public GXResultUtils handleRRBeanValidateException(GXBeanValidateException e) {
         log.error(e.getMessage(), e);
-        GXResultUtils r = new GXResultUtils();
-        r.put("code", e.getCode());
-        r.put("msg", e.getMessage());
-        r.putData(e.getDict());
-        return r;
+        return GXResultUtils.error(e.getCode(), e.getMsg());
     }
 
     @ExceptionHandler(NoHandlerFoundException.class)

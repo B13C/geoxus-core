@@ -76,7 +76,7 @@ public class GXRequestToBeanHandlerMethodArgumentResolver implements HandlerMeth
             }
             final Set<String> tmpDictKey = JSONUtil.toBean(json, Dict.class).keySet();
             if (!tmpDictKey.isEmpty() && !CollUtil.containsAll(targetDict.keySet(), tmpDictKey)) {
-                throw new GXException(StrUtil.format("请求参数不匹配(System Preferences : {} , Request Data : {})", targetDict.keySet(), tmpDictKey), GXResultCode.PARSE_REQUEST_JSON_ERROR.getCode());
+                throw new GXException(StrUtil.format("{}字段参数不匹配(系统预设: {} , 实际请求: {})", jsonField, targetDict.keySet(), tmpDictKey), GXResultCode.PARSE_REQUEST_JSON_ERROR.getCode());
             }
             dict.set(jsonField, JSONUtil.toJsonStr(targetDict));
         }
