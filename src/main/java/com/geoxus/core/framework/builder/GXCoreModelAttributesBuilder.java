@@ -9,7 +9,7 @@ public class GXCoreModelAttributesBuilder implements GXBaseBuilder {
     @Override
     public String listOrSearch(Dict param) {
         final SQL sql = new SQL().SELECT("core_model.table_name ,ca.attribute_name, ca.attribute_id, ca.show_name, ca.category, ca.data_type,\n" +
-                "ca.front_type, ca.validation_desc, ca.validation_expression, cmaa.force_validation,cmaa.default_value, cmaa.db_field_name, cmaa.required")
+                "ca.front_type, ca.validation_desc, ca.validation_expression, cmaa.force_validation, cmaa.default_value, cmaa.fixed_value, cmaa.db_field_name, cmaa.required")
                 .FROM("core_model_attributes as cmaa");
         sql.LEFT_OUTER_JOIN("core_attributes ca on cmaa.attribute_id = ca.attribute_id");
         sql.INNER_JOIN("core_model on  core_model.model_id = cmaa.core_model_id");

@@ -105,11 +105,14 @@ public class GXCoreModelAttributesServiceImpl extends ServiceImpl<GXCoreModelAtt
             final List<Dict> list = LIST_DICT_CACHE.get(cacheKey, () -> baseMapper.listOrSearch(condition));
             for (Dict data : list) {
                 final String attributeName = data.getStr("attribute_name");
-                Object value = sourceDict.getObj(attributeName);
+                Object value = data.getStr("fixed_value");
                 if (StrUtil.isBlankIfStr(value)) {
-                    value = data.getObj("default_value");
+                    value = sourceDict.getObj(attributeName);
                     if (StrUtil.isBlankIfStr(value)) {
-                        value = RandomUtil.randomString(5);
+                        value = data.getObj("default_value");
+                        if (StrUtil.isBlankIfStr(value)) {
+                            value = RandomUtil.randomString(5);
+                        }
                     }
                 }
                 retDict.set(attributeName, value);
