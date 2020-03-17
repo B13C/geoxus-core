@@ -17,7 +17,6 @@ import com.geoxus.core.common.event.GXMediaLibraryEvent;
 import com.geoxus.core.common.exception.GXException;
 import com.geoxus.core.common.mapper.GXBaseMapper;
 import com.geoxus.core.common.util.GXCommonUtils;
-import com.geoxus.core.common.util.GXHttpContextUtils;
 import com.geoxus.core.common.util.GXSpringContextUtils;
 import com.geoxus.core.framework.entity.GXCoreMediaLibraryEntity;
 import org.slf4j.LoggerFactory;
@@ -284,7 +283,7 @@ public interface GXBaseService<T> extends IService<T> {
         final String mediaFieldName = "media_info";
         Object mediaObj = param.getObj(mediaFieldName);
         if (null == mediaObj) {
-            mediaObj = GXHttpContextUtils.getHttpParam(mediaFieldName, List.class);
+            throw new GXException(StrUtil.format("请求参数param中不存在{}字段", mediaFieldName));
         }
         final List<JSONObject> media = Convert.convert(new TypeReference<List<JSONObject>>() {
         }, mediaObj);

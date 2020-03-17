@@ -2,7 +2,6 @@ package com.geoxus.core.framework.service.impl;
 
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.lang.Dict;
-import cn.hutool.core.util.StrUtil;
 import cn.hutool.json.JSONObject;
 import cn.hutool.json.JSONUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
@@ -24,7 +23,6 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -60,10 +58,10 @@ public class GXCoreMediaLibraryServiceImpl extends ServiceImpl<GXCoreMediaLibrar
                 if (null != dict.getLong("object_id")) {
                     objectId = dict.getLong("object_id");
                 }
-                final long itemCoreModelId = Optional.ofNullable(dict.getLong(GXCommonConstants.CORE_MODEL_PRIMARY_NAME)).orElse(coreModelId);
-                final String resourceType = Optional.ofNullable(dict.getStr("resource_type")).orElse("");
+                final long itemCoreModelId = dict.getLong(GXCommonConstants.CORE_MODEL_PRIMARY_NAME, coreModelId);
+                final String resourceType = dict.getStr("resource_type", "");
                 final GXCoreMediaLibraryEntity entity = getOne(new QueryWrapper<GXCoreMediaLibraryEntity>().eq("id", mediaId));
-                String customProperties = StrUtil.format("{}", Optional.ofNullable(dict.getStr("custom_properties")).orElse("{}"));
+                String customProperties = dict.getStr("custom_properties", "{}");
                 Integer saveOld = dict.getInt("save_old");
                 if (null != saveOld) {
                     saveOldData.add(mediaId);
@@ -97,6 +95,7 @@ public class GXCoreMediaLibraryServiceImpl extends ServiceImpl<GXCoreMediaLibrar
     }
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public GXCoreMediaLibraryEntity saveFileInfo(MultipartFile file, Dict param) {
         String filePath = uploadConfig.getDepositPath().trim();
         try {
