@@ -67,18 +67,17 @@ public class GXRequestToBeanHandlerMethodArgumentResolver implements HandlerMeth
         final Integer coreModelId = dict.getInt(GXCommonConstants.CORE_MODEL_PRIMARY_NAME);
         for (String jsonField : jsonFields) {
             final String json = Optional.ofNullable(dict.getStr(jsonField)).orElse("{}");
-            if (!fillJSONField) {
-                continue;
-            }
             final Dict targetDict = gxCoreModelAttributesService.getModelAttributesDefaultValue(coreModelId, jsonField, json);
-            if (targetDict.isEmpty()) {
-                continue;
-            }
             final Set<String> tmpDictKey = JSONUtil.toBean(json, Dict.class).keySet();
             if (!tmpDictKey.isEmpty() && !CollUtil.containsAll(targetDict.keySet(), tmpDictKey)) {
-                throw new GXException(StrUtil.format("{}字段参数不匹配(系统预设: {} , 实际请求: {})", jsonField, targetDict.keySet(), tmpDictKey), GXResultCode.PARSE_REQUEST_JSON_ERROR.getCode());
+                throw new GXException(StrUtil.format("{}字段参数不匹配(系统预置: {} , 实际请求: {})", jsonField, targetDict.keySet(), tmpDictKey), GXResultCode.PARSE_REQUEST_JSON_ERROR.getCode());
             }
-            dict.set(jsonField, JSONUtil.toJsonStr(targetDict));
+            if (fillJSONField) {
+                if (targetDict.isEmpty()) {
+                    continue;
+                }
+                dict.set(jsonField, JSONUtil.toJsonStr(targetDict));
+            }
         }
         Object bean;
         if (StrUtil.isNotBlank(value)) {
