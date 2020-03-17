@@ -4,10 +4,12 @@ import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.lang.Dict;
 import cn.hutool.core.util.RandomUtil;
 import cn.hutool.core.util.StrUtil;
+import cn.hutool.http.HttpStatus;
 import cn.hutool.json.JSONUtil;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.geoxus.core.common.annotation.GXFieldCommentAnnotation;
 import com.geoxus.core.common.constant.GXCommonConstants;
+import com.geoxus.core.common.exception.GXException;
 import com.geoxus.core.common.util.GXCacheKeysUtils;
 import com.geoxus.core.framework.entity.GXCoreModelAttributesEntity;
 import com.geoxus.core.framework.mapper.GXCoreModelAttributesMapper;
@@ -103,19 +105,27 @@ public class GXCoreModelAttributesServiceImpl extends ServiceImpl<GXCoreModelAtt
         try {
             final Dict retDict = Dict.create();
             final List<Dict> list = LIST_DICT_CACHE.get(cacheKey, () -> baseMapper.listOrSearch(condition));
-            for (Dict data : list) {
-                final String attributeName = data.getStr("attribute_name");
-                Object value = data.getStr("fixed_value");
+            Dict errorsDict = Dict.create();
+            for (Dict dict : list) {
+                final String attributeName = dict.getStr("attribute_name");
+                Object value = dict.getStr("fixed_value");
+                Integer required = dict.getInt("required");
+                if (required == 1 && null == sourceDict.getObj(attributeName)) {
+                    errorsDict.set(attributeName, StrUtil.format("{}是必填项", attributeName));
+                }
                 if (StrUtil.isBlankIfStr(value)) {
                     value = sourceDict.getObj(attributeName);
                     if (StrUtil.isBlankIfStr(value)) {
-                        value = data.getObj("default_value");
+                        value = dict.getObj("default_value");
                         if (StrUtil.isBlankIfStr(value)) {
                             value = RandomUtil.randomString(5);
                         }
                     }
                 }
                 retDict.set(attributeName, value);
+            }
+            if (!errorsDict.isEmpty()) {
+                throw new GXException("属性必填项", HttpStatus.HTTP_INTERNAL_ERROR, errorsDict);
             }
             return retDict;
         } catch (ExecutionException e) {

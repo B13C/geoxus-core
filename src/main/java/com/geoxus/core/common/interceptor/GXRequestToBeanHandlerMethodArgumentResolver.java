@@ -18,6 +18,7 @@ import com.geoxus.core.common.vo.GXResultCode;
 import com.geoxus.core.framework.service.GXCoreModelAttributesService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.MethodParameter;
+import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Component;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.support.WebDataBinderFactory;
@@ -47,7 +48,7 @@ public class GXRequestToBeanHandlerMethodArgumentResolver implements HandlerMeth
     }
 
     @Override
-    public Object resolveArgument(MethodParameter parameter, ModelAndViewContainer mavContainer, NativeWebRequest webRequest, WebDataBinderFactory binderFactory) throws Exception {
+    public Object resolveArgument(@NonNull MethodParameter parameter, ModelAndViewContainer mavContainer, NativeWebRequest webRequest, WebDataBinderFactory binderFactory) throws Exception {
         final String body = getRequestBody(webRequest);
         if (!JSONUtil.isJson(body)) {
             throw new GXException(GXResultCode.NEED_JSON_FORMAT);

@@ -34,7 +34,7 @@ public class GXExceptionHandler {
     @ExceptionHandler(GXException.class)
     public GXResultUtils handleRRException(GXException e) {
         log.error(e.getMessage(), e);
-        return GXResultUtils.error(e.getCode(), e.getMsg());
+        return GXResultUtils.error(e.getCode(), e.getMsg()).putData(e.getData());
     }
 
     @ExceptionHandler(GXBeanValidateException.class)
