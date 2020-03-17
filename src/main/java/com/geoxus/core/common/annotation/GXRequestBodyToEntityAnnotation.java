@@ -14,5 +14,7 @@ public @interface GXRequestBodyToEntityAnnotation {
 
     String[] jsonFields() default {"ext"};
 
+    boolean fillJSONField() default true;
+
     String primaryKey() default "id";
 }

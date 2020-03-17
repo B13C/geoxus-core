@@ -53,6 +53,9 @@ public class GXRequestToBeanHandlerMethodArgumentResolver implements HandlerMeth
             throw new GXException(GXResultCode.NEED_JSON_FORMAT);
         }
         final Dict dict = Convert.convert(Dict.class, JSONUtil.toBean(body, Dict.class));
+        if (null == dict.getInt(GXCommonConstants.CORE_MODEL_PRIMARY_NAME)) {
+            throw new GXException(StrUtil.format("{}参数必传...", GXCommonConstants.CORE_MODEL_PRIMARY_NAME));
+        }
         if (dict.isEmpty()) {
             throw new GXException(GXResultCode.REQUEST_JSON_NOT_BODY);
         }
@@ -60,10 +63,11 @@ public class GXRequestToBeanHandlerMethodArgumentResolver implements HandlerMeth
         final GXRequestBodyToEntityAnnotation gxRequestBodyToEntityAnnotation = parameter.getParameterAnnotation(GXRequestBodyToEntityAnnotation.class);
         final String value = Objects.requireNonNull(gxRequestBodyToEntityAnnotation).value();
         final String[] jsonFields = gxRequestBodyToEntityAnnotation.jsonFields();
+        boolean fillJSONField = gxRequestBodyToEntityAnnotation.fillJSONField();
         final Integer coreModelId = dict.getInt(GXCommonConstants.CORE_MODEL_PRIMARY_NAME);
         for (String jsonField : jsonFields) {
-            final String json = dict.getStr(jsonField);
-            if (StrUtil.isBlankIfStr(json)) {
+            final String json = Optional.ofNullable(dict.getStr(jsonField)).orElse("{}");
+            if (!fillJSONField) {
                 continue;
             }
             final Dict targetDict = gxCoreModelAttributesService.getModelAttributesDefaultValue(coreModelId, jsonField, json);

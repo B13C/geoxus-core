@@ -1,7 +1,9 @@
 package com.geoxus.core.common.validator.impl;
 
 import cn.hutool.core.lang.Dict;
+import cn.hutool.core.util.StrUtil;
 import com.geoxus.core.common.annotation.GXValidateDBExistsAnnotation;
+import com.geoxus.core.common.exception.GXException;
 import com.geoxus.core.common.util.GXSpringContextUtils;
 import com.geoxus.core.common.validator.GXValidateDBExists;
 import lombok.extern.slf4j.Slf4j;
@@ -32,6 +34,9 @@ public class GXValidateDBExistsValidator implements ConstraintValidator<GXValida
 
     @Override
     public boolean isValid(Object o, ConstraintValidatorContext constraintValidatorContext) {
+        if (null == service) {
+            throw new GXException(StrUtil.format("字段{}的值{}需要指定特定的Service进行验证...", fieldName, o));
+        }
         return service.validateExists(o, fieldName, constraintValidatorContext, Dict.create());
     }
 }
