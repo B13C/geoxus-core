@@ -16,5 +16,7 @@ public @interface GXRequestBodyToEntityAnnotation {
 
     boolean fillJSONField() default true;
 
+    boolean validateEntity() default true;
+
     String primaryKey() default "id";
 }

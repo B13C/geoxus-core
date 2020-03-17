@@ -111,7 +111,11 @@ public class GXCoreModelAttributesServiceImpl extends ServiceImpl<GXCoreModelAtt
                 Object value = dict.getStr("fixed_value");
                 Integer required = dict.getInt("required");
                 if (required == 1 && null == sourceDict.getObj(attributeName)) {
-                    errorsDict.set(attributeName, StrUtil.format("{}是必填项", attributeName));
+                    String errorTips = dict.getStr("error_tips");
+                    if (StrUtil.isBlank(errorTips)) {
+                        errorTips = StrUtil.format("{}是必填项", attributeName);
+                    }
+                    errorsDict.set(attributeName, errorTips);
                 }
                 if (StrUtil.isBlankIfStr(value)) {
                     value = sourceDict.getObj(attributeName);
@@ -125,7 +129,7 @@ public class GXCoreModelAttributesServiceImpl extends ServiceImpl<GXCoreModelAtt
                 retDict.set(attributeName, value);
             }
             if (!errorsDict.isEmpty()) {
-                throw new GXException("属性必填项", HttpStatus.HTTP_INTERNAL_ERROR, errorsDict);
+                throw new GXException("属性必填错误", HttpStatus.HTTP_INTERNAL_ERROR, errorsDict);
             }
             return retDict;
         } catch (ExecutionException e) {

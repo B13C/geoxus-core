@@ -4,10 +4,7 @@ import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.convert.Convert;
 import cn.hutool.core.io.IoUtil;
 import cn.hutool.core.lang.Dict;
-import cn.hutool.core.util.ReflectUtil;
 import cn.hutool.core.util.StrUtil;
-import cn.hutool.json.JSONArray;
-import cn.hutool.json.JSONObject;
 import cn.hutool.json.JSONUtil;
 import com.geoxus.core.common.annotation.GXFieldCommentAnnotation;
 import com.geoxus.core.common.annotation.GXRequestBodyToEntityAnnotation;
@@ -48,7 +45,7 @@ public class GXRequestToBeanHandlerMethodArgumentResolver implements HandlerMeth
     }
 
     @Override
-    public Object resolveArgument(@NonNull MethodParameter parameter, ModelAndViewContainer mavContainer, NativeWebRequest webRequest, WebDataBinderFactory binderFactory) throws Exception {
+    public Object resolveArgument(@NonNull MethodParameter parameter, ModelAndViewContainer mavContainer, @NonNull NativeWebRequest webRequest, WebDataBinderFactory binderFactory) throws Exception {
         final String body = getRequestBody(webRequest);
         if (!JSONUtil.isJson(body)) {
             throw new GXException(GXResultCode.NEED_JSON_FORMAT);
@@ -65,6 +62,7 @@ public class GXRequestToBeanHandlerMethodArgumentResolver implements HandlerMeth
         final String value = Objects.requireNonNull(gxRequestBodyToEntityAnnotation).value();
         final String[] jsonFields = gxRequestBodyToEntityAnnotation.jsonFields();
         boolean fillJSONField = gxRequestBodyToEntityAnnotation.fillJSONField();
+        boolean validateEntity = gxRequestBodyToEntityAnnotation.validateEntity();
         final Integer coreModelId = dict.getInt(GXCommonConstants.CORE_MODEL_PRIMARY_NAME);
         for (String jsonField : jsonFields) {
             final String json = Optional.ofNullable(dict.getStr(jsonField)).orElse("{}");
@@ -80,30 +78,12 @@ public class GXRequestToBeanHandlerMethodArgumentResolver implements HandlerMeth
                 dict.set(jsonField, JSONUtil.toJsonStr(targetDict));
             }
         }
-        Object bean;
-        if (StrUtil.isNotBlank(value)) {
-            final Object o = JSONUtil.getByPath(JSONUtil.parseObj(body), value);
-            if (o instanceof JSONArray) {
-                bean = Convert.convert(parameterType, o);
-            } else if (JSONUtil.isJsonArray(o.toString())) {
-                final JSONArray jsonArray = JSONUtil.parseArray(o);
-                bean = Convert.toList(parameterType, jsonArray);
-            } else {
-                final JSONObject jsonObject = Convert.convert(JSONObject.class, o);
-                if (null == jsonObject) {
-                    throw new GXException(StrUtil.format("请求参数没有{}键", value), GXResultCode.PARSE_REQUEST_JSON_ERROR.getCode());
-                }
-                bean = jsonObject.toBean(parameterType);
-            }
-        } else {
-            bean = Convert.convert(parameterType, dict);
-        }
-        final boolean enableValidateEntity = (boolean) Optional.ofNullable(ReflectUtil.getFieldValue(bean, "enableValidateEntity")).orElse(true);
+        Object bean = Convert.convert(parameterType, dict);
         Class<?>[] groups = gxRequestBodyToEntityAnnotation.groups();
-        if (parameter.hasParameterAnnotation(Valid.class) && enableValidateEntity) {
+        if (parameter.hasParameterAnnotation(Valid.class) && validateEntity) {
             GXValidatorUtils.validateEntity(bean, value, groups);
         }
-        if (parameter.hasParameterAnnotation(Validated.class) && enableValidateEntity) {
+        if (parameter.hasParameterAnnotation(Validated.class) && validateEntity) {
             groups = Objects.requireNonNull(parameter.getParameterAnnotation(Validated.class)).value();
             GXValidatorUtils.validateEntity(bean, value, groups);
         }
