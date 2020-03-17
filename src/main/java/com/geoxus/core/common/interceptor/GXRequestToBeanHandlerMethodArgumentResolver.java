@@ -27,9 +27,12 @@ import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
+
+import static cn.hutool.core.map.MapUtil.filter;
 
 @Component
 public class GXRequestToBeanHandlerMethodArgumentResolver implements HandlerMethodArgumentResolver {
@@ -47,15 +50,9 @@ public class GXRequestToBeanHandlerMethodArgumentResolver implements HandlerMeth
     @Override
     public Object resolveArgument(@NonNull MethodParameter parameter, ModelAndViewContainer mavContainer, @NonNull NativeWebRequest webRequest, WebDataBinderFactory binderFactory) throws Exception {
         final String body = getRequestBody(webRequest);
-        if (!JSONUtil.isJson(body)) {
-            throw new GXException(GXResultCode.NEED_JSON_FORMAT);
-        }
         final Dict dict = Convert.convert(Dict.class, JSONUtil.toBean(body, Dict.class));
         if (null == dict.getInt(GXCommonConstants.CORE_MODEL_PRIMARY_NAME)) {
             throw new GXException(StrUtil.format("{}参数必传...", GXCommonConstants.CORE_MODEL_PRIMARY_NAME));
-        }
-        if (dict.isEmpty()) {
-            throw new GXException(GXResultCode.REQUEST_JSON_NOT_BODY);
         }
         final Class<?> parameterType = parameter.getParameterType();
         final GXRequestBodyToEntityAnnotation gxRequestBodyToEntityAnnotation = parameter.getParameterAnnotation(GXRequestBodyToEntityAnnotation.class);
@@ -67,25 +64,27 @@ public class GXRequestToBeanHandlerMethodArgumentResolver implements HandlerMeth
         for (String jsonField : jsonFields) {
             final String json = Optional.ofNullable(dict.getStr(jsonField)).orElse("{}");
             final Dict targetDict = gxCoreModelAttributesService.getModelAttributesDefaultValue(coreModelId, jsonField, json);
-            final Set<String> tmpDictKey = JSONUtil.toBean(json, Dict.class).keySet();
-            if (!tmpDictKey.isEmpty() && !CollUtil.containsAll(targetDict.keySet(), tmpDictKey)) {
+            Dict tmpDict = JSONUtil.toBean(json, Dict.class);
+            final Set<String> tmpDictKey = tmpDict.keySet();
+            if (!tmpDict.isEmpty() && !CollUtil.containsAll(targetDict.keySet(), tmpDictKey)) {
                 throw new GXException(StrUtil.format("{}字段参数不匹配(系统预置: {} , 实际请求: {})", jsonField, targetDict.keySet(), tmpDictKey), GXResultCode.PARSE_REQUEST_JSON_ERROR.getCode());
             }
-            if (fillJSONField) {
-                if (targetDict.isEmpty()) {
-                    continue;
-                }
+            Map<String, Object> filter = filter(targetDict, (Map.Entry<String, Object> t) -> null != tmpDict.getStr(t.getKey()));
+            if (fillJSONField && !targetDict.isEmpty()) {
                 dict.set(jsonField, JSONUtil.toJsonStr(targetDict));
+            } else if (!filter.isEmpty()) {
+                dict.set(jsonField, JSONUtil.toJsonStr(filter));
             }
         }
         Object bean = Convert.convert(parameterType, dict);
         Class<?>[] groups = gxRequestBodyToEntityAnnotation.groups();
-        if (parameter.hasParameterAnnotation(Valid.class) && validateEntity) {
-            GXValidatorUtils.validateEntity(bean, value, groups);
-        }
-        if (parameter.hasParameterAnnotation(Validated.class) && validateEntity) {
-            groups = Objects.requireNonNull(parameter.getParameterAnnotation(Validated.class)).value();
-            GXValidatorUtils.validateEntity(bean, value, groups);
+        if (validateEntity) {
+            if (parameter.hasParameterAnnotation(Valid.class)) {
+                GXValidatorUtils.validateEntity(bean, value, groups);
+            } else if (parameter.hasParameterAnnotation(Validated.class)) {
+                groups = Objects.requireNonNull(parameter.getParameterAnnotation(Validated.class)).value();
+                GXValidatorUtils.validateEntity(bean, value, groups);
+            }
         }
         return bean;
     }
@@ -101,6 +100,9 @@ public class GXRequestToBeanHandlerMethodArgumentResolver implements HandlerMeth
             } catch (IOException e) {
                 throw new GXException(e.getMessage(), e);
             }
+        }
+        if (!JSONUtil.isJson(jsonBody)) {
+            throw new GXException(GXResultCode.REQUEST_JSON_NOT_BODY);
         }
         return jsonBody;
     }
