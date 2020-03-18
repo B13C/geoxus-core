@@ -35,7 +35,7 @@ public class GXValidateDBExistsValidator implements ConstraintValidator<GXValida
     @Override
     public boolean isValid(Object o, ConstraintValidatorContext constraintValidatorContext) {
         if (null == service) {
-            throw new GXException(StrUtil.format("字段{}的值{}需要指定特定的Service进行验证...", fieldName, o));
+            throw new GXException(StrUtil.format("字段<{}>的值<{}>需要指定相应的Service进行验证...", fieldName, o));
         }
         return service.validateExists(o, fieldName, constraintValidatorContext, Dict.create());
     }

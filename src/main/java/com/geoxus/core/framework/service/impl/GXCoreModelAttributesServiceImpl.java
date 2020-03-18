@@ -108,7 +108,6 @@ public class GXCoreModelAttributesServiceImpl extends ServiceImpl<GXCoreModelAtt
             Dict errorsDict = Dict.create();
             for (Dict dict : list) {
                 final String attributeName = dict.getStr("attribute_name");
-                Object value = dict.getStr("fixed_value");
                 Integer required = dict.getInt("required");
                 if (required == 1 && null == sourceDict.getObj(attributeName)) {
                     String errorTips = dict.getStr("error_tips");
@@ -116,7 +115,9 @@ public class GXCoreModelAttributesServiceImpl extends ServiceImpl<GXCoreModelAtt
                         errorTips = StrUtil.format("{}是必填项", attributeName);
                     }
                     errorsDict.set(attributeName, errorTips);
+                    continue;
                 }
+                Object value = dict.getStr("fixed_value");
                 if (StrUtil.isBlankIfStr(value)) {
                     value = sourceDict.getObj(attributeName);
                     if (StrUtil.isBlankIfStr(value)) {
