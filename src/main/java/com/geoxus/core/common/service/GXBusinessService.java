@@ -64,8 +64,8 @@ public interface GXBusinessService<T> extends GXBaseService<T>, GXValidateDBExis
      * @param param 参数
      * @return GXPagination
      */
-    default GXPagination listOrSearchPage(Dict param) {
-        return new GXPagination(Collections.emptyList());
+    default GXPagination<Dict> listOrSearchPage(Dict param) {
+        return new GXPagination<>(Collections.emptyList());
     }
 
     /**
@@ -183,7 +183,7 @@ public interface GXBusinessService<T> extends GXBaseService<T>, GXValidateDBExis
      * @param modelIdKey 分页数据中模型的key,一般为数据表主键名字的驼峰名字
      * @return GXPagination
      */
-    default GXPagination mergePaginationCoreMediaLibrary(GXPagination pagination, String modelIdKey) {
+    default GXPagination<Dict> mergePaginationCoreMediaLibrary(GXPagination<Dict> pagination, String modelIdKey) {
         final GXCoreMediaLibraryService coreMediaLibraryService = GXSpringContextUtils.getBean(GXCoreMediaLibraryService.class);
         final List<?> records = pagination.getRecords();
         for (Object record : records) {
@@ -205,7 +205,7 @@ public interface GXBusinessService<T> extends GXBaseService<T>, GXValidateDBExis
      * @param pagination 分页数据
      * @return GXPagination
      */
-    default GXPagination mergePaginationCoreMediaLibrary(GXPagination pagination) {
+    default GXPagination<Dict> mergePaginationCoreMediaLibrary(GXPagination<Dict> pagination) {
         String modelIdKey = getPrimaryKey();
         final GXCoreMediaLibraryService coreMediaLibraryService = GXSpringContextUtils.getBean(GXCoreMediaLibraryService.class);
         final List<?> records = pagination.getRecords();
@@ -256,12 +256,12 @@ public interface GXBusinessService<T> extends GXBaseService<T>, GXValidateDBExis
      * @param removeField 需要移除的数据
      * @return GXPagination
      */
-    default GXPagination generatePage(Dict param, Dict removeField) {
+    default GXPagination<Dict> generatePage(Dict param, Dict removeField) {
         final IPage<Dict> riPage = constructPageObjectFromParam(param);
         GXBaseMapper<Dict> baseMapper = (GXBaseMapper<Dict>) getBaseMapper();
         final List<Dict> list = baseMapper.listOrSearchPage(riPage, param);
         riPage.setRecords(processingListData(list, removeField));
-        return new GXPagination(riPage.getRecords(), riPage.getTotal(), riPage.getSize(), riPage.getCurrent());
+        return new GXPagination<>(riPage.getRecords(), riPage.getTotal(), riPage.getSize(), riPage.getCurrent());
     }
 
     /**
@@ -312,9 +312,9 @@ public interface GXBusinessService<T> extends GXBaseService<T>, GXValidateDBExis
      * @param iPage 分页对象
      * @return GXPagination
      */
-    default GXPagination generatePage(IPage<Dict> iPage, Dict removeField) {
+    default GXPagination<Dict> generatePage(IPage<Dict> iPage, Dict removeField) {
         final List<Dict> records = processingListData(iPage.getRecords(), removeField);
-        return new GXPagination(records, iPage.getTotal(), iPage.getSize(), iPage.getCurrent());
+        return new GXPagination<>(records, iPage.getTotal(), iPage.getSize(), iPage.getCurrent());
     }
 
     /**
@@ -325,12 +325,12 @@ public interface GXBusinessService<T> extends GXBaseService<T>, GXValidateDBExis
      * @param removeField      需要移除的字段
      * @return GXPagination
      */
-    default GXPagination generatePage(Dict param, String mapperMethodName, Dict removeField) {
+    default GXPagination<Dict> generatePage(Dict param, String mapperMethodName, Dict removeField) {
         final Dict pageParam = getPageInfoFromParam(param);
         final IPage<Dict> iPage = new Page<>(pageParam.getInt("current"), pageParam.getInt("size"));
         final List<Dict> list = ReflectUtil.invoke(getBaseMapper(), mapperMethodName, iPage, param);
         iPage.setRecords(processingListData(list, removeField));
-        return new GXPagination(iPage.getRecords(), iPage.getTotal(), iPage.getSize(), iPage.getCurrent());
+        return new GXPagination<>(iPage.getRecords(), iPage.getTotal(), iPage.getSize(), iPage.getCurrent());
     }
 
     /**

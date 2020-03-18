@@ -9,7 +9,7 @@ import java.io.Serializable;
 import java.util.List;
 
 @Data
-public class GXPagination implements Serializable {
+public class GXPagination<T> implements Serializable {
     private static final long serialVersionUID = 1L;
 
     @GXFieldCommentAnnotation(zh = "总记录数")
@@ -25,7 +25,7 @@ public class GXPagination implements Serializable {
     private long current;
 
     @GXFieldCommentAnnotation(zh = "列表数据")
-    private List<?> records;
+    private transient List<T> records;
 
     /**
      * 分页
@@ -35,7 +35,7 @@ public class GXPagination implements Serializable {
      * @param pageSize   每页记录数
      * @param currPage   当前页数
      */
-    public GXPagination(List<?> list, long totalCount, long pageSize, long currPage) {
+    public GXPagination(List<T> list, long totalCount, long pageSize, long currPage) {
         this.records = list;
         this.total = totalCount;
         this.size = pageSize;
@@ -46,7 +46,7 @@ public class GXPagination implements Serializable {
     /**
      * 分页
      */
-    public GXPagination(Page<?> page) {
+    public GXPagination(Page<T> page) {
         this.records = page.getRecords();
         this.total = page.getTotal();
         this.size = page.getSize();
@@ -57,7 +57,7 @@ public class GXPagination implements Serializable {
     /**
      * 分页
      */
-    public GXPagination(IPage<?> page) {
+    public GXPagination(IPage<T> page) {
         this.records = page.getRecords();
         this.total = (int) page.getTotal();
         this.size = (int) page.getSize();
@@ -68,7 +68,7 @@ public class GXPagination implements Serializable {
     /**
      * 分页
      */
-    public GXPagination(List<?> list) {
+    public GXPagination(List<T> list) {
         this.records = list;
     }
 }
