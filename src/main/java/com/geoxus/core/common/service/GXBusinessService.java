@@ -28,6 +28,10 @@ import java.util.stream.Collectors;
 public interface GXBusinessService<T> extends GXBaseService<T>, GXValidateDBExists, GXValidateDBUnique {
     /**
      * 创建数据
+     *
+     * @param target 目标实体
+     * @param param  额外参数
+     * @return long
      */
     default long create(T target, Dict param) {
         return 0;
@@ -36,9 +40,9 @@ public interface GXBusinessService<T> extends GXBaseService<T>, GXValidateDBExis
     /**
      * 更新数据
      *
-     * @param target
-     * @param param
-     * @return
+     * @param target 目标实体
+     * @param param  额外参数
+     * @return long
      */
     default long update(T target, Dict param) {
         return 0;
@@ -46,20 +50,29 @@ public interface GXBusinessService<T> extends GXBaseService<T>, GXValidateDBExis
 
     /**
      * 删除数据
+     *
+     * @param param 参数
+     * @return boolean
      */
     default boolean delete(Dict param) {
         return batchDelete(param);
     }
 
     /**
-     * 列表或者搜索
+     * 列表或者搜索(分页)
+     *
+     * @param param 参数
+     * @return GXPagination
      */
     default GXPagination listOrSearchPage(Dict param) {
         return new GXPagination(Collections.emptyList());
     }
 
     /**
-     * 列表或者搜索
+     * 列表或者搜索 (不分页)
+     *
+     * @param param 参数
+     * @return List
      */
     default List<Dict> listOrSearch(Dict param) {
         return Collections.emptyList();
@@ -67,6 +80,9 @@ public interface GXBusinessService<T> extends GXBaseService<T>, GXValidateDBExis
 
     /**
      * 内容详情
+     *
+     * @param param 参数
+     * @return Dict
      */
     default Dict detail(Dict param) {
         final String tableName = (String) param.remove("table_name");
@@ -81,8 +97,8 @@ public interface GXBusinessService<T> extends GXBaseService<T>, GXValidateDBExis
     /**
      * 批量删除
      *
-     * @param param
-     * @return
+     * @param param 参数
+     * @return boolean
      */
     default boolean batchDelete(Dict param) {
         final List<Long> ids = Convert.convert(new TypeReference<List<Long>>() {
@@ -109,8 +125,8 @@ public interface GXBusinessService<T> extends GXBaseService<T>, GXValidateDBExis
     /**
      * 通过条件获取配置信息
      *
-     * @param condition
-     * @return
+     * @param condition 条件
+     * @return Dict
      */
     default Dict getDataByCondition(Dict condition) {
         final T entity = getOne(new QueryWrapper<T>().allEq(condition));
@@ -120,8 +136,8 @@ public interface GXBusinessService<T> extends GXBaseService<T>, GXValidateDBExis
     /**
      * 通过条件获取配置信息
      *
-     * @param condition
-     * @return
+     * @param condition 条件
+     * @return Dict
      */
     default Dict getDataByCondition(Dict condition, String... fields) {
         final T entity = getOne(new QueryWrapper<T>().select(fields).allEq(condition));
@@ -165,13 +181,14 @@ public interface GXBusinessService<T> extends GXBaseService<T>, GXValidateDBExis
      *
      * @param pagination 分页数据
      * @param modelIdKey 分页数据中模型的key,一般为数据表主键名字的驼峰名字
-     * @return
+     * @return GXPagination
      */
     default GXPagination mergePaginationCoreMediaLibrary(GXPagination pagination, String modelIdKey) {
         final GXCoreMediaLibraryService coreMediaLibraryService = GXSpringContextUtils.getBean(GXCoreMediaLibraryService.class);
         final List<?> records = pagination.getRecords();
-        for (int i = 0; i < records.size(); i++) {
-            final Dict o = (Dict) records.get(i);
+        for (Object record : records) {
+            final Dict o = (Dict) record;
+            assert coreMediaLibraryService != null;
             o.set("media", coreMediaLibraryService.getMediaByCondition(Dict.create().set("model_id", o.getLong(modelIdKey)).set(GXCommonConstants.CORE_MODEL_PRIMARY_NAME, o.getLong("coreModelId"))));
         }
         return pagination;
@@ -186,14 +203,15 @@ public interface GXBusinessService<T> extends GXBaseService<T>, GXValidateDBExis
      * </pre>
      *
      * @param pagination 分页数据
-     * @return
+     * @return GXPagination
      */
     default GXPagination mergePaginationCoreMediaLibrary(GXPagination pagination) {
         String modelIdKey = getPrimaryKey();
         final GXCoreMediaLibraryService coreMediaLibraryService = GXSpringContextUtils.getBean(GXCoreMediaLibraryService.class);
         final List<?> records = pagination.getRecords();
-        for (int i = 0; i < records.size(); i++) {
-            final Dict o = (Dict) records.get(i);
+        for (Object record : records) {
+            final Dict o = (Dict) record;
+            assert coreMediaLibraryService != null;
             o.set("media", coreMediaLibraryService.getMediaByCondition(Dict.create().set("model_id", o.getLong(modelIdKey)).set(GXCommonConstants.CORE_MODEL_PRIMARY_NAME, o.getLong("coreModelId"))));
         }
         return pagination;
@@ -202,8 +220,8 @@ public interface GXBusinessService<T> extends GXBaseService<T>, GXValidateDBExis
     /**
      * 获取分页对象信息
      *
-     * @param param
-     * @return
+     * @param param 参数
+     * @return IPage
      */
     default IPage<Dict> constructPageObjectFromParam(Dict param) {
         final Dict pageInfo = getPageInfoFromParam(param);
@@ -213,8 +231,8 @@ public interface GXBusinessService<T> extends GXBaseService<T>, GXValidateDBExis
     /**
      * 从请求参数中获取分页的信息
      *
-     * @param param
-     * @return
+     * @param param 参数
+     * @return Dict
      */
     default Dict getPageInfoFromParam(Dict param) {
         int currentPage = GXCommonConstants.DEFAULT_CURRENT_PAGE;
@@ -291,8 +309,8 @@ public interface GXBusinessService<T> extends GXBaseService<T>, GXValidateDBExis
     /**
      * 将IPage信息转换成Pagination对象
      *
-     * @param iPage
-     * @return
+     * @param iPage 分页对象
+     * @return GXPagination
      */
     default GXPagination generatePage(IPage<Dict> iPage, Dict removeField) {
         final List<Dict> records = processingListData(iPage.getRecords(), removeField);
@@ -302,10 +320,10 @@ public interface GXBusinessService<T> extends GXBaseService<T>, GXValidateDBExis
     /**
      * 分页  返回实体对象
      *
-     * @param param
-     * @param mapperMethodName
-     * @param removeField
-     * @return
+     * @param param            参数
+     * @param mapperMethodName Mapper方法
+     * @param removeField      需要移除的字段
+     * @return GXPagination
      */
     default GXPagination generatePage(Dict param, String mapperMethodName, Dict removeField) {
         final Dict pageParam = getPageInfoFromParam(param);
