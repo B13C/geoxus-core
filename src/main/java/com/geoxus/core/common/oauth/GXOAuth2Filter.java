@@ -2,9 +2,9 @@ package com.geoxus.core.common.oauth;
 
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.json.JSONUtil;
-import com.google.gson.Gson;
 import com.geoxus.core.common.util.GXHttpContextUtils;
 import com.geoxus.core.common.util.GXResultUtils;
+import com.google.gson.Gson;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.http.HttpStatus;
 import org.apache.shiro.authc.AuthenticationException;
@@ -22,7 +22,6 @@ import java.io.IOException;
 public class GXOAuth2Filter extends AuthenticatingFilter {
     @Override
     protected AuthenticationToken createToken(ServletRequest request, ServletResponse response) {
-        //获取请求token
         String token = getRequestToken((HttpServletRequest) request);
         if (StrUtil.isBlank(token)) {
             return null;
@@ -37,7 +36,6 @@ public class GXOAuth2Filter extends AuthenticatingFilter {
 
     @Override
     protected boolean onAccessDenied(ServletRequest request, ServletResponse response) throws Exception {
-        //获取请求token，如果token不存在，直接返回401
         String token = getRequestToken((HttpServletRequest) request);
         if (StrUtil.isBlank(token)) {
             HttpServletResponse httpResponse = (HttpServletResponse) response;
@@ -57,7 +55,6 @@ public class GXOAuth2Filter extends AuthenticatingFilter {
         httpResponse.setHeader("Access-Control-Allow-Credentials", "true");
         httpResponse.setHeader("Access-Control-Allow-Origin", GXHttpContextUtils.getOrigin());
         try {
-            //处理登录失败的异常
             Throwable throwable = e.getCause() == null ? e : e.getCause();
             GXResultUtils r = GXResultUtils.error(HttpStatus.SC_UNAUTHORIZED, throwable.getMessage());
             String json = JSONUtil.toJsonStr(r);
@@ -72,9 +69,7 @@ public class GXOAuth2Filter extends AuthenticatingFilter {
      * 获取请求的token
      */
     private String getRequestToken(HttpServletRequest httpRequest) {
-        //从header中获取token
         String token = httpRequest.getHeader(GXTokenManager.ADMIN_TOKEN);
-        //如果header中不存在token，则从参数中获取token
         if (StrUtil.isBlank(token)) {
             token = httpRequest.getParameter(GXTokenManager.ADMIN_TOKEN);
         }

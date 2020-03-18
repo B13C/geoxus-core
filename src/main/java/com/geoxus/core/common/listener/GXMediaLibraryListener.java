@@ -7,6 +7,7 @@ import cn.hutool.json.JSONObject;
 import com.geoxus.core.common.constant.GXCommonConstants;
 import com.geoxus.core.common.event.GXMediaLibraryEvent;
 import com.geoxus.core.framework.service.GXCoreMediaLibraryService;
+import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationListener;
@@ -21,7 +22,7 @@ public class GXMediaLibraryListener<T> implements ApplicationListener<GXMediaLib
     private GXCoreMediaLibraryService coreMediaLibraryService;
 
     @Override
-    public void onApplicationEvent(GXMediaLibraryEvent<T> event) {
+    public void onApplicationEvent(@NonNull GXMediaLibraryEvent<T> event) {
         dealData(event);
     }
 
