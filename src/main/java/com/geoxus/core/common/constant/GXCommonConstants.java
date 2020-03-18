@@ -20,4 +20,7 @@ public class GXCommonConstants {
 
     @GXFieldCommentAnnotation(zh = "默认每页的大小")
     public static final int DEFAULT_PAGE_SIZE = 20;
+    
+    @GXFieldCommentAnnotation(zh = "默认数据")
+    public static final String DEFAULT_DATA = "控制器默认方法";
 }
