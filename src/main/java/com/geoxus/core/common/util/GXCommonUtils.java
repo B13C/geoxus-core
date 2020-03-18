@@ -721,27 +721,6 @@ public class GXCommonUtils {
     }
 
     /**
-     * 获取指定Map中的JSON字段的值
-     *
-     * @param param 数据
-     * @param keys  字段名字
-     * @return JSON字符串
-     */
-    public static String getJSONStr(Map<String, Object> param, String... keys) {
-        Dict data = Dict.create();
-        for (String key : keys) {
-            Object obj = param.get(key);
-            if (null != obj && JSONUtil.isJson(JSONUtil.toJsonStr(obj))) {
-                data.set(key, obj);
-            }
-        }
-        if (data.isEmpty()) {
-            return "{}";
-        }
-        return JSONUtil.toJsonStr(data);
-    }
-
-    /**
      * 获取Logger对象
      *
      * @param clazz Class
