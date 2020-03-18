@@ -7,5 +7,5 @@ import java.io.Serializable;
 
 @Data
 @EqualsAndHashCode(callSuper = false)
-public class GXSAdminHasRolesEntity extends GXBaseEntity implements Serializable {
+public class GXSAdminRolesEntity extends GXBaseEntity implements Serializable {
 }

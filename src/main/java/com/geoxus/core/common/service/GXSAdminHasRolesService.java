@@ -1,11 +1,9 @@
 package com.geoxus.core.common.service;
 
 import cn.hutool.core.lang.Dict;
-import com.geoxus.core.common.entity.GXSAdminHasRolesEntity;
+import com.geoxus.core.common.entity.GXSAdminRolesEntity;
 
-import java.util.Collections;
-
-public interface GXSAdminHasRolesService<T extends GXSAdminHasRolesEntity> extends GXBusinessService<T> {
+public interface GXSAdminHasRolesService<T extends GXSAdminRolesEntity> extends GXBusinessService<T> {
     /**
      * 获取当前人的角色列表
      *

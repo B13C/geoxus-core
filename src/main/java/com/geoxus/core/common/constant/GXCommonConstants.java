@@ -20,7 +20,10 @@ public class GXCommonConstants {
 
     @GXFieldCommentAnnotation(zh = "默认每页的大小")
     public static final int DEFAULT_PAGE_SIZE = 20;
-    
+
     @GXFieldCommentAnnotation(zh = "默认数据")
     public static final String DEFAULT_DATA = "控制器默认方法";
+
+    @GXFieldCommentAnnotation(zh = "验证数字的正则表达式")
+    public static final String DIGITAL_REGULAR_EXPRESSION = "^[+-]?(0|([1-9]\\d*))(\\.\\d+)?$";
 }

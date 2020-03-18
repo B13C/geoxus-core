@@ -9,8 +9,8 @@ import cn.hutool.core.util.ClassUtil;
 import cn.hutool.core.util.ReUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.json.JSONUtil;
-import com.geoxus.core.common.annotation.GXFieldCommentAnnotation;
 import com.geoxus.core.common.constant.GXBaseBuilderConstants;
+import com.geoxus.core.common.constant.GXCommonConstants;
 import com.geoxus.core.common.entity.GXBaseEntity;
 import com.geoxus.core.common.util.GXCommonUtils;
 import com.geoxus.core.common.util.GXSpringContextUtils;
@@ -18,15 +18,10 @@ import com.geoxus.core.framework.service.GXCoreModelService;
 import com.geoxus.core.framework.service.GXDBSchemaService;
 import com.google.common.collect.Table;
 import org.apache.ibatis.jdbc.SQL;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.util.*;
 
 public interface GXBaseBuilder {
-    @GXFieldCommentAnnotation(zh = "LOG对象")
-    Logger LOG = LoggerFactory.getLogger(GXBaseBuilder.class);
-
     /**
      * 更新实体字段和虚拟字段
      * <pre>
@@ -61,7 +56,7 @@ public interface GXBaseBuilder {
                     if (entryKey.startsWith("-")) {
                         sql.SET(StrUtil.format("{} = JSON_REMOVE({} , '$.{}')", dataKey, dataKey, entryKey.substring(1)));
                     } else {
-                        if (ReUtil.isMatch("^[+-]?(0|([1-9]\\d*))(\\.\\d+)?$", entryValue.toString())) {
+                        if (ReUtil.isMatch(GXCommonConstants.DIGITAL_REGULAR_EXPRESSION, entryValue.toString())) {
                             sql.SET(StrUtil.format("{} = JSON_SET({} , '$.{}' , {})", dataKey, dataKey, entryKey, entryValue));
                         } else {
                             if (!ClassUtil.isPrimitiveWrapper(entryValue.getClass()) && !ClassUtil.equals(entryValue.getClass(), "String", true) && (entryValue instanceof Map || entryValue instanceof GXBaseEntity)) {
@@ -76,14 +71,14 @@ public interface GXBaseBuilder {
             if (value instanceof Map) {
                 value = JSONUtil.toJsonStr(value);
             }
-            sql.SET(StrUtil.format("{} = '{}'", dataKey, value));
+            sql.SET(StrUtil.format("{} " + GXBaseBuilderConstants.STR_EQ, dataKey, value));
         }
         final Set<String> conditionKeys = whereData.keySet();
         for (String conditionKey : conditionKeys) {
-            String template = "{} = '{}'";
+            String template = "{} " + GXBaseBuilderConstants.STR_EQ;
             final String value = whereData.getStr(conditionKey);
-            if (ReUtil.isMatch("^[+-]?(0|([1-9]\\d*))(\\.\\d+)?$", value)) {
-                template = "{} = {}";
+            if (ReUtil.isMatch(GXCommonConstants.DIGITAL_REGULAR_EXPRESSION, value)) {
+                template = "{} " + GXBaseBuilderConstants.NUMBER_EQ;
             }
             sql.WHERE(StrUtil.format(template, conditionKey, value));
         }
@@ -104,10 +99,10 @@ public interface GXBaseBuilder {
         sql.SET(StrUtil.format("`status` = {}", status));
         final Set<String> conditionKeys = condition.keySet();
         for (String conditionKey : conditionKeys) {
-            String template = "{} = '{}'";
+            String template = "{} " + GXBaseBuilderConstants.STR_EQ;
             final String value = condition.getStr(conditionKey);
-            if (ReUtil.isMatch("^[+-]?(0|([1-9]\\d*))(\\.\\d+)?$", value)) {
-                template = "{} = {}";
+            if (ReUtil.isMatch(GXCommonConstants.DIGITAL_REGULAR_EXPRESSION, value)) {
+                template = "{} " + GXBaseBuilderConstants.NUMBER_EQ;
             }
             sql.WHERE(StrUtil.format(template, conditionKey, value));
         }
@@ -125,10 +120,10 @@ public interface GXBaseBuilder {
         final SQL sql = new SQL().SELECT("1").FROM(tableName);
         final Set<String> conditionKeys = condition.keySet();
         for (String conditionKey : conditionKeys) {
-            String template = "{} = '{}'";
+            String template = "{} " + GXBaseBuilderConstants.STR_EQ;
             final String value = condition.getStr(conditionKey);
-            if (ReUtil.isMatch("^[+-]?(0|([1-9]\\d*))(\\.\\d+)?$", value)) {
-                template = "{} = {}";
+            if (ReUtil.isMatch(GXCommonConstants.DIGITAL_REGULAR_EXPRESSION, value)) {
+                template = "{} " + GXBaseBuilderConstants.NUMBER_EQ;
             }
             sql.WHERE(StrUtil.format(template, conditionKey, value));
         }
@@ -147,10 +142,10 @@ public interface GXBaseBuilder {
         final SQL sql = new SQL().SELECT("count(*) as cnt").FROM(tableName);
         final Set<String> conditionKeys = condition.keySet();
         for (String conditionKey : conditionKeys) {
-            String template = "{} = '{}'";
+            String template = "{} " + GXBaseBuilderConstants.STR_EQ;
             final String value = condition.getStr(conditionKey);
-            if (ReUtil.isMatch("^[+-]?(0|([1-9]\\d*))(\\.\\d+)?$", value)) {
-                template = "{} = {}";
+            if (ReUtil.isMatch(GXCommonConstants.DIGITAL_REGULAR_EXPRESSION, value)) {
+                template = "{} " + GXBaseBuilderConstants.NUMBER_EQ;
             }
             sql.WHERE(StrUtil.format(template, conditionKey, value));
         }
@@ -173,10 +168,10 @@ public interface GXBaseBuilder {
         final SQL sql = new SQL().SELECT(sqlFieldStr).FROM(tableName);
         final Set<String> conditionKeys = condition.keySet();
         for (String conditionKey : conditionKeys) {
-            String template = "{} = '{}'";
+            String template = "{} " + GXBaseBuilderConstants.STR_EQ;
             final String value = condition.getStr(conditionKey);
-            if (ReUtil.isMatch("^[+-]?(0|([1-9]\\d*))(\\.\\d+)?$", value)) {
-                template = "{} = {}";
+            if (ReUtil.isMatch(GXCommonConstants.DIGITAL_REGULAR_EXPRESSION, value)) {
+                template = "{} " + GXBaseBuilderConstants.NUMBER_EQ;
             }
             sql.WHERE(StrUtil.format(template, conditionKey, value));
         }
@@ -189,7 +184,7 @@ public interface GXBaseBuilder {
      * @param tableName 表名
      * @param fieldSet  字段集合
      * @param dataList  需要插入的数据列表
-     * @return
+     * @return String
      */
     static String batchInsertBySQL(String tableName, Set<String> fieldSet, List<Dict> dataList) {
         if (dataList.isEmpty()) {
@@ -287,7 +282,7 @@ public interface GXBaseBuilder {
     default Dict mergeSearchConditionToSQL(SQL sql, Dict requestParam, String aliasPrefix) {
         final String modelIdentificationValue = getModelIdentificationValue();
         if (StrUtil.isBlank(modelIdentificationValue)) {
-            LOG.error("请配置{}.{}的模型标识", getClass().getSimpleName(), GXBaseBuilderConstants.MODEL_IDENTIFICATION_NAME);
+            GXCommonUtils.getLogger(GXBaseBuilder.class).error("请配置{}.{}的模型标识", getClass().getSimpleName(), GXBaseBuilderConstants.MODEL_IDENTIFICATION_NAME);
         }
         final Dict condition = Dict.create().set(GXBaseBuilderConstants.MODEL_IDENTIFICATION_NAME, modelIdentificationValue);
         Dict searchField = Objects.requireNonNull(GXSpringContextUtils.getBean(GXCoreModelService.class)).getSearchCondition(condition);
@@ -314,7 +309,7 @@ public interface GXBaseBuilder {
                     continue;
                 }
                 if (null == operator) {
-                    LOG.warn("{}字段没有配置搜索条件", key);
+                    GXCommonUtils.getLogger(GXBaseBuilder.class).warn("{}字段没有配置搜索条件", key);
                     continue;
                 }
                 if (value instanceof Collection) {
@@ -339,7 +334,7 @@ public interface GXBaseBuilder {
      *
      * @param sql          SQL对象
      * @param requestParam 请求参数
-     * @return
+     * @return Dict
      */
     default Dict mergeSearchConditionToSQL(SQL sql, Dict requestParam) {
         return mergeSearchConditionToSQL(sql, requestParam, "");
@@ -400,7 +395,7 @@ public interface GXBaseBuilder {
     /**
      * 获取时间字段配置
      *
-     * @return
+     * @return Dict
      */
     default Dict getTimeFields() {
         return Dict.create()
