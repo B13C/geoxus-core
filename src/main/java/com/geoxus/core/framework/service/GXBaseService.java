@@ -531,6 +531,17 @@ public interface GXBaseService<T> extends IService<T> {
     }
 
     /**
+     * 获取指定Map中的JSON字段的值
+     *
+     * @param param 数据
+     * @param keys  字段名字
+     * @return JSON字符串
+     */
+    default String getJSONStr(Dict param, String... keys) {
+        return GXCommonUtils.getJSONStr(param, keys);
+    }
+
+    /**
      * 派发事件 (异步事件可以通过在监听器上面添加@Async注解实现)
      *
      * @param event ApplicationEvent对象

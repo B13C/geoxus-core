@@ -4,6 +4,7 @@ import cn.hutool.core.lang.Dict;
 import com.geoxus.core.common.annotation.GXRequestBodyToEntityAnnotation;
 import com.geoxus.core.common.constant.GXControllerConstants;
 import com.geoxus.core.common.entity.GXBaseEntity;
+import com.geoxus.core.common.util.GXCommonUtils;
 import com.geoxus.core.common.util.GXHttpContextUtils;
 import com.geoxus.core.common.util.GXResultUtils;
 import com.geoxus.core.common.validator.group.GXCreateGroup;
@@ -51,11 +52,22 @@ public interface GXController<T extends GXBaseEntity> {
     }
 
     /**
+     * 获取指定Map中的JSON字段的值
+     *
+     * @param param 数据
+     * @param keys  字段名字
+     * @return JSON字符串
+     */
+    default String getJSONStr(Dict param, String... keys) {
+        return GXCommonUtils.getJSONStr(param, keys);
+    }
+
+    /**
      * 从token中获取用户ID
      *
-     * @param tokenName
-     * @param tokenIdName
-     * @return
+     * @param tokenName   token的名字
+     * @param tokenIdName token中的字段表示
+     * @return Long
      */
     default long getUserIdFromToken(String tokenName, String tokenIdName) {
         return GXHttpContextUtils.getUserIdFromToken(tokenName, tokenIdName);
