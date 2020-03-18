@@ -19,6 +19,8 @@ import javax.servlet.http.HttpServletRequest;
 @Aspect
 @Component
 public class GXApiIdempotentAspect {
+    private static final String API_IDEMPOTENT_TOKEN = "api-token";
+
     @Autowired
     private GXApiIdempotentService apiIdempotentService;
 
@@ -30,10 +32,10 @@ public class GXApiIdempotentAspect {
     public Object around(ProceedingJoinPoint point) throws Throwable {
         HttpServletRequest request = GXHttpContextUtils.getHttpServletRequest();
         assert request != null;
-        final String token = ServletUtil.getHeader(request, GXApiIdempotentService.API_IDEMPOTENT_TOKEN, CharsetUtil.UTF_8);
+        final String token = ServletUtil.getHeader(request, API_IDEMPOTENT_TOKEN, CharsetUtil.UTF_8);
         if (null != token && apiIdempotentService.checkApiIdempotentToken(token)) {
             return point.proceed(point.getArgs());
         }
-        return GXResultUtils.error().putData(Dict.create().set("error", StrUtil.format("{} HEADERS NOT EXISTS", GXApiIdempotentService.API_IDEMPOTENT_TOKEN)));
+        return GXResultUtils.error().putData(Dict.create().set("error", StrUtil.format("{} HEADERS NOT EXISTS", API_IDEMPOTENT_TOKEN)));
     }
 }
