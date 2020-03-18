@@ -154,21 +154,29 @@ public interface GXBusinessService<T> extends GXBaseService<T>, GXValidateDBExis
      * @return boolean
      * @throws UnsupportedOperationException
      */
-    default boolean validateExists(Object value, String field, ConstraintValidatorContext constraintValidatorContext, Dict param) throws UnsupportedOperationException {
-        return null != getById(Convert.toLong(value));
+    default boolean validateExists(Object value, String fieldName, ConstraintValidatorContext constraintValidatorContext, Dict param) throws UnsupportedOperationException {
+        String tableName = param.getStr("table_name");
+        if (StrUtil.isBlank(tableName)) {
+            throw new GXException(StrUtil.format("请指定数据库表的名字 , 验证的字段 {} , 验证的值 : {}", fieldName, value));
+        }
+        return 1 == checkRecordIsExists(tableName, Dict.create().set(fieldName, value));
     }
 
     /**
      * 验证数据的唯一性 (返回true表示数据已经存在)
      *
      * @param value                      值
-     * @param field                      字段名字
+     * @param fieldName                  字段名字
      * @param constraintValidatorContext 验证上下文对象
      * @param param                      参数
      * @return boolean
      */
-    default boolean validateUnique(Object value, String field, ConstraintValidatorContext constraintValidatorContext, Dict param) {
-        return null != getById(Convert.toLong(value));
+    default boolean validateUnique(Object value, String fieldName, ConstraintValidatorContext constraintValidatorContext, Dict param) {
+        String tableName = param.getStr("table_name");
+        if (StrUtil.isBlank(tableName)) {
+            throw new GXException(StrUtil.format("请指定数据库表的名字 , 验证的字段 {} , 验证的值 : {}", fieldName, value));
+        }
+        return checkRecordIsUnique(tableName, Dict.create().set(fieldName, value)) > 1;
     }
 
     /**

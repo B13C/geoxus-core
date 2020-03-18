@@ -323,6 +323,18 @@ public interface GXBaseService<T> extends IService<T> {
     }
 
     /**
+     * 检测给定条件的记录是否存在
+     *
+     * @param tableName 数据库表名字
+     * @param condition 条件
+     * @return int
+     */
+    default Integer checkRecordIsExists(String tableName, Dict condition) {
+        GXBaseMapper<T> baseMapper = (GXBaseMapper<T>) getBaseMapper();
+        return baseMapper.checkRecordIsExists(tableName, condition);
+    }
+
+    /**
      * 检测给定条件的记录是否唯一
      *
      * @param clazz     实体的Class
@@ -332,6 +344,18 @@ public interface GXBaseService<T> extends IService<T> {
     default Integer checkRecordIsUnique(Class<T> clazz, Dict condition) {
         GXBaseMapper<T> baseMapper = (GXBaseMapper<T>) getBaseMapper();
         return baseMapper.checkRecordIsUnique(getTableName(clazz), condition);
+    }
+
+    /**
+     * 检测给定条件的记录是否唯一
+     *
+     * @param tableName 数据库表名字
+     * @param condition 条件
+     * @return int
+     */
+    default Integer checkRecordIsUnique(String tableName, Dict condition) {
+        GXBaseMapper<T> baseMapper = (GXBaseMapper<T>) getBaseMapper();
+        return baseMapper.checkRecordIsUnique(tableName, condition);
     }
 
     /**

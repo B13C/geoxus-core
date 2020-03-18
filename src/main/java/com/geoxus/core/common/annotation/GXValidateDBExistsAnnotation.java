@@ -14,8 +14,7 @@ import java.lang.annotation.Target;
 import static java.lang.annotation.RetentionPolicy.RUNTIME;
 
 /**
- * @author britton chen
- * @email britton@126.com
+ * @author britton chen <britton@126.com>
  */
 @Target({ElementType.METHOD, ElementType.FIELD, ElementType.ANNOTATION_TYPE})
 @Retention(RUNTIME)
@@ -31,4 +30,6 @@ public @interface GXValidateDBExistsAnnotation {
     Class<? extends GXValidateDBExists> service() default GXCoreModelService.class;
 
     String fieldName() default "model_id";
+
+    String tableName() default "";
 }

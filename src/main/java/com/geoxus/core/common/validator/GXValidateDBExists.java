@@ -14,9 +14,9 @@ public interface GXValidateDBExists {
      * Checks whether or not a given value exists for a given field
      *
      * @param value The value to check for
-     * @param field The name of the field for which to check if the value exists
+     * @param fieldName The name of the field for which to check if the value exists
      * @return True if the value exists for the field; false otherwise
      * @throws UnsupportedOperationException
      */
-    boolean validateExists(Object value, String field, ConstraintValidatorContext constraintValidatorContext, Dict param) throws UnsupportedOperationException;
+    boolean validateExists(Object value, String fieldName, ConstraintValidatorContext constraintValidatorContext, Dict param) throws UnsupportedOperationException;
 }

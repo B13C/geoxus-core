@@ -29,5 +29,7 @@ public @interface GXValidateDBUniqueAnnotation {
 
     Class<? extends GXValidateDBUnique> service();
 
-    String fieldName();
+    String fieldName() default "model_id";
+
+    String tableName() default "";
 }

@@ -24,12 +24,15 @@ public class GXValidateDBExistsValidator implements ConstraintValidator<GXValida
 
     private Class<?>[] groups;
 
+    private String tableName;
+
     @Override
-    public void initialize(GXValidateDBExistsAnnotation exists) {
-        Class<? extends GXValidateDBExists> clazz = exists.service();
-        fieldName = exists.fieldName();
-        groups = exists.groups();
+    public void initialize(GXValidateDBExistsAnnotation annotation) {
+        Class<? extends GXValidateDBExists> clazz = annotation.service();
+        fieldName = annotation.fieldName();
+        groups = annotation.groups();
         service = GXSpringContextUtils.getBean(clazz);
+        tableName = annotation.tableName();
     }
 
     @Override
@@ -37,6 +40,6 @@ public class GXValidateDBExistsValidator implements ConstraintValidator<GXValida
         if (null == service) {
             throw new GXException(StrUtil.format("字段<{}>的值<{}>需要指定相应的Service进行验证...", fieldName, o));
         }
-        return service.validateExists(o, fieldName, constraintValidatorContext, Dict.create());
+        return service.validateExists(o, fieldName, constraintValidatorContext, Dict.create().set("table_name", tableName));
     }
 }
