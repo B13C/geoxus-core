@@ -6,6 +6,7 @@ import cn.hutool.json.JSONUtil;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 
+@SuppressWarnings("unused")
 public class GXDict extends Dict {
     /**
      * @param attr 字段名
