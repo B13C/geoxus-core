@@ -6,7 +6,7 @@ import cn.hutool.json.JSONObject;
 import cn.hutool.json.JSONUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import com.geoxus.core.common.config.UploadConfig;
+import com.geoxus.core.common.config.GXUploadConfig;
 import com.geoxus.core.common.constant.GXCommonConstants;
 import com.geoxus.core.common.exception.GXException;
 import com.geoxus.core.common.util.GXUploadUtils;
@@ -30,7 +30,7 @@ import java.util.stream.Collectors;
 @Service(value = "coreMediaLibraryService")
 public class GXCoreMediaLibraryServiceImpl extends ServiceImpl<GXCoreMediaLibraryMapper, GXCoreMediaLibraryEntity> implements GXCoreMediaLibraryService {
     @Autowired
-    private UploadConfig uploadConfig;
+    private GXUploadConfig gxUploadConfig;
 
     @Autowired
     private GXCoreModelService coreModelService;
@@ -97,7 +97,7 @@ public class GXCoreMediaLibraryServiceImpl extends ServiceImpl<GXCoreMediaLibrar
     @Override
     @Transactional(rollbackFor = Exception.class)
     public GXCoreMediaLibraryEntity saveFileInfo(MultipartFile file, Dict param) {
-        String filePath = uploadConfig.getDepositPath().trim();
+        String filePath = gxUploadConfig.getDepositPath().trim();
         try {
             String fileName = GXUploadUtils.singleUpload(file, filePath);
             GXCoreMediaLibraryEntity entity = new GXCoreMediaLibraryEntity();

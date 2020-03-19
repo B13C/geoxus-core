@@ -31,7 +31,7 @@ import java.util.concurrent.TimeUnit;
 @Slf4j
 public class GXWebMvcInterceptorConfig implements WebMvcConfigurer {
     @Autowired
-    private UploadConfig uploadConfig;
+    private GXUploadConfig gxUploadConfig;
 
     @Autowired
     private GXAuthorizationInterceptor authorizationInterceptor;
@@ -81,9 +81,9 @@ public class GXWebMvcInterceptorConfig implements WebMvcConfigurer {
             String[] array = new String[list.size()];
             list.toArray(array);
             registry.addResourceHandler(array)
-                    .addResourceLocations("file:" + ResourceUtils.getURL(uploadConfig.getDepositPath()).getPath())
+                    .addResourceLocations("file:" + ResourceUtils.getURL(gxUploadConfig.getDepositPath()).getPath())
                     //PHP图片地址
-                    .addResourceLocations("file:" + ResourceUtils.getURL(uploadConfig.getDepositPath() + File.separator + "media").getPath());
+                    .addResourceLocations("file:" + ResourceUtils.getURL(gxUploadConfig.getDepositPath() + File.separator + "media").getPath());
             //编辑器上传路径
             registry.addResourceHandler(properties.getLocal().getUrlPrefix() + "**")
                     .addResourceLocations("file:" + ResourceUtils.getURL(properties.getLocal().getPhysicalPath()).getPath())

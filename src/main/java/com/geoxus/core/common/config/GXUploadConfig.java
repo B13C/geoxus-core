@@ -10,7 +10,7 @@ import org.springframework.stereotype.Component;
 @Component
 @ConfigurationProperties(prefix = "upload")
 @PropertySource(value = {"classpath:/ymls/${spring.profiles.active}/upload.yml"}, factory = GXYamlPropertySourceFactory.class, encoding = "utf-8")
-public class UploadConfig {
+public class GXUploadConfig {
     private String depositPath;
 
     private String returnPath;
