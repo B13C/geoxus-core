@@ -6,6 +6,7 @@ import org.springframework.context.annotation.Condition;
 import org.springframework.context.annotation.ConditionContext;
 import org.springframework.core.env.Environment;
 import org.springframework.core.type.AnnotatedTypeMetadata;
+import org.springframework.lang.NonNull;
 
 import java.util.Optional;
 
@@ -16,7 +17,7 @@ public class GXAliYunSMSCondition implements Condition {
     private static final String PROVIDER_NAME = "aliyun-sms";
 
     @Override
-    public boolean matches(ConditionContext context, AnnotatedTypeMetadata metadata) {
+    public boolean matches(ConditionContext context, @NonNull AnnotatedTypeMetadata metadata) {
         Environment environment = context.getEnvironment();
         final String property = Optional.ofNullable(environment.getProperty("sms-provider", String.class)).orElse("");
         return PROVIDER_NAME.equals(property);
