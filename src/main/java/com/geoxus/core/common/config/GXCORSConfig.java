@@ -9,8 +9,7 @@ import org.springframework.web.filter.CorsFilter;
 /**
  * 处理跨域问题
  *
- * @author zj chen <britton@126.com>
- * @date 2018/9/20 09:37
+ * @author britton chen <britton@126.com>
  */
 @Configuration
 public class GXCORSConfig {
