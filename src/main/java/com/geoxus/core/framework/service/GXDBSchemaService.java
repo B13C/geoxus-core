@@ -10,9 +10,8 @@ public interface GXDBSchemaService {
     /**
      * 获取表的列
      *
-     * @param tableName
-     * @return
-     * @throws SQLException
+     * @param tableName 数据表名
+     * @return List
      */
     List<GXDBSchemaService.TableField> getTableColumn(String tableName);
 
@@ -20,8 +19,7 @@ public interface GXDBSchemaService {
      * 获取表的索引
      *
      * @param tableName 表名
-     * @return
-     * @throws SQLException
+     * @return List
      */
     List<GXDBSchemaService.TableIndexData> listTableIndex(String tableName) throws SQLException;
 
@@ -30,46 +28,46 @@ public interface GXDBSchemaService {
      *
      * @param tableName 表名
      * @param indexName 索引名
-     * @return
+     * @return boolean
      */
     boolean dropTableIndex(String tableName, String indexName);
 
     /**
      * 检测表中是否有指定的字段
      *
-     * @param tableName
-     * @param field
-     * @return
+     * @param tableName 数据表名字
+     * @param field     字段名字
+     * @return boolean
      */
     boolean checkTableFieldExists(String tableName, String field);
 
     /**
      * 检测索引是否存在
      *
-     * @param tableName
-     * @param indexName
-     * @return
+     * @param tableName 数据表名字
+     * @param indexName 索引名字
+     * @return boolean
      */
     boolean checkTableIndexExists(String tableName, String indexName);
 
     /**
      * 获取SQL语句的查询字段
      *
-     * @param tableName
-     * @param targetSet
-     * @param remove
-     * @return
+     * @param tableName 数据表名
+     * @param targetSet 字段集合
+     * @param remove    是否移除
+     * @return String
      */
     String getSqlFieldStr(String tableName, Set<String> targetSet, boolean remove);
 
     /**
      * 获取SQL语句的查询字段
      *
-     * @param tableName
-     * @param targetSet
-     * @param tableAlias
-     * @param remove
-     * @return
+     * @param tableName  数据表名
+     * @param targetSet  字段集合
+     * @param tableAlias 数据表的别名
+     * @param remove     是否移除
+     * @return String
      */
     String getSqlFieldStr(String tableName, Set<String> targetSet, String tableAlias, boolean remove);
 

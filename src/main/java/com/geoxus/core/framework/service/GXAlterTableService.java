@@ -11,7 +11,7 @@ public interface GXAlterTableService {
      * @param coreModelId        模型ID
      * @param oldSearchCondition 旧的条件
      * @param newSearchCondition 新的条件
-     * @return
+     * @return boolean
      */
     boolean addTableSearchCondition(String tableName, int coreModelId, String oldSearchCondition, String newSearchCondition) throws SQLException;
 
@@ -21,7 +21,7 @@ public interface GXAlterTableService {
      * @param tableName       表名
      * @param coreModelId     模型ID
      * @param indexFieldParam 索引字段
-     * @return
+     * @return boolean
      */
     boolean tableCreateIndex(String tableName, int coreModelId, String indexFieldParam) throws SQLException;
 
@@ -29,7 +29,7 @@ public interface GXAlterTableService {
      * 获取表的列
      *
      * @param tableName 表名
-     * @return
+     * @return List
      */
     List<GXDBSchemaService.TableField> getTableColumns(String tableName) throws SQLException;
 
@@ -37,7 +37,7 @@ public interface GXAlterTableService {
      * 列出数据表的索引
      *
      * @param tableName 表名
-     * @return
+     * @return List
      */
     List<GXDBSchemaService.TableIndexData> getTableIndexes(String tableName) throws SQLException;
 
@@ -46,7 +46,7 @@ public interface GXAlterTableService {
      *
      * @param tableName 表名
      * @param indexName 索引名字
-     * @return
+     * @return boolean
      */
     boolean tableDropIndex(String tableName, String indexName) throws SQLException;
 
@@ -55,7 +55,7 @@ public interface GXAlterTableService {
      *
      * @param tableName 表名
      * @param indexName 索引名字
-     * @return
+     * @return boolean
      */
     boolean tableCheckIndexExists(String tableName, String indexName);
 }
