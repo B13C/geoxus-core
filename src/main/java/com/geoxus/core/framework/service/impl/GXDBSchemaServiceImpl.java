@@ -43,14 +43,14 @@ public class GXDBSchemaServiceImpl implements GXDBSchemaService {
     private GXCoreModelService gxCoreModelService;
 
     @Override
-    @Cacheable(value = "__DEFAULT__", key = "targetClass + methodName +#tableName")
+    @Cacheable(value = "__DEFAULT__", key = "targetClass + methodName + #tableName")
     public List<GXDBSchemaService.TableField> getTableColumn(String tableName) {
         final List<TableField> resultData = new ArrayList<>();
-        try {
-            final String sql = "SELECT column_name,data_type,column_type FROM INFORMATION_SCHEMA.COLUMNS WHERE table_name ='{}'";
-            try (final Connection connection = dataSource.getConnection();
-                 final Statement statement = connection.createStatement();
-                 final ResultSet resultSet = statement.executeQuery(StrUtil.format(sql, tableName))) {
+        try (final Connection connection = dataSource.getConnection()) {
+            String databaseName = connection.getCatalog();
+            final String sql = "SELECT column_name,data_type,column_type FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA = '{}' AND TABLE_NAME ='{}'";
+            try (final Statement statement = connection.createStatement();
+                 final ResultSet resultSet = statement.executeQuery(StrUtil.format(sql, databaseName, tableName))) {
                 while (resultSet.next()) {
                     final TableField tableField = new TableField();
                     final String columnName = resultSet.getString("column_name");
