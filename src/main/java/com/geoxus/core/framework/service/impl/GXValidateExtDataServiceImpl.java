@@ -52,17 +52,17 @@ public class GXValidateExtDataServiceImpl implements GXValidateExtDataService {
         if (!JSONUtil.isJson(jsonStr)) {
             return false;
         }
-        final int modelId = coreModelService.getModelIdByModelIdentification(modelIdentification);
-        if (modelId <= 0) {
+        final int coreModelId = coreModelService.getModelIdByModelIdentification(modelIdentification);
+        if (coreModelId <= 0) {
             throw new GXException(StrUtil.format(MODEL_SETTING_NOT_EXISTS, modelIdentification));
         }
         if (isFullMatchAttribute && !StrUtil.equals(jsonStr, "{}")) {
-            final boolean b = coreModelAttributeService.checkCoreModelFieldAttributes(modelId, subFiled, jsonStr);
+            final boolean b = coreModelAttributeService.checkCoreModelFieldAttributes(coreModelId, subFiled, jsonStr);
             if (!b) {
                 throw new GXException(StrUtil.format("{}字段提交的属性与数据库配置的字段属性不匹配!", subFiled));
             }
         }
-        final GXCoreModelEntity coreModelEntity = coreModelService.getCoreModelByModelId(modelId, subFiled);
+        final GXCoreModelEntity coreModelEntity = coreModelService.getCoreModelByModelId(coreModelId, subFiled);
         final List<Dict> attributesList = coreModelEntity.getCoreAttributes();
         final Dict validateRule = Dict.create();
         for (Dict dict : attributesList) {
@@ -70,13 +70,13 @@ public class GXValidateExtDataServiceImpl implements GXValidateExtDataService {
         }
         if (JSONUtil.isJsonObj(jsonStr)) {
             final Dict validateDataMap = Convert.convert(Dict.class, JSONUtil.toBean(jsonStr, Dict.class));
-            return !dataValidation(modelIdentification, modelId, validateRule, validateDataMap, context, -1);
+            return !dataValidation(modelIdentification, coreModelId, validateRule, validateDataMap, context, -1);
         } else {
             final JSONArray jsonArray = JSONUtil.parseArray(jsonStr);
             int currentIndex = 0;
             for (Object object : jsonArray) {
                 final Dict validateDataMap = Convert.convert(Dict.class, object);
-                if (dataValidation(modelIdentification, modelId, validateRule, validateDataMap, context, currentIndex++)) {
+                if (dataValidation(modelIdentification, coreModelId, validateRule, validateDataMap, context, currentIndex++)) {
                     return false;
                 }
             }

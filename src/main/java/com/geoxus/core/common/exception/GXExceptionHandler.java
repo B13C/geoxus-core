@@ -40,7 +40,7 @@ public class GXExceptionHandler {
     @ExceptionHandler(GXBeanValidateException.class)
     public GXResultUtils handleRRBeanValidateException(GXBeanValidateException e) {
         log.error(e.getMessage(), e);
-        return GXResultUtils.error(e.getCode(), e.getMsg());
+        return GXResultUtils.error(e.getCode(), e.getMsg()).putData(e.getDict());
     }
 
     @ExceptionHandler(NoHandlerFoundException.class)

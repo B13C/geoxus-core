@@ -76,7 +76,7 @@ public class GXCoreModelAttributesServiceImpl extends ServiceImpl<GXCoreModelAtt
             paramSet.add(entry.getKey());
         }
         final String cacheKey = gxCacheKeysUtils.getCacheKey("", StrUtil.format("{}.{}.{}", coreModelId, modelAttributeField, String.join(".", paramSet)));
-        final Dict condition = Dict.create().set("model_id", coreModelId).set("model_attribute_field", modelAttributeField);
+        final Dict condition = Dict.create().set("core_model_id", coreModelId).set("model_attribute_field", modelAttributeField);
         try {
             final List<Dict> list = LIST_DICT_CACHE.get(cacheKey, () -> baseMapper.listOrSearch(condition));
             if (list.isEmpty()) {
@@ -84,7 +84,9 @@ public class GXCoreModelAttributesServiceImpl extends ServiceImpl<GXCoreModelAtt
             }
             Set<String> dbSet = CollUtil.newHashSet();
             for (Dict dict : list) {
-                dbSet.add(dict.getStr("attribute_name"));
+                if (null != dict.getStr("attribute_name")) {
+                    dbSet.add(dict.getStr("attribute_name"));
+                }
             }
             log.info("checkCoreModelFieldAttributes ->> dbSet : {} , paramSet : {}", dbSet, paramSet);
             return dbSet.toString().equals(paramSet.toString());
@@ -112,7 +114,7 @@ public class GXCoreModelAttributesServiceImpl extends ServiceImpl<GXCoreModelAtt
                 if (required == 1 && null == sourceDict.getObj(attributeName)) {
                     String errorTips = dict.getStr("error_tips");
                     if (StrUtil.isBlank(errorTips)) {
-                        errorTips = StrUtil.format("{}是必填项", attributeName);
+                        errorTips = StrUtil.format("{}.{}是必填项", modelAttributeField, attributeName);
                     }
                     errorsDict.set(attributeName, errorTips);
                     continue;

@@ -10,6 +10,7 @@ import lombok.extern.slf4j.Slf4j;
 
 import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
+import java.util.Objects;
 
 /**
  * 验证数据是否唯一验证器
@@ -34,6 +35,9 @@ public class GXValidateDBUniqueValidator implements ConstraintValidator<GXValida
 
     @Override
     public boolean isValid(Object o, ConstraintValidatorContext constraintValidatorContext) {
+        if (Objects.isNull(o)) {
+            throw new GXException(StrUtil.format("验证出错 , <{}>字段的值为<{}>", fieldName, o));
+        }
         if (null == service) {
             throw new GXException(StrUtil.format("字段<{}>的值<{}>需要指定相应的Service进行验证...", fieldName, o));
         }
