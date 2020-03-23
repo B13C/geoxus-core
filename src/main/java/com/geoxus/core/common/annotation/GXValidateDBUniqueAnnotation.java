@@ -2,9 +2,9 @@ package com.geoxus.core.common.annotation;
 
 import com.geoxus.core.common.validator.GXValidateDBUnique;
 import com.geoxus.core.common.validator.impl.GXValidateDBUniqueValidator;
-import org.springframework.messaging.handler.annotation.Payload;
 
 import javax.validation.Constraint;
+import javax.validation.Payload;
 import java.lang.annotation.Documented;
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
