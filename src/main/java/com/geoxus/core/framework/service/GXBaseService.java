@@ -458,16 +458,18 @@ public interface GXBaseService<T> extends IService<T> {
      */
     default Dict getFieldBySQL(String tableName, Set<String> fieldSet, Dict condition, boolean remove) {
         GXBaseMapper<T> baseMapper = (GXBaseMapper<T>) getBaseMapper();
+        final Dict dict = baseMapper.getFieldBySQL(tableName, fieldSet, condition, remove);
+        if (null == dict) {
+            throw new GXException("核心模型数据不存在");
+        }
         final GXCoreModelService modelService = GXSpringContextUtils.getBean(GXCoreModelService.class);
         assert modelService != null;
         final int coreModelId = modelService.getCoreModelIdByTableName(tableName);
         final GXCoreModelAttributePermissionService permissionService = GXSpringContextUtils.getBean(GXCoreModelAttributePermissionService.class);
         assert permissionService != null;
         final Dict permissions = permissionService.getModelAttributePermissionByCoreModelId(coreModelId, Dict.create());
-        final Dict dict = baseMapper.getFieldBySQL(tableName, fieldSet, condition, remove);
         final Dict jsonFieldDict = Convert.convert(Dict.class, permissions.getObj("json_field"));
         final Dict dbFieldDict = Convert.convert(Dict.class, permissions.getObj("db_field"));
-        assert dict != null;
         final Set<Map.Entry<String, Object>> entries = dict.entrySet();
         final Dict retDict = Dict.create();
         for (Map.Entry<String, Object> entry : entries) {

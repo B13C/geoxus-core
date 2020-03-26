@@ -76,11 +76,12 @@ public class GXCoreModelServiceImpl extends ServiceImpl<GXCoreModelMapper, GXCor
     @Override
     @Cacheable(value = "__DEFAULT__", key = "targetClass + methodName + #coreModelId")
     public String getModelTypeByModelId(long coreModelId, String defaultValue) {
-        final GXCoreModelEntity entity = getOne(new QueryWrapper<GXCoreModelEntity>().select("model_type").eq("model_id", coreModelId));
-        if (null == entity) {
+        Dict dict = getFieldBySQL(GXCoreModelEntity.class, CollUtil.newHashSet("model_type"), Dict.create().set("model_id", coreModelId));
+        String modelType = dict.getStr("model_type");
+        if (StrUtil.isBlank(modelType)) {
             return defaultValue + "Type";
         }
-        return entity.getModelType();
+        return modelType;
     }
 
     @Override
