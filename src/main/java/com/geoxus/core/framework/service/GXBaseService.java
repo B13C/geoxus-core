@@ -129,7 +129,7 @@ public interface GXBaseService<T> extends IService<T> {
             if (value instanceof byte[]) {
                 value = new String((byte[]) value, StandardCharsets.UTF_8);
             }
-            final Class<?> aClass = fields.get(entry.getValue());
+            final Class<?> aClass = fields.get(entry.getValue().toString());
             retDict.set((String) entry.getValue(), Convert.convert(aClass, value, GXCommonUtils.getClassDefaultValue(aClass)));
         }
         return retDict;
