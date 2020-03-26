@@ -20,10 +20,7 @@ import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 import javax.validation.ConstraintValidatorContext;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 
 @Service
 @Slf4j
@@ -99,15 +96,11 @@ public class GXCoreModelServiceImpl extends ServiceImpl<GXCoreModelMapper, GXCor
     public int getCoreModelIdByTableName(String tableName) {
         final Dict condition = Dict.create().set("table_name", tableName);
         final QueryWrapper<GXCoreModelEntity> queryWrapper = new QueryWrapper<GXCoreModelEntity>().select("model_id").allEq(condition);
-        final GXCoreModelEntity entity = getOne(queryWrapper);
-        if (null == entity) {
+        Map<String, Object> data = getMap(queryWrapper);
+        if (null == data || data.isEmpty()) {
             return 0;
         }
-        final Dict dict = Dict.parse(entity);
-        if (dict.isEmpty()) {
-            return 0;
-        }
-        return dict.getInt("modelId");
+        return Convert.convert(Integer.class, data.get("model_id"));
     }
 
     @Override
