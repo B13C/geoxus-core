@@ -465,9 +465,9 @@ public interface GXBaseService<T> extends IService<T> {
         final GXCoreModelService modelService = GXSpringContextUtils.getBean(GXCoreModelService.class);
         assert modelService != null;
         final int coreModelId = modelService.getCoreModelIdByTableName(tableName);
-        final GXCoreModelAttributePermissionService permissionService = GXSpringContextUtils.getBean(GXCoreModelAttributePermissionService.class);
-        assert permissionService != null;
-        final Dict permissions = permissionService.getModelAttributePermissionByCoreModelId(coreModelId, Dict.create());
+        final GXCoreModelAttributePermissionService attributePermissionService = GXSpringContextUtils.getBean(GXCoreModelAttributePermissionService.class);
+        assert attributePermissionService != null;
+        final Dict permissions = attributePermissionService.getModelAttributePermissionByCoreModelId(coreModelId, Dict.create());
         final Dict jsonFieldDict = Convert.convert(Dict.class, permissions.getObj("json_field"));
         final Dict dbFieldDict = Convert.convert(Dict.class, permissions.getObj("db_field"));
         final Set<Map.Entry<String, Object>> entries = dict.entrySet();
