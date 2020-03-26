@@ -215,15 +215,15 @@ public interface GXBaseService<T> extends IService<T> {
     /**
      * 获取实体对象的媒体文件
      *
-     * @param modelId     实体对象模型ID
+     * @param objectId    实体对象模型ID
      * @param coreModelId 实体模型ID
      * @param param       其他参数
      * @return Collection
      */
-    default Collection<GXCoreMediaLibraryEntity> getMedia(int modelId, int coreModelId, Dict param) {
+    default Collection<GXCoreMediaLibraryEntity> getMedia(int objectId, int coreModelId, Dict param) {
         final GXCoreMediaLibraryService mediaLibraryService = GXSpringContextUtils.getBean(GXCoreMediaLibraryService.class);
         assert mediaLibraryService != null;
-        return mediaLibraryService.listByMap(param.set("model_id", modelId).set(GXCommonConstants.CORE_MODEL_PRIMARY_NAME, coreModelId));
+        return mediaLibraryService.listByMap(param.set("model_id", objectId).set(GXCommonConstants.CORE_MODEL_PRIMARY_NAME, coreModelId));
     }
 
     /**
