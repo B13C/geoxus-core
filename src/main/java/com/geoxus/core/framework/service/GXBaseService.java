@@ -91,7 +91,7 @@ public interface GXBaseService<T> extends IService<T> {
             path = StrUtil.format("{} as `{}`", path, aliasName);
         }
         GXBaseMapper<T> baseMapper = (GXBaseMapper<T>) getBaseMapper();
-        final Dict dict = baseMapper.getFieldBySQL(getTableName(clazz), CollUtil.newHashSet(path), condition, false);
+        final Dict dict = baseMapper.getFieldValueBySQL(getTableName(clazz), CollUtil.newHashSet(path), condition, false);
         if (null == dict) {
             return defaultValue;
         }
@@ -122,7 +122,7 @@ public interface GXBaseService<T> extends IService<T> {
             }
             dataKey.set(aliasName, key);
         }
-        final Dict dict = baseMapper.getFieldBySQL(getTableName(clazz), fieldSet, condition, false);
+        final Dict dict = baseMapper.getFieldValueBySQL(getTableName(clazz), fieldSet, condition, false);
         final Dict retDict = Dict.create();
         for (Map.Entry<String, Object> entry : dataKey.entrySet()) {
             Object value = dict.getObj(entry.getKey());
@@ -307,7 +307,7 @@ public interface GXBaseService<T> extends IService<T> {
      */
     @SuppressWarnings("unused")
     default Dict getOneByCondition(Class<T> clazz, Set<String> fieldSet, Dict condition) {
-        return getFieldBySQL(clazz, fieldSet, condition);
+        return getFieldValueBySQL(clazz, fieldSet, condition);
     }
 
     /**
@@ -379,7 +379,7 @@ public interface GXBaseService<T> extends IService<T> {
         final Type type = ((ParameterizedType) getClass().getGenericSuperclass()).getActualTypeArguments()[1];
         Class<T> clazz = Convert.convert(new TypeReference<Class<T>>() {
         }, type);
-        return updateStatusBySQL(clazz, status, condition);
+        return updateStatusByCondition(clazz, status, condition);
     }
 
     /**
@@ -390,7 +390,7 @@ public interface GXBaseService<T> extends IService<T> {
      * @param condition 更新条件
      * @return boolean
      */
-    default boolean updateFieldBySQL(Class<T> clazz, Dict data, Dict condition) {
+    default boolean updateFieldByCondition(Class<T> clazz, Dict data, Dict condition) {
         GXBaseMapper<T> baseMapper = (GXBaseMapper<T>) getBaseMapper();
         return baseMapper.updateFieldByCondition(getTableName(clazz), data, condition);
     }
@@ -403,7 +403,7 @@ public interface GXBaseService<T> extends IService<T> {
      * @param condition 更新条件
      * @return boolean
      */
-    default boolean updateStatusBySQL(Class<T> clazz, int status, Dict condition) {
+    default boolean updateStatusByCondition(Class<T> clazz, int status, Dict condition) {
         GXBaseMapper<T> baseMapper = (GXBaseMapper<T>) getBaseMapper();
         return baseMapper.updateStatusByCondition(getTableName(clazz), status, condition);
     }
@@ -430,8 +430,8 @@ public interface GXBaseService<T> extends IService<T> {
      * @param condition 查询条件
      * @return Dict
      */
-    default Dict getFieldBySQL(Class<T> clazz, Set<String> fieldSet, Dict condition) {
-        return getFieldBySQL(clazz, fieldSet, condition, false);
+    default Dict getFieldValueBySQL(Class<T> clazz, Set<String> fieldSet, Dict condition) {
+        return getFieldValueBySQL(clazz, fieldSet, condition, false);
     }
 
     /**
@@ -442,9 +442,9 @@ public interface GXBaseService<T> extends IService<T> {
      * @param condition 查询条件
      * @return Dict
      */
-    default Dict getFieldBySQL(Class<T> clazz, Set<String> fieldSet, Dict condition, boolean remove) {
+    default Dict getFieldValueBySQL(Class<T> clazz, Set<String> fieldSet, Dict condition, boolean remove) {
         final String tableName = getTableName(clazz);
-        return getFieldBySQL(tableName, fieldSet, condition, remove);
+        return getFieldValueBySQL(tableName, fieldSet, condition, remove);
     }
 
     /**
@@ -456,9 +456,9 @@ public interface GXBaseService<T> extends IService<T> {
      * @param remove    是否移除
      * @return Dict
      */
-    default Dict getFieldBySQL(String tableName, Set<String> fieldSet, Dict condition, boolean remove) {
+    default Dict getFieldValueBySQL(String tableName, Set<String> fieldSet, Dict condition, boolean remove) {
         GXBaseMapper<T> baseMapper = (GXBaseMapper<T>) getBaseMapper();
-        final Dict dict = baseMapper.getFieldBySQL(tableName, fieldSet, condition, remove);
+        final Dict dict = baseMapper.getFieldValueBySQL(tableName, fieldSet, condition, remove);
         if (null == dict) {
             throw new GXException("核心模型数据不存在");
         }
@@ -508,7 +508,7 @@ public interface GXBaseService<T> extends IService<T> {
     default boolean recordModificationHistory(String originTableName, String historyTableName, Dict condition, Dict appendData) {
         GXBaseMapper<T> baseMapper = (GXBaseMapper<T>) getBaseMapper();
         assert baseMapper != null;
-        final Dict targetDict = baseMapper.getFieldBySQL(originTableName, CollUtil.newHashSet("*"), condition, false);
+        final Dict targetDict = baseMapper.getFieldValueBySQL(originTableName, CollUtil.newHashSet("*"), condition, false);
         if (targetDict.isEmpty()) {
             return false;
         }

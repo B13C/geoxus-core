@@ -52,7 +52,7 @@ public class GXRecordHistoryAspect {
                     }
                 }
                 if (condition.isEmpty()) {
-                    throw new GXException("请指定需要记录的历史信息条件");
+                    throw new GXException("请指定需要记录的历史信息的查询条件");
                 }
                 service.recordModificationHistory(originTableName, historyTableName, condition, Dict.create().set("append_data", "附加信息"));
             }

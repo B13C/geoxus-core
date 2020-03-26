@@ -59,7 +59,9 @@ public interface GXBaseBuilder {
                         if (ReUtil.isMatch(GXCommonConstants.DIGITAL_REGULAR_EXPRESSION, entryValue.toString())) {
                             sql.SET(StrUtil.format("{} = JSON_SET({} , '$.{}' , {})", dataKey, dataKey, entryKey, entryValue));
                         } else {
-                            if (!ClassUtil.isPrimitiveWrapper(entryValue.getClass()) && !ClassUtil.equals(entryValue.getClass(), "String", true) && (entryValue instanceof Map || entryValue instanceof GXBaseEntity)) {
+                            if (!ClassUtil.isPrimitiveWrapper(entryValue.getClass())
+                                    && !ClassUtil.equals(entryValue.getClass(), "String", true)
+                                    && (entryValue instanceof Map || entryValue instanceof GXBaseEntity)) {
                                 entryValue = JSONUtil.toJsonStr(entryValue);
                             }
                             sql.SET(StrUtil.format("{} = JSON_SET({} , '$.{}' , '{}')", dataKey, dataKey, entryKey, entryValue));
@@ -71,7 +73,11 @@ public interface GXBaseBuilder {
             if (value instanceof Map) {
                 value = JSONUtil.toJsonStr(value);
             }
-            sql.SET(StrUtil.format("{} " + GXBaseBuilderConstants.STR_EQ, dataKey, value));
+            if (ReUtil.isMatch(GXCommonConstants.DIGITAL_REGULAR_EXPRESSION, value.toString())) {
+                sql.SET(StrUtil.format("{} " + GXBaseBuilderConstants.NUMBER_EQ, dataKey, value));
+            } else {
+                sql.SET(StrUtil.format("{} " + GXBaseBuilderConstants.STR_EQ, dataKey, value));
+            }
         }
         final Set<String> conditionKeys = whereData.keySet();
         for (String conditionKey : conditionKeys) {
@@ -94,19 +100,8 @@ public interface GXBaseBuilder {
      * @param condition 更新条件
      * @return String
      */
-    static String updateStatus(String tableName, int status, Dict condition) {
-        final SQL sql = new SQL().UPDATE(tableName);
-        sql.SET(StrUtil.format("`status` = {}", status));
-        final Set<String> conditionKeys = condition.keySet();
-        for (String conditionKey : conditionKeys) {
-            String template = "{} " + GXBaseBuilderConstants.STR_EQ;
-            final String value = condition.getStr(conditionKey);
-            if (ReUtil.isMatch(GXCommonConstants.DIGITAL_REGULAR_EXPRESSION, value)) {
-                template = "{} " + GXBaseBuilderConstants.NUMBER_EQ;
-            }
-            sql.WHERE(StrUtil.format(template, conditionKey, value));
-        }
-        return sql.toString();
+    static String updateStatusByCondition(String tableName, int status, Dict condition) {
+        return updateFieldByCondition(tableName, Dict.create().set("status", status), condition);
     }
 
     /**
@@ -139,18 +134,7 @@ public interface GXBaseBuilder {
      * @return String
      */
     static String checkRecordIsUnique(String tableName, Dict condition) {
-        final SQL sql = new SQL().SELECT("count(*) as cnt").FROM(tableName);
-        final Set<String> conditionKeys = condition.keySet();
-        for (String conditionKey : conditionKeys) {
-            String template = "{} " + GXBaseBuilderConstants.STR_EQ;
-            final String value = condition.getStr(conditionKey);
-            if (ReUtil.isMatch(GXCommonConstants.DIGITAL_REGULAR_EXPRESSION, value)) {
-                template = "{} " + GXBaseBuilderConstants.NUMBER_EQ;
-            }
-            sql.WHERE(StrUtil.format(template, conditionKey, value));
-        }
-        sql.LIMIT(5);
-        return sql.toString();
+        return checkRecordIsExists(tableName, condition);
     }
 
     /**
@@ -161,11 +145,11 @@ public interface GXBaseBuilder {
      * @param condition 条件
      * @return String
      */
-    static String getFieldBySQL(String tableName, Set<String> fieldSet, Dict condition, boolean remove) {
+    static String getFieldValueBySQL(String tableName, Set<String> fieldSet, Dict condition, boolean remove) {
         final GXDBSchemaService schemaService = GXSpringContextUtils.getBean(GXDBSchemaService.class);
         assert schemaService != null;
-        final String sqlFieldStr = schemaService.getSqlFieldStr(tableName, fieldSet, remove);
-        final SQL sql = new SQL().SELECT(sqlFieldStr).FROM(tableName);
+        final String selectFieldStr = schemaService.getSqlFieldStr(tableName, fieldSet, remove);
+        final SQL sql = new SQL().SELECT(selectFieldStr).FROM(tableName);
         final Set<String> conditionKeys = condition.keySet();
         for (String conditionKey : conditionKeys) {
             String template = "{} " + GXBaseBuilderConstants.STR_EQ;

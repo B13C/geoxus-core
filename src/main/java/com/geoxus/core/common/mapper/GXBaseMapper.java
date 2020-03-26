@@ -20,11 +20,11 @@ public interface GXBaseMapper<T> extends BaseMapper<T> {
     @SelectProvider(type = GXBaseBuilder.class, method = "listOrSearch")
     List<Dict> listOrSearchPage(IPage<Dict> page, Dict param);
 
-    @UpdateProvider(type = GXBaseBuilder.class, method = "updateStatus")
+    @UpdateProvider(type = GXBaseBuilder.class, method = "updateStatusByCondition")
     boolean updateStatusByCondition(String tableName, int status, Dict condition);
 
-    @SelectProvider(type = GXBaseBuilder.class, method = "getFieldBySQL")
-    Dict getFieldBySQL(String tableName, Set<String> fieldSet, Dict condition, boolean remove);
+    @SelectProvider(type = GXBaseBuilder.class, method = "getFieldValueBySQL")
+    Dict getFieldValueBySQL(String tableName, Set<String> fieldSet, Dict condition, boolean remove);
 
     @SelectProvider(type = GXBaseBuilder.class, method = "listOrSearch")
     List<Dict> listOrSearch(Dict param);

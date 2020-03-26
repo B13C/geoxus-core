@@ -91,7 +91,7 @@ public interface GXBusinessService<T> extends GXBaseService<T>, GXValidateDBExis
         }
         final String fields = (String) Optional.ofNullable(param.remove("fields")).orElse("*");
         final Boolean remove = (Boolean) Optional.ofNullable(param.remove("remove")).orElse(false);
-        return getFieldBySQL(tableName, Arrays.stream(StrUtil.replace(fields, " ", "").split(",")).collect(Collectors.toSet()), param, remove);
+        return getFieldValueBySQL(tableName, Arrays.stream(StrUtil.replace(fields, " ", "").split(",")).collect(Collectors.toSet()), param, remove);
     }
 
     /**
@@ -349,7 +349,7 @@ public interface GXBusinessService<T> extends GXBaseService<T>, GXValidateDBExis
      * @return String
      */
     default String getParentPath(Class<T> clazz, Long parentId, boolean appendSelf) {
-        final Dict dict = getFieldBySQL(clazz, CollUtil.newHashSet("path"), Dict.create().set(getPrimaryKey(), parentId));
+        final Dict dict = getFieldValueBySQL(clazz, CollUtil.newHashSet("path"), Dict.create().set(getPrimaryKey(), parentId));
         if (null == dict || dict.isEmpty()) {
             return "0";
         }
