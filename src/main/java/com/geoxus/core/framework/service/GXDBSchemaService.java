@@ -80,6 +80,18 @@ public interface GXDBSchemaService {
      */
     String getSelectFieldStr(String tableName, Set<String> targetSet, String tableAlias, boolean remove);
 
+    /**
+     * 获取SQL语句的查询字段
+     *
+     * @param tableName     数据表名
+     * @param targetSet     字段集合
+     * @param tableAlias    数据表的别名
+     * @param remove        是否移除
+     * @param saveJSONField 是否保留JSON字段
+     * @return String
+     */
+    String getSelectFieldStr(String tableName, Set<String> targetSet, String tableAlias, boolean remove, boolean saveJSONField);
+
     @Data
     class TableField {
         private String columnName;

@@ -333,6 +333,21 @@ public interface GXBaseBuilder {
      * @param remove     是否移除
      * @return String
      */
+    default String getSelectFieldStr(String tableName, Set<String> targetSet, String tableAlias, boolean remove, boolean saveJSONField) {
+        final GXDBSchemaService schemaService = GXSpringContextUtils.getBean(GXDBSchemaService.class);
+        assert schemaService != null;
+        return schemaService.getSelectFieldStr(tableName, targetSet, tableAlias, remove , saveJSONField);
+    }
+
+    /**
+     * 获取SQL语句的查询字段
+     *
+     * @param tableName  表名
+     * @param targetSet  目标字段集合
+     * @param tableAlias 表的别名
+     * @param remove     是否移除
+     * @return String
+     */
     default String getSelectFieldStr(String tableName, Set<String> targetSet, String tableAlias, boolean remove) {
         final GXDBSchemaService schemaService = GXSpringContextUtils.getBean(GXDBSchemaService.class);
         assert schemaService != null;

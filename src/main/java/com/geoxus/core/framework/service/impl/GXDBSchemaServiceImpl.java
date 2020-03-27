@@ -151,6 +151,12 @@ public class GXDBSchemaServiceImpl implements GXDBSchemaService {
     @Override
     @Cacheable(value = "__DEFAULT__", key = "targetClass + methodName + #tableName + #targetSet + #tableAlias")
     public String getSelectFieldStr(String tableName, Set<String> targetSet, String tableAlias, boolean remove) {
+        return getSelectFieldStr(tableName, targetSet, tableAlias, remove, false);
+    }
+
+    @Override
+    @Cacheable(value = "__DEFAULT__", key = "targetClass + methodName + #tableName + #targetSet + #tableAlias")
+    public String getSelectFieldStr(String tableName, Set<String> targetSet, String tableAlias, boolean remove, boolean saveJSONField) {
         if (targetSet.size() == 1 && targetSet.contains("*") && remove) {
             log.error("删除字段不能为'*' , 请指定需要删除的具体字段...");
             return "";
@@ -162,8 +168,8 @@ public class GXDBSchemaServiceImpl implements GXDBSchemaService {
         for (TableField tableField : tableFields) {
             final String columnName = tableField.getColumnName();
             String dataType = tableField.getDataType();
-            if (dataType.equalsIgnoreCase("json")) {
-                if (remove && targetSet.contains(columnName)) {
+            if (dataType.equalsIgnoreCase("json") && !saveJSONField) {
+                if ((remove && targetSet.contains(columnName))) {
                     continue;
                 }
                 Dict attributeCondition = Dict.create().set("core_model_id", coreModelId).set("db_field_name", columnName);
