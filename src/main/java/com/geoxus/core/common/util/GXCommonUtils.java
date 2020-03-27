@@ -701,7 +701,8 @@ public class GXCommonUtils {
     public static long getCurrentSessionUserId() {
         try {
             return GXShiroUtils.getAdminId();
-        } catch (Exception ignored) {
+        } catch (Exception e) {
+            GXCommonUtils.getLogger(GXCommonUtils.class).error(e.getMessage(), e);
         }
         return 0;
     }
