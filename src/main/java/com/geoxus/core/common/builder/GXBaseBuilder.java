@@ -336,7 +336,7 @@ public interface GXBaseBuilder {
     default String getSelectFieldStr(String tableName, Set<String> targetSet, String tableAlias, boolean remove, boolean saveJSONField) {
         final GXDBSchemaService schemaService = GXSpringContextUtils.getBean(GXDBSchemaService.class);
         assert schemaService != null;
-        return schemaService.getSelectFieldStr(tableName, targetSet, tableAlias, remove , saveJSONField);
+        return schemaService.getSelectFieldStr(tableName, targetSet, tableAlias, remove, saveJSONField);
     }
 
     /**
