@@ -138,19 +138,19 @@ public class GXDBSchemaServiceImpl implements GXDBSchemaService {
 
     @Override
     @Cacheable(value = "__DEFAULT__", key = "targetClass + methodName + #tableName + #targetSet")
-    public String getSqlFieldStr(String tableName, Set<String> targetSet) {
-        return getSqlFieldStr(tableName, targetSet, "", false);
+    public String getSelectFieldStr(String tableName, Set<String> targetSet) {
+        return getSelectFieldStr(tableName, targetSet, "", false);
     }
 
     @Override
     @Cacheable(value = "__DEFAULT__", key = "targetClass + methodName + #tableName + #targetSet")
-    public String getSqlFieldStr(String tableName, Set<String> targetSet, boolean remove) {
-        return getSqlFieldStr(tableName, targetSet, "", remove);
+    public String getSelectFieldStr(String tableName, Set<String> targetSet, boolean remove) {
+        return getSelectFieldStr(tableName, targetSet, "", remove);
     }
 
     @Override
     @Cacheable(value = "__DEFAULT__", key = "targetClass + methodName + #tableName + #targetSet + #tableAlias")
-    public String getSqlFieldStr(String tableName, Set<String> targetSet, String tableAlias, boolean remove) {
+    public String getSelectFieldStr(String tableName, Set<String> targetSet, String tableAlias, boolean remove) {
         if (targetSet.size() == 1 && targetSet.contains("*") && remove) {
             log.error("删除字段不能为'*' , 请指定需要删除的具体字段...");
             return "";
@@ -163,6 +163,9 @@ public class GXDBSchemaServiceImpl implements GXDBSchemaService {
             final String columnName = tableField.getColumnName();
             String dataType = tableField.getDataType();
             if (dataType.equalsIgnoreCase("json")) {
+                if (remove && targetSet.contains(columnName)) {
+                    continue;
+                }
                 Dict attributeCondition = Dict.create().set("core_model_id", coreModelId).set("db_field_name", columnName);
                 List<Dict> attributes = gxCoreModelAttributesService.getModelAttributesByModelId(attributeCondition);
                 String attributeFlag = "attribute_name";
@@ -175,11 +178,11 @@ public class GXDBSchemaServiceImpl implements GXDBSchemaService {
                         continue;
                     }
                     if (remove) {
-                        if (!targetSet.contains(extFieldKey)) {
+                        if (!targetSet.contains(extFieldKey) || !targetSet.contains(columnName)) {
                             tmpResult.set(extFieldKey, lastAttributeName);
                         }
                     } else {
-                        if (targetSet.contains(extFieldKey)) {
+                        if (targetSet.contains(extFieldKey) || targetSet.contains(columnName)) {
                             tmpResult.set(extFieldKey, lastAttributeName);
                         }
                     }

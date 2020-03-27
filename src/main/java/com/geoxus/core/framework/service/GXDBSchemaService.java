@@ -57,7 +57,7 @@ public interface GXDBSchemaService {
      * @param targetSet 字段集合
      * @return String
      */
-    String getSqlFieldStr(String tableName, Set<String> targetSet);
+    String getSelectFieldStr(String tableName, Set<String> targetSet);
 
     /**
      * 获取SQL语句的查询字段
@@ -67,7 +67,7 @@ public interface GXDBSchemaService {
      * @param remove    是否移除
      * @return String
      */
-    String getSqlFieldStr(String tableName, Set<String> targetSet, boolean remove);
+    String getSelectFieldStr(String tableName, Set<String> targetSet, boolean remove);
 
     /**
      * 获取SQL语句的查询字段
@@ -78,7 +78,7 @@ public interface GXDBSchemaService {
      * @param remove     是否移除
      * @return String
      */
-    String getSqlFieldStr(String tableName, Set<String> targetSet, String tableAlias, boolean remove);
+    String getSelectFieldStr(String tableName, Set<String> targetSet, String tableAlias, boolean remove);
 
     @Data
     class TableField {
