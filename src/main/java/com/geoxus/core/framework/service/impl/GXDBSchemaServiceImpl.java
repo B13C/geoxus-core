@@ -166,6 +166,10 @@ public class GXDBSchemaServiceImpl implements GXDBSchemaService {
                     String attributeValue = dict.getStr(attributeFlag);
                     String lastAttributeName = StrUtil.format("{}->>'$.{}' as '{}::{}'", columnName, attributeValue, columnName, attributeValue);
                     String tmpKey = StrUtil.format("{}::{}", columnName, attributeValue);
+                    if (targetSet.size() == 1 && targetSet.contains("*")) {
+                        tmpResult.set(tmpKey, lastAttributeName);
+                        continue;
+                    }
                     if (remove) {
                         if (!targetSet.contains(tmpKey)) {
                             tmpResult.set(tmpKey, lastAttributeName);
@@ -177,6 +181,10 @@ public class GXDBSchemaServiceImpl implements GXDBSchemaService {
                     }
                 }
             } else {
+                if (targetSet.size() == 1 && targetSet.contains("*")) {
+                    tmpResult.set(columnName, columnName);
+                    continue;
+                }
                 if (remove) {
                     if (!targetSet.contains(columnName)) {
                         tmpResult.set(columnName, columnName);
