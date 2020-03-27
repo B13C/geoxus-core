@@ -10,6 +10,7 @@ import cn.hutool.json.JSONUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.geoxus.core.common.constant.GXBaseBuilderConstants;
 import com.geoxus.core.common.constant.GXCommonConstants;
 import com.geoxus.core.common.exception.GXException;
 import com.geoxus.core.common.mapper.GXBaseMapper;
@@ -90,8 +91,9 @@ public interface GXBusinessService<T> extends GXBaseService<T>, GXValidateDBExis
             throw new GXException("请提供表名!");
         }
         final String fields = (String) Optional.ofNullable(param.remove("fields")).orElse("*");
-        final Boolean remove = (Boolean) Optional.ofNullable(param.remove("remove")).orElse(false);
-        return getFieldValueBySQL(tableName, Arrays.stream(StrUtil.replace(fields, " ", "").split(",")).collect(Collectors.toSet()), param, remove);
+        Set<String> lastFields = Arrays.stream(StrUtil.replace(fields, " ", "").split(",")).collect(Collectors.toSet());
+        Dict condition = Convert.convert(Dict.class, Optional.ofNullable(param.getObj(GXBaseBuilderConstants.SEARCH_CONDITION_NAME)).orElse(Dict.create()));
+        return getFieldValueBySQL(tableName, lastFields, condition);
     }
 
     /**
@@ -148,7 +150,7 @@ public interface GXBusinessService<T> extends GXBaseService<T>, GXValidateDBExis
      * 实现验证注解(返回true表示数据已经存在)
      *
      * @param value                      The value to check for
-     * @param field                      The name of the field for which to check if the value exists
+     * @param fieldName                  The name of the field for which to check if the value exists
      * @param constraintValidatorContext The ValidatorContext
      * @param param                      param
      * @return boolean

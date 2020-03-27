@@ -53,9 +53,8 @@ public class GXCoreModelAttributePermissionServiceImpl extends ServiceImpl<GXCor
                 final Dict convertDict = Convert.convert(Dict.class, jsonFieldDict.getOrDefault(strings[0], Dict.create()));
                 convertDict.set(StrUtil.format("{}", strings[1]), StrUtil.format("`{}`", String.join("::", strings)));
                 jsonFieldDict.set(strings[0], convertDict);
-            } else {
-                dbFieldDict.set(dbFieldName, dbFieldName);
             }
+            dbFieldDict.set(dbFieldName, dbFieldName);
         }
         return data.set("json_field", jsonFieldDict).set("db_field", dbFieldDict);
     }

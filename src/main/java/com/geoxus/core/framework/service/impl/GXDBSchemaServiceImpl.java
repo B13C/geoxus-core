@@ -5,8 +5,8 @@ import cn.hutool.core.convert.Convert;
 import cn.hutool.core.lang.Dict;
 import cn.hutool.core.util.StrUtil;
 import com.geoxus.core.common.annotation.GXFieldCommentAnnotation;
-import com.geoxus.core.common.exception.GXException;
 import com.geoxus.core.framework.service.GXCoreModelAttributePermissionService;
+import com.geoxus.core.framework.service.GXCoreModelAttributesService;
 import com.geoxus.core.framework.service.GXCoreModelService;
 import com.geoxus.core.framework.service.GXDBSchemaService;
 import lombok.extern.slf4j.Slf4j;
@@ -41,6 +41,9 @@ public class GXDBSchemaServiceImpl implements GXDBSchemaService {
 
     @Autowired
     private GXCoreModelService gxCoreModelService;
+
+    @Autowired
+    private GXCoreModelAttributesService gxCoreModelAttributesService;
 
     @Override
     @Cacheable(value = "__DEFAULT__", key = "targetClass + methodName + #tableName")
@@ -135,61 +138,66 @@ public class GXDBSchemaServiceImpl implements GXDBSchemaService {
 
     @Override
     @Cacheable(value = "__DEFAULT__", key = "targetClass + methodName + #tableName")
-    public String getSqlFieldStr(String tableName, Set<String> targetSet, boolean remove) {
-        return getSqlFieldStr(tableName, targetSet, "gx_system_table_mark", remove);
+    public String getSqlFieldStr(String tableName, Set<String> targetSet) {
+        return getSqlFieldStr(tableName, targetSet, "gx_system_table_mark");
     }
 
     @Override
     @Cacheable(value = "__DEFAULT__", key = "targetClass + methodName + #tableName")
-    public String getSqlFieldStr(String tableName, Set<String> targetSet, String tableAlias, boolean remove) {
-        if (targetSet.size() == 1 && targetSet.contains("*") && remove) {
-            throw new GXException("请指定要删除的字段名字!");
+    public String getSqlFieldStr(String tableName, Set<String> targetSet, String tableAlias) {
+        boolean allFlag = false;
+        if (targetSet.size() == 1 && targetSet.contains("*")) {
+            allFlag = true;
         }
         if (StrUtil.isBlank(tableAlias)) {
             log.error("表的别名不能为空");
             return "";
         }
-        if (tableAlias.equals("gx_system_table_mark")) {
+        if ("gx_system_table_mark".equals(tableAlias)) {
             tableAlias = "";
         }
-        if (targetSet.size() == 1 && targetSet.contains("*")) {
-            if (StrUtil.isEmpty(tableAlias)) {
-                return StrUtil.format("{}.*", tableName);
-            } else {
-                return StrUtil.format("{}.*", tableAlias);
-            }
-        }
+        int coreModelId = gxCoreModelService.getCoreModelIdByTableName(tableName);
         final List<TableField> tableFields = getTableColumn(tableName);
-        final HashSet<String> tmpResult = new HashSet<>();
-        final HashSet<String> result = new HashSet<>();
+        final Dict tmpResult = Dict.create();
         for (TableField tableField : tableFields) {
             final String columnName = tableField.getColumnName();
-            if (remove) {
-                if (targetSet.contains(columnName)) {
+            String dataType = tableField.getDataType();
+            if (dataType.equalsIgnoreCase("json")) {
+                Dict attributeCondition = Dict.create().set("core_model_id", coreModelId).set("db_field_name", columnName);
+                List<Dict> attributes = gxCoreModelAttributesService.getModelAttributesByModelId(attributeCondition);
+                String attributeFlag = "attribute_name";
+                for (Dict dict : attributes) {
+                    String attributeValue = dict.getStr(attributeFlag);
+                    if (!allFlag && !targetSet.contains(StrUtil.format("{}.{}", columnName, attributeValue))) {
+                        continue;
+                    }
+                    String lastAttributeName = StrUtil.format("{}->>'$.{}' as '{}::{}'", columnName, attributeValue, columnName, attributeValue);
+                    tmpResult.set(StrUtil.format("{}::{}", columnName, attributeValue), lastAttributeName);
+                }
+            } else {
+                if (!allFlag && !targetSet.contains(columnName)) {
                     continue;
                 }
-                tmpResult.add(columnName);
-            } else {
-                if (targetSet.contains(columnName)) {
-                    tmpResult.add(columnName);
-                }
+                tmpResult.set(columnName, columnName);
             }
         }
-        int coreModelId = gxCoreModelService.getCoreModelIdByTableName(tableName);
         final Dict permissions = gxCoreModelAttributePermissionService.getModelAttributePermissionByCoreModelId(coreModelId, Dict.create());
         Dict dict = Dict.create();
         if (!permissions.isEmpty() && null != permissions.getObj("db_field")) {
             dict = Convert.convert(Dict.class, permissions.getObj("db_field"));
         }
         final Set<String> strings = dict.keySet();
-        for (String field : tmpResult) {
-            if (CollUtil.contains(strings, field)) {
+        final HashSet<String> result = new HashSet<>();
+        for (Map.Entry<String, Object> entry : tmpResult.entrySet()) {
+            String key = entry.getKey();
+            Object value = entry.getValue();
+            if (CollUtil.contains(strings, key)) {
                 continue;
             }
             if (StrUtil.isEmpty(tableAlias)) {
-                result.add(StrUtil.format("{}", field));
+                result.add(StrUtil.format("{}", value));
             } else {
-                result.add(StrUtil.format("{}.{}", tableAlias, field));
+                result.add(StrUtil.format("{}.{}", tableAlias, value));
             }
         }
         return String.join(",", result);

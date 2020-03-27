@@ -91,7 +91,7 @@ public interface GXBaseService<T> extends IService<T> {
             path = StrUtil.format("{} as `{}`", path, aliasName);
         }
         GXBaseMapper<T> baseMapper = (GXBaseMapper<T>) getBaseMapper();
-        final Dict dict = baseMapper.getFieldValueBySQL(getTableName(clazz), CollUtil.newHashSet(path), condition, false);
+        final Dict dict = baseMapper.getFieldValueBySQL(getTableName(clazz), CollUtil.newHashSet(path), condition);
         if (null == dict) {
             return defaultValue;
         }
@@ -122,7 +122,7 @@ public interface GXBaseService<T> extends IService<T> {
             }
             dataKey.set(aliasName, key);
         }
-        final Dict dict = baseMapper.getFieldValueBySQL(getTableName(clazz), fieldSet, condition, false);
+        final Dict dict = baseMapper.getFieldValueBySQL(getTableName(clazz), fieldSet, condition);
         final Dict retDict = Dict.create();
         for (Map.Entry<String, Object> entry : dataKey.entrySet()) {
             Object value = dict.getObj(entry.getKey());
@@ -431,20 +431,8 @@ public interface GXBaseService<T> extends IService<T> {
      * @return Dict
      */
     default Dict getFieldValueBySQL(Class<T> clazz, Set<String> fieldSet, Dict condition) {
-        return getFieldValueBySQL(clazz, fieldSet, condition, false);
-    }
-
-    /**
-     * 获取表中的指定字段
-     *
-     * @param clazz     Class对象
-     * @param fieldSet  字段集合
-     * @param condition 查询条件
-     * @return Dict
-     */
-    default Dict getFieldValueBySQL(Class<T> clazz, Set<String> fieldSet, Dict condition, boolean remove) {
         final String tableName = getTableName(clazz);
-        return getFieldValueBySQL(tableName, fieldSet, condition, remove);
+        return getFieldValueBySQL(tableName, fieldSet, condition);
     }
 
     /**
@@ -453,23 +441,16 @@ public interface GXBaseService<T> extends IService<T> {
      * @param tableName 表名
      * @param fieldSet  字段集合
      * @param condition 更新条件
-     * @param remove    是否移除
      * @return Dict
      */
-    default Dict getFieldValueBySQL(String tableName, Set<String> fieldSet, Dict condition, boolean remove) {
+    default Dict getFieldValueBySQL(String tableName, Set<String> fieldSet, Dict condition) {
         GXBaseMapper<T> baseMapper = (GXBaseMapper<T>) getBaseMapper();
-        final Dict dict = baseMapper.getFieldValueBySQL(tableName, fieldSet, condition, remove);
+        final Dict dict = baseMapper.getFieldValueBySQL(tableName, fieldSet, condition);
         if (null == dict) {
             throw new GXException("核心模型数据不存在");
         }
         final GXCoreModelService modelService = GXSpringContextUtils.getBean(GXCoreModelService.class);
         assert modelService != null;
-        final int coreModelId = modelService.getCoreModelIdByTableName(tableName);
-        final GXCoreModelAttributePermissionService attributePermissionService = GXSpringContextUtils.getBean(GXCoreModelAttributePermissionService.class);
-        assert attributePermissionService != null;
-        final Dict permissions = attributePermissionService.getModelAttributePermissionByCoreModelId(coreModelId, Dict.create());
-        final Dict jsonFieldDict = Convert.convert(Dict.class, permissions.getObj("json_field"));
-        final Dict dbFieldDict = Convert.convert(Dict.class, permissions.getObj("db_field"));
         final Set<Map.Entry<String, Object>> entries = dict.entrySet();
         final Dict retDict = Dict.create();
         for (Map.Entry<String, Object> entry : entries) {
@@ -478,17 +459,13 @@ public interface GXBaseService<T> extends IService<T> {
             if (null == object) {
                 continue;
             }
-            if ((object instanceof String) && JSONUtil.isJson((String) object)) {
-                final Dict removeField = Convert.convert(Dict.class, jsonFieldDict.getObj(key));
-                final Dict bean = JSONUtil.toBean((String) object, Dict.class);
-                if (null != removeField) {
-                    for (String removeKey : removeField.keySet()) {
-                        bean.remove(removeKey);
-                    }
-                }
-                retDict.set(key, bean);
-            } else if (null == dbFieldDict.getObj(key)) {
-                retDict.set(key, dict.getObj(key));
+            if (object instanceof byte[]) {
+                String[] keys = StrUtil.split(key, "::");
+                Dict data = Convert.convert(Dict.class, Optional.ofNullable(retDict.getObj(keys[0])).orElse(Dict.create()));
+                String str = new String((byte[]) object, StandardCharsets.UTF_8);
+                retDict.set(keys[0], data.set(keys[1], str));
+            } else {
+                retDict.set(key, object);
             }
         }
         return retDict;
@@ -508,7 +485,7 @@ public interface GXBaseService<T> extends IService<T> {
     default boolean recordModificationHistory(String originTableName, String historyTableName, Dict condition, Dict appendData) {
         GXBaseMapper<T> baseMapper = (GXBaseMapper<T>) getBaseMapper();
         assert baseMapper != null;
-        final Dict targetDict = baseMapper.getFieldValueBySQL(originTableName, CollUtil.newHashSet("*"), condition, false);
+        final Dict targetDict = baseMapper.getFieldValueBySQL(originTableName, CollUtil.newHashSet("*"), condition);
         if (targetDict.isEmpty()) {
             return false;
         }
