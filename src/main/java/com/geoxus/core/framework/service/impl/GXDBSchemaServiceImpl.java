@@ -138,17 +138,13 @@ public class GXDBSchemaServiceImpl implements GXDBSchemaService {
 
     @Override
     @Cacheable(value = "__DEFAULT__", key = "targetClass + methodName + #tableName")
-    public String getSqlFieldStr(String tableName, Set<String> targetSet) {
-        return getSqlFieldStr(tableName, targetSet, "gx_system_table_mark");
+    public String getSqlFieldStr(String tableName, Set<String> targetSet, boolean remove) {
+        return getSqlFieldStr(tableName, targetSet, "gx_system_table_mark", remove);
     }
 
     @Override
     @Cacheable(value = "__DEFAULT__", key = "targetClass + methodName + #tableName")
-    public String getSqlFieldStr(String tableName, Set<String> targetSet, String tableAlias) {
-        boolean allFlag = false;
-        if (targetSet.size() == 1 && targetSet.contains("*")) {
-            allFlag = true;
-        }
+    public String getSqlFieldStr(String tableName, Set<String> targetSet, String tableAlias, boolean remove) {
         if (StrUtil.isBlank(tableAlias)) {
             log.error("表的别名不能为空");
             return "";
@@ -168,17 +164,28 @@ public class GXDBSchemaServiceImpl implements GXDBSchemaService {
                 String attributeFlag = "attribute_name";
                 for (Dict dict : attributes) {
                     String attributeValue = dict.getStr(attributeFlag);
-                    if (!allFlag && !targetSet.contains(StrUtil.format("{}.{}", columnName, attributeValue))) {
-                        continue;
-                    }
                     String lastAttributeName = StrUtil.format("{}->>'$.{}' as '{}::{}'", columnName, attributeValue, columnName, attributeValue);
-                    tmpResult.set(StrUtil.format("{}::{}", columnName, attributeValue), lastAttributeName);
+                    String tmpKey = StrUtil.format("{}::{}", columnName, attributeValue);
+                    if (remove) {
+                        if (!targetSet.contains(tmpKey)) {
+                            tmpResult.set(tmpKey, lastAttributeName);
+                        }
+                    } else {
+                        if (targetSet.contains(tmpKey)) {
+                            tmpResult.set(tmpKey, lastAttributeName);
+                        }
+                    }
                 }
             } else {
-                if (!allFlag && !targetSet.contains(columnName)) {
-                    continue;
+                if (remove) {
+                    if (!targetSet.contains(columnName)) {
+                        tmpResult.set(columnName, columnName);
+                    }
+                } else {
+                    if (targetSet.contains(columnName)) {
+                        tmpResult.set(columnName, columnName);
+                    }
                 }
-                tmpResult.set(columnName, columnName);
             }
         }
         final Dict permissions = gxCoreModelAttributePermissionService.getModelAttributePermissionByCoreModelId(coreModelId, Dict.create());

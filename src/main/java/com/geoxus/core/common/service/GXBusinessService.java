@@ -91,9 +91,10 @@ public interface GXBusinessService<T> extends GXBaseService<T>, GXValidateDBExis
             throw new GXException("请提供表名!");
         }
         final String fields = (String) Optional.ofNullable(param.remove("fields")).orElse("*");
+        final boolean remove = (boolean) Optional.ofNullable(param.remove("remove")).orElse(false);
         Set<String> lastFields = Arrays.stream(StrUtil.replace(fields, " ", "").split(",")).collect(Collectors.toSet());
         Dict condition = Convert.convert(Dict.class, Optional.ofNullable(param.getObj(GXBaseBuilderConstants.SEARCH_CONDITION_NAME)).orElse(Dict.create()));
-        return getFieldValueBySQL(tableName, lastFields, condition);
+        return getFieldValueBySQL(tableName, lastFields, condition, remove);
     }
 
     /**
@@ -351,7 +352,8 @@ public interface GXBusinessService<T> extends GXBaseService<T>, GXValidateDBExis
      * @return String
      */
     default String getParentPath(Class<T> clazz, Long parentId, boolean appendSelf) {
-        final Dict dict = getFieldValueBySQL(clazz, CollUtil.newHashSet("path"), Dict.create().set(getPrimaryKey(), parentId));
+        Dict condition = Dict.create().set(getPrimaryKey(), parentId);
+        final Dict dict = getFieldValueBySQL(clazz, CollUtil.newHashSet("path"), condition, false);
         if (null == dict || dict.isEmpty()) {
             return "0";
         }

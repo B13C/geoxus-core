@@ -145,10 +145,10 @@ public interface GXBaseBuilder {
      * @param condition 条件
      * @return String
      */
-    static String getFieldValueBySQL(String tableName, Set<String> fieldSet, Dict condition) {
+    static String getFieldValueBySQL(String tableName, Set<String> fieldSet, Dict condition, boolean remove) {
         final GXDBSchemaService schemaService = GXSpringContextUtils.getBean(GXDBSchemaService.class);
         assert schemaService != null;
-        final String selectFieldStr = schemaService.getSqlFieldStr(tableName, fieldSet);
+        final String selectFieldStr = schemaService.getSqlFieldStr(tableName, fieldSet, remove);
         final SQL sql = new SQL().SELECT(selectFieldStr).FROM(tableName);
         final Set<String> conditionKeys = condition.keySet();
         for (String conditionKey : conditionKeys) {
@@ -336,7 +336,7 @@ public interface GXBaseBuilder {
     default String getSelectFieldStr(String tableName, Set<String> targetSet, String tableAlias, boolean remove) {
         final GXDBSchemaService schemaService = GXSpringContextUtils.getBean(GXDBSchemaService.class);
         assert schemaService != null;
-        return schemaService.getSqlFieldStr(tableName, targetSet, tableAlias);
+        return schemaService.getSqlFieldStr(tableName, targetSet, tableAlias, remove);
     }
 
     /**
@@ -344,12 +344,13 @@ public interface GXBaseBuilder {
      *
      * @param tableName 表名
      * @param targetSet 目标字段集合
+     * @param remove    是否移除
      * @return String
      */
-    default String getSelectFieldStr(String tableName, Set<String> targetSet) {
+    default String getSelectFieldStr(String tableName, Set<String> targetSet, boolean remove) {
         final GXDBSchemaService schemaService = GXSpringContextUtils.getBean(GXDBSchemaService.class);
         assert schemaService != null;
-        return schemaService.getSqlFieldStr(tableName, targetSet);
+        return schemaService.getSqlFieldStr(tableName, targetSet, remove);
     }
 
     /**

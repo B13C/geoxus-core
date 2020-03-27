@@ -56,7 +56,7 @@ public class GXCoreModelAttributesServiceImpl extends ServiceImpl<GXCoreModelAtt
     public Dict getModelAttributeByModelIdAndAttributeId(int modelId, int attributeId) {
         final Dict condition = Dict.create().set(GXCommonConstants.CORE_MODEL_PRIMARY_NAME, modelId).set("attribute_id", attributeId);
         final HashSet<String> fieldSet = CollUtil.newHashSet("validation_expression", "force_validation", "required");
-        return getFieldValueBySQL(GXCoreModelAttributesEntity.class, fieldSet, condition);
+        return getFieldValueBySQL(GXCoreModelAttributesEntity.class, fieldSet, condition, false);
     }
 
     @Cacheable(value = "__DEFAULT__", key = "targetClass + methodName + #coreModelId + #attributeName")
