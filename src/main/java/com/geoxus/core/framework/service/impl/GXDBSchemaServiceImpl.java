@@ -138,23 +138,27 @@ public class GXDBSchemaServiceImpl implements GXDBSchemaService {
 
     @Override
     @Cacheable(value = "__DEFAULT__", key = "targetClass + methodName + #tableName")
+    public String getSqlFieldStr(String tableName, Set<String> targetSet) {
+        return getSqlFieldStr(tableName, targetSet, "", false);
+    }
+
+    @Override
+    @Cacheable(value = "__DEFAULT__", key = "targetClass + methodName + #tableName")
     public String getSqlFieldStr(String tableName, Set<String> targetSet, boolean remove) {
-        return getSqlFieldStr(tableName, targetSet, "gx_system_table_mark", remove);
+        return getSqlFieldStr(tableName, targetSet, "", remove);
     }
 
     @Override
     @Cacheable(value = "__DEFAULT__", key = "targetClass + methodName + #tableName")
     public String getSqlFieldStr(String tableName, Set<String> targetSet, String tableAlias, boolean remove) {
-        if (StrUtil.isBlank(tableAlias)) {
-            log.error("表的别名不能为空");
+        if (targetSet.size() == 1 && targetSet.contains("*") && remove) {
+            log.error("删除字段不能为'*' , 请指定需要删除的具体字段...");
             return "";
-        }
-        if ("gx_system_table_mark".equals(tableAlias)) {
-            tableAlias = "";
         }
         int coreModelId = gxCoreModelService.getCoreModelIdByTableName(tableName);
         final List<TableField> tableFields = getTableColumn(tableName);
         final Dict tmpResult = Dict.create();
+        boolean allFieldFlag = targetSet.size() == 1 && targetSet.contains("*");
         for (TableField tableField : tableFields) {
             final String columnName = tableField.getColumnName();
             String dataType = tableField.getDataType();
@@ -166,7 +170,7 @@ public class GXDBSchemaServiceImpl implements GXDBSchemaService {
                     String attributeValue = dict.getStr(attributeFlag);
                     String lastAttributeName = StrUtil.format("{}->>'$.{}' as '{}::{}'", columnName, attributeValue, columnName, attributeValue);
                     String tmpKey = StrUtil.format("{}::{}", columnName, attributeValue);
-                    if (targetSet.size() == 1 && targetSet.contains("*")) {
+                    if (allFieldFlag) {
                         tmpResult.set(tmpKey, lastAttributeName);
                         continue;
                     }
@@ -181,7 +185,7 @@ public class GXDBSchemaServiceImpl implements GXDBSchemaService {
                     }
                 }
             } else {
-                if (targetSet.size() == 1 && targetSet.contains("*")) {
+                if (allFieldFlag) {
                     tmpResult.set(columnName, columnName);
                     continue;
                 }
@@ -209,7 +213,7 @@ public class GXDBSchemaServiceImpl implements GXDBSchemaService {
             if (CollUtil.contains(strings, key)) {
                 continue;
             }
-            if (StrUtil.isEmpty(tableAlias)) {
+            if (StrUtil.isBlank(tableAlias)) {
                 result.add(StrUtil.format("{}", value));
             } else {
                 result.add(StrUtil.format("{}.{}", tableAlias, value));
