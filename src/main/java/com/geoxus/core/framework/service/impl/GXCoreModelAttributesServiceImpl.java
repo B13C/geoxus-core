@@ -47,8 +47,7 @@ public class GXCoreModelAttributesServiceImpl extends ServiceImpl<GXCoreModelAtt
         if (null == param.getInt(GXCommonConstants.CORE_MODEL_PRIMARY_NAME)) {
             param.set(GXCommonConstants.CORE_MODEL_PRIMARY_NAME, 0);
         }
-        final List<Dict> attributes = baseMapper.getModelAttributesByModelId(param);
-        return attributes;
+        return baseMapper.getModelAttributesByModelId(param);
     }
 
     @Override

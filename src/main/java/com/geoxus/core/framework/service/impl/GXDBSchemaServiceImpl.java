@@ -137,19 +137,19 @@ public class GXDBSchemaServiceImpl implements GXDBSchemaService {
     }
 
     @Override
-    @Cacheable(value = "__DEFAULT__", key = "targetClass + methodName + #tableName")
+    @Cacheable(value = "__DEFAULT__", key = "targetClass + methodName + #tableName + #targetSet")
     public String getSqlFieldStr(String tableName, Set<String> targetSet) {
         return getSqlFieldStr(tableName, targetSet, "", false);
     }
 
     @Override
-    @Cacheable(value = "__DEFAULT__", key = "targetClass + methodName + #tableName")
+    @Cacheable(value = "__DEFAULT__", key = "targetClass + methodName + #tableName + #targetSet")
     public String getSqlFieldStr(String tableName, Set<String> targetSet, boolean remove) {
         return getSqlFieldStr(tableName, targetSet, "", remove);
     }
 
     @Override
-    @Cacheable(value = "__DEFAULT__", key = "targetClass + methodName + #tableName")
+    @Cacheable(value = "__DEFAULT__", key = "targetClass + methodName + #tableName + #targetSet + #tableAlias")
     public String getSqlFieldStr(String tableName, Set<String> targetSet, String tableAlias, boolean remove) {
         if (targetSet.size() == 1 && targetSet.contains("*") && remove) {
             log.error("删除字段不能为'*' , 请指定需要删除的具体字段...");
@@ -169,18 +169,18 @@ public class GXDBSchemaServiceImpl implements GXDBSchemaService {
                 for (Dict dict : attributes) {
                     String attributeValue = dict.getStr(attributeFlag);
                     String lastAttributeName = StrUtil.format("{}->>'$.{}' as '{}::{}'", columnName, attributeValue, columnName, attributeValue);
-                    String tmpKey = StrUtil.format("{}::{}", columnName, attributeValue);
+                    String extFieldKey = StrUtil.format("{}::{}", columnName, attributeValue);
                     if (allFieldFlag) {
-                        tmpResult.set(tmpKey, lastAttributeName);
+                        tmpResult.set(extFieldKey, lastAttributeName);
                         continue;
                     }
                     if (remove) {
-                        if (!targetSet.contains(tmpKey)) {
-                            tmpResult.set(tmpKey, lastAttributeName);
+                        if (!targetSet.contains(extFieldKey)) {
+                            tmpResult.set(extFieldKey, lastAttributeName);
                         }
                     } else {
-                        if (targetSet.contains(tmpKey)) {
-                            tmpResult.set(tmpKey, lastAttributeName);
+                        if (targetSet.contains(extFieldKey)) {
+                            tmpResult.set(extFieldKey, lastAttributeName);
                         }
                     }
                 }
