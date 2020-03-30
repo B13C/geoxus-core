@@ -275,6 +275,22 @@ public interface GXBusinessService<T> extends GXBaseService<T>, GXValidateDBExis
     }
 
     /**
+     * 获取分页信息
+     *
+     * @param param 查询参数
+     * @return GXPagination
+     */
+    default GXPagination<Dict> generatePage(Dict param) {
+        String removeStr = Optional.ofNullable(param.getStr("remove_field")).orElse("");
+        Map<String, Object> removeField = CollUtil.newHashMap();
+        if (StrUtil.isNotBlank(removeStr)) {
+            String[] split = StrUtil.split(removeStr, ",");
+            removeField = Arrays.stream(split).collect(Collectors.toMap(key -> key, key -> key));
+        }
+        return generatePage(param, Convert.convert(Dict.class, removeField));
+    }
+
+    /**
      * 处理列表数据,主要用于删除指定的字段值
      *
      * @param list        数据列表
