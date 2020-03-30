@@ -182,8 +182,8 @@ public class GXDBSchemaServiceImpl implements GXDBSchemaService {
                 String attributeFlag = "attribute_name";
                 for (Dict dict : attributes) {
                     String attributeValue = dict.getStr(attributeFlag);
-                    String lastAttributeName = StrUtil.format("{}->>'$.{}' as '{}::{}'", columnName, attributeValue, columnName, attributeValue);
                     String extFieldKey = StrUtil.format("{}::{}", columnName, attributeValue);
+                    String lastAttributeName = StrUtil.format("{}->>'$.{}' as '{}'", columnName, attributeValue, extFieldKey);
                     if (allFieldFlag) {
                         tmpResult.set(extFieldKey, lastAttributeName);
                         continue;
