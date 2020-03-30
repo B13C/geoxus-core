@@ -5,7 +5,6 @@ import cn.hutool.core.convert.Convert;
 import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.lang.Dict;
 import cn.hutool.core.lang.TypeReference;
-import cn.hutool.core.util.RandomUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.json.JSON;
 import cn.hutool.json.JSONUtil;
@@ -87,15 +86,22 @@ public interface GXBaseService<T> extends IService<T> {
     default <R> R getSingleJSONFieldValueByDB(Class<T> clazz, String path, Dict condition, Class<R> type, R defaultValue) {
         String aliasName = path;
         if (StrUtil.contains(path, ".")) {
-            aliasName = StrUtil.split(path, ".")[1].replace("'", "");
-            path = StrUtil.format("{} as `{}`", path, aliasName);
+            String[] fields = StrUtil.split(path, ".");
+            path = StrUtil.format("{}::{}", fields[0].replace("'", ""), fields[1].replace("'", ""));
         }
         GXBaseMapper<T> baseMapper = (GXBaseMapper<T>) getBaseMapper();
         final Dict dict = baseMapper.getFieldValueBySQL(getTableName(clazz), CollUtil.newHashSet(path), condition, false);
         if (null == dict) {
             return defaultValue;
         }
-        return Convert.convert(type, dict.get(aliasName, defaultValue));
+        Object obj = dict.get(path);
+        if (null == obj) {
+            return defaultValue;
+        }
+        if (obj instanceof byte[]) {
+            obj = new String((byte[]) obj, StandardCharsets.UTF_8);
+        }
+        return Convert.convert(type, obj);
     }
 
     /**
@@ -115,24 +121,18 @@ public interface GXBaseService<T> extends IService<T> {
             String key = entry.getKey();
             String aliasName = key;
             if (StrUtil.contains(key, ".")) {
-                aliasName = StrUtil.format("ext::{}", StrUtil.split(key, ".")[1].replace("'", "").concat(RandomUtil.randomString(5)));
-                fieldSet.add(StrUtil.format("{} as `{}`", key, aliasName));
+                aliasName = StrUtil.format("{}::{}",
+                        StrUtil.split(key, ".")[0].replace("'", ""),
+                        StrUtil.split(key, ".")[1].replace("'", ""));
+                fieldSet.add(StrUtil.format("{}", aliasName));
             } else {
-                fieldSet.add(StrUtil.format("`{}`", key));
+                fieldSet.add(StrUtil.format("{}", key));
             }
             dataKey.set(aliasName, key);
         }
         final Dict dict = baseMapper.getFieldValueBySQL(getTableName(clazz), fieldSet, condition, false);
-        final Dict retDict = Dict.create();
-        for (Map.Entry<String, Object> entry : dataKey.entrySet()) {
-            Object value = dict.getObj(entry.getKey());
-            if (value instanceof byte[]) {
-                value = new String((byte[]) value, StandardCharsets.UTF_8);
-            }
-            final Class<?> aClass = fields.get(entry.getValue().toString());
-            retDict.set((String) entry.getValue(), Convert.convert(aClass, value, GXCommonUtils.getClassDefaultValue(aClass)));
-        }
-        return retDict;
+        dict.remove(GXCommonConstants.CORE_MODEL_PRIMARY_NAME);
+        return handleSamePrefixDict(dict);
     }
 
     /**

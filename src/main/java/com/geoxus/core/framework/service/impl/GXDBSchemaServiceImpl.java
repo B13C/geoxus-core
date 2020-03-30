@@ -177,7 +177,7 @@ public class GXDBSchemaServiceImpl implements GXDBSchemaService {
                 if ((remove && targetSet.contains(columnName))) {
                     continue;
                 }
-                Dict attributeCondition = Dict.create().set("core_model_id", coreModelId).set("db_field_name", columnName);
+                Dict attributeCondition = Dict.create().set(GXCommonConstants.CORE_MODEL_PRIMARY_NAME, coreModelId).set("db_field_name", columnName);
                 List<Dict> attributes = gxCoreModelAttributesService.getModelAttributesByModelId(attributeCondition);
                 String attributeFlag = "attribute_name";
                 for (Dict dict : attributes) {
