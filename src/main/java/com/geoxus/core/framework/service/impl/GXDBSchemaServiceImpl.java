@@ -184,7 +184,7 @@ public class GXDBSchemaServiceImpl implements GXDBSchemaService {
                         continue;
                     }
                     if (remove) {
-                        if (!targetSet.contains(extFieldKey) || !targetSet.contains(columnName)) {
+                        if (!targetSet.contains(extFieldKey)) {
                             tmpResult.set(extFieldKey, lastAttributeName);
                         }
                     } else {
@@ -214,12 +214,12 @@ public class GXDBSchemaServiceImpl implements GXDBSchemaService {
         if (!permissions.isEmpty() && null != permissions.getObj("db_field")) {
             dict = Convert.convert(Dict.class, permissions.getObj("db_field"));
         }
-        final Set<String> strings = dict.keySet();
+        final Set<String> permissionsKey = dict.keySet();
         final HashSet<String> result = new HashSet<>();
         for (Map.Entry<String, Object> entry : tmpResult.entrySet()) {
             String key = entry.getKey();
             Object value = entry.getValue();
-            if (CollUtil.contains(strings, key)) {
+            if (CollUtil.contains(permissionsKey, key)) {
                 continue;
             }
             if (StrUtil.isBlank(tableAlias)) {
