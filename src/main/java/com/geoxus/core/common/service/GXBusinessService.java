@@ -55,7 +55,7 @@ public interface GXBusinessService<T> extends GXBaseService<T>, GXValidateDBExis
      * @return boolean
      */
     default boolean delete(Dict param) {
-        return batchDelete(param);
+        return batchSoftDelete(param);
     }
 
     /**
@@ -102,13 +102,13 @@ public interface GXBusinessService<T> extends GXBaseService<T>, GXValidateDBExis
      * @param param 参数
      * @return boolean
      */
-    default boolean batchDelete(Dict param) {
+    default boolean batchSoftDelete(Dict param) {
         final List<Long> ids = Convert.convert(new TypeReference<List<Long>>() {
         }, param.getObj(getPrimaryKey()));
         if (null == ids) {
             return false;
         }
-        final ArrayList<T> updateEntities = new ArrayList<>();
+        final List<T> updateEntities = new ArrayList<>();
         for (Long id : ids) {
             T entity = getById(id);
             final Object status = ReflectUtil.invoke(entity, "getStatus");
@@ -130,17 +130,6 @@ public interface GXBusinessService<T> extends GXBaseService<T>, GXValidateDBExis
      * @param condition 条件
      * @return Dict
      */
-    default Dict getDataByCondition(Dict condition) {
-        final T entity = getOne(new QueryWrapper<T>().allEq(condition));
-        return (null != entity) ? Dict.parse(entity) : Dict.create();
-    }
-
-    /**
-     * 通过条件获取配置信息
-     *
-     * @param condition 条件
-     * @return Dict
-     */
     default Dict getDataByCondition(Dict condition, String... fields) {
         final T entity = getOne(new QueryWrapper<T>().select(fields).allEq(condition));
         return (null != entity) ? Dict.parse(entity) : Dict.create();
@@ -154,7 +143,6 @@ public interface GXBusinessService<T> extends GXBaseService<T>, GXValidateDBExis
      * @param constraintValidatorContext The ValidatorContext
      * @param param                      param
      * @return boolean
-     * @throws UnsupportedOperationException
      */
     default boolean validateExists(Object value, String fieldName, ConstraintValidatorContext constraintValidatorContext, Dict param) throws UnsupportedOperationException {
         String tableName = param.getStr("table_name");
@@ -199,7 +187,7 @@ public interface GXBusinessService<T> extends GXBaseService<T>, GXValidateDBExis
         for (Object record : records) {
             final Dict o = (Dict) record;
             assert coreMediaLibraryService != null;
-            o.set("media", coreMediaLibraryService.getMediaByCondition(Dict.create().set("model_id", o.getLong(modelIdKey)).set(GXCommonConstants.CORE_MODEL_PRIMARY_NAME, o.getLong("coreModelId"))));
+            o.set("media", coreMediaLibraryService.getMediaByCondition(Dict.create().set("object_id", o.getLong(modelIdKey)).set(GXCommonConstants.CORE_MODEL_PRIMARY_NAME, o.getLong("coreModelId"))));
         }
         return pagination;
     }
@@ -222,7 +210,7 @@ public interface GXBusinessService<T> extends GXBaseService<T>, GXValidateDBExis
         for (Object record : records) {
             final Dict o = (Dict) record;
             assert coreMediaLibraryService != null;
-            o.set("media", coreMediaLibraryService.getMediaByCondition(Dict.create().set("model_id", o.getLong(modelIdKey)).set(GXCommonConstants.CORE_MODEL_PRIMARY_NAME, o.getLong("coreModelId"))));
+            o.set("media", coreMediaLibraryService.getMediaByCondition(Dict.create().set("object_id", o.getLong(modelIdKey)).set(GXCommonConstants.CORE_MODEL_PRIMARY_NAME, o.getLong("coreModelId"))));
         }
         return pagination;
     }

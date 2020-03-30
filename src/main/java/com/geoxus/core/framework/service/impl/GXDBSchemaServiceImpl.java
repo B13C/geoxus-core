@@ -158,7 +158,7 @@ public class GXDBSchemaServiceImpl implements GXDBSchemaService {
     @Override
     @Cacheable(value = "__DEFAULT__", key = "targetClass + methodName + #tableName + #targetSet + #tableAlias")
     public String getSelectFieldStr(String tableName, Set<String> targetSet, String tableAlias, boolean remove, boolean saveJSONField) {
-        if (targetSet.size() == 1 && targetSet.contains("*") && remove) {
+        if (remove && targetSet.size() == 1 && targetSet.contains("*")) {
             log.error("删除字段不能为'*' , 请指定需要删除的具体字段...");
             return "";
         }
@@ -220,7 +220,7 @@ public class GXDBSchemaServiceImpl implements GXDBSchemaService {
             dict = Convert.convert(Dict.class, permissions.getObj("db_field"));
         }
         final Set<String> permissionsKey = dict.keySet();
-        final HashSet<String> result = new HashSet<>();
+        final Set<String> result = new HashSet<>();
         for (Map.Entry<String, Object> entry : tmpResult.entrySet()) {
             String key = entry.getKey();
             Object value = entry.getValue();

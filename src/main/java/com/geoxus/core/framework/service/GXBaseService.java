@@ -45,7 +45,7 @@ public interface GXBaseService<T> extends IService<T> {
     @SuppressWarnings("unused")
     default Dict getConstantsFields() {
         final Dict data = Dict.create();
-        final ArrayList<Class<?>> clazzInterfaces = new ArrayList<>();
+        final List<Class<?>> clazzInterfaces = new ArrayList<>();
         GXCommonUtils.getInterfaces(getClass(), clazzInterfaces);
         for (Class<?> clz : clazzInterfaces) {
             GXCommonUtils.clazzFields(clz, data);
@@ -109,13 +109,13 @@ public interface GXBaseService<T> extends IService<T> {
     @SuppressWarnings("unused")
     default Dict getMultiJSONFieldValueByDB(Class<T> clazz, Map<String, Class<?>> fields, Dict condition) {
         GXBaseMapper<T> baseMapper = (GXBaseMapper<T>) getBaseMapper();
-        final HashSet<String> fieldSet = CollUtil.newHashSet();
+        final Set<String> fieldSet = CollUtil.newHashSet();
         final Dict dataKey = Dict.create();
         for (Map.Entry<String, Class<?>> entry : fields.entrySet()) {
             String key = entry.getKey();
             String aliasName = key;
             if (StrUtil.contains(key, ".")) {
-                aliasName = StrUtil.format("ext_{}", StrUtil.split(key, ".")[1].replace("'", "").concat(RandomUtil.randomString(5)));
+                aliasName = StrUtil.format("ext::{}", StrUtil.split(key, ".")[1].replace("'", "").concat(RandomUtil.randomString(5)));
                 fieldSet.add(StrUtil.format("{} as `{}`", key, aliasName));
             } else {
                 fieldSet.add(StrUtil.format("`{}`", key));
@@ -223,7 +223,7 @@ public interface GXBaseService<T> extends IService<T> {
     default Collection<GXCoreMediaLibraryEntity> getMedia(int objectId, int coreModelId, Dict param) {
         final GXCoreMediaLibraryService mediaLibraryService = GXSpringContextUtils.getBean(GXCoreMediaLibraryService.class);
         assert mediaLibraryService != null;
-        return mediaLibraryService.listByMap(param.set("model_id", objectId).set(GXCommonConstants.CORE_MODEL_PRIMARY_NAME, coreModelId));
+        return mediaLibraryService.listByMap(param.set("object_id", objectId).set(GXCommonConstants.CORE_MODEL_PRIMARY_NAME, coreModelId));
     }
 
     /**
@@ -449,7 +449,7 @@ public interface GXBaseService<T> extends IService<T> {
         GXBaseMapper<T> baseMapper = (GXBaseMapper<T>) getBaseMapper();
         final Dict dict = baseMapper.getFieldValueBySQL(tableName, fieldSet, condition, remove);
         if (null == dict) {
-            throw new GXException("核心模型数据不存在");
+            throw new GXException("数据不存在...");
         }
         return handleSamePrefixDict(dict);
     }
