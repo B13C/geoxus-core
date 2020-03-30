@@ -6,7 +6,6 @@ import cn.hutool.core.lang.Dict;
 import cn.hutool.core.lang.TypeReference;
 import cn.hutool.core.util.ReflectUtil;
 import cn.hutool.core.util.StrUtil;
-import cn.hutool.json.JSONUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
@@ -286,33 +285,20 @@ public interface GXBusinessService<T> extends GXBaseService<T>, GXValidateDBExis
         if (list.isEmpty()) {
             return Collections.emptyList();
         }
+        if (null == removeField) {
+            removeField = Dict.create();
+        }
         final List<Dict> retList = CollUtil.newArrayList();
         for (Dict dict : list) {
             final Set<Map.Entry<String, Object>> entries = dict.entrySet();
             final Dict retDict = Dict.create();
             for (Map.Entry<String, Object> entry : entries) {
                 final String key = entry.getKey();
-                final Object value = entry.getValue();
-                if (null != value && (value instanceof Dict || JSONUtil.isJson(value.toString())) && null != removeField.getObj(key)) {
-                    Dict beanDict = Dict.create();
-                    if (value instanceof Dict) {
-                        beanDict = (Dict) value;
-                    } else if (JSONUtil.isJson(value.toString())) {
-                        beanDict = JSONUtil.toBean(value.toString(), Dict.class);
-                    }
-                    final Dict tmpExtData = Dict.create();
-                    final Dict removeDict = Convert.convert(Dict.class, removeField.getObj(key));
-                    for (Map.Entry<String, Object> tmpEntry : beanDict.entrySet()) {
-                        if (null == removeDict.get(tmpEntry.getKey())) {
-                            tmpExtData.set(tmpEntry.getKey(), tmpEntry.getValue());
-                        }
-                    }
-                    retDict.set(key, tmpExtData);
-                } else if (null == removeField.get(key)) {
-                    retDict.set(key, value);
+                if (null == removeField.get(key)) {
+                    retDict.set(key, entry.getValue());
                 }
             }
-            retList.add(retDict);
+            retList.add(handleSamePrefixDict(retDict));
         }
         return retList;
     }
