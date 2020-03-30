@@ -451,8 +451,16 @@ public interface GXBaseService<T> extends IService<T> {
         if (null == dict) {
             throw new GXException("核心模型数据不存在");
         }
-        final GXCoreModelService modelService = GXSpringContextUtils.getBean(GXCoreModelService.class);
-        assert modelService != null;
+        return handleSamePrefixDict(dict);
+    }
+
+    /**
+     * 处理相同前缀的Dict
+     *
+     * @param dict 要处理的Dict
+     * @return Dict
+     */
+    default Dict handleSamePrefixDict(Dict dict) {
         final Set<Map.Entry<String, Object>> entries = dict.entrySet();
         final Dict retDict = Dict.create();
         for (Map.Entry<String, Object> entry : entries) {

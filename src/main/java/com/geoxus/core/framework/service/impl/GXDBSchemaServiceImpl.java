@@ -5,6 +5,7 @@ import cn.hutool.core.convert.Convert;
 import cn.hutool.core.lang.Dict;
 import cn.hutool.core.util.StrUtil;
 import com.geoxus.core.common.annotation.GXFieldCommentAnnotation;
+import com.geoxus.core.common.constant.GXCommonConstants;
 import com.geoxus.core.framework.service.GXCoreModelAttributePermissionService;
 import com.geoxus.core.framework.service.GXCoreModelAttributesService;
 import com.geoxus.core.framework.service.GXCoreModelService;
@@ -167,6 +168,10 @@ public class GXDBSchemaServiceImpl implements GXDBSchemaService {
         boolean allFieldFlag = targetSet.size() == 1 && targetSet.contains("*");
         for (TableField tableField : tableFields) {
             final String columnName = tableField.getColumnName();
+            if (GXCommonConstants.CORE_MODEL_PRIMARY_NAME.equals(columnName)) {
+                tmpResult.set(GXCommonConstants.CORE_MODEL_PRIMARY_NAME, columnName);
+                continue;
+            }
             String dataType = tableField.getDataType();
             if (dataType.equalsIgnoreCase("json") && !saveJSONField) {
                 if ((remove && targetSet.contains(columnName))) {
