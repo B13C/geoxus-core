@@ -84,9 +84,8 @@ public interface GXBaseService<T> extends IService<T> {
      * @return R
      */
     default <R> R getSingleJSONFieldValueByDB(Class<T> clazz, String path, Dict condition, Class<R> type, R defaultValue) {
-        String aliasName = path;
-        if (StrUtil.contains(path, ".")) {
-            String[] fields = StrUtil.split(path, ".");
+        if (StrUtil.contains(path, "::")) {
+            String[] fields = StrUtil.split(path, "::");
             path = StrUtil.format("{}::{}", fields[0].replace("'", ""), fields[1].replace("'", ""));
         }
         GXBaseMapper<T> baseMapper = (GXBaseMapper<T>) getBaseMapper();
@@ -113,17 +112,18 @@ public interface GXBaseService<T> extends IService<T> {
      * @return Dict
      */
     @SuppressWarnings("unused")
-    default Dict getMultiJSONFieldValueByDB(Class<T> clazz, Map<String, Class<?>> fields, Dict condition) {
+    default Dict getMultiJSONFieldValueByDB(Class<T> clazz, Dict fields, Dict condition) {
         GXBaseMapper<T> baseMapper = (GXBaseMapper<T>) getBaseMapper();
         final Set<String> fieldSet = CollUtil.newHashSet();
         final Dict dataKey = Dict.create();
-        for (Map.Entry<String, Class<?>> entry : fields.entrySet()) {
+        for (Map.Entry<String, Object> entry : fields.entrySet()) {
             String key = entry.getKey();
             String aliasName = key;
-            if (StrUtil.contains(key, ".")) {
+            if (StrUtil.contains(key, "::")) {
+                String[] keys = StrUtil.split(key, "::");
                 aliasName = StrUtil.format("{}::{}",
-                        StrUtil.split(key, ".")[0].replace("'", ""),
-                        StrUtil.split(key, ".")[1].replace("'", ""));
+                        keys[0].replace("'", ""),
+                        keys[1].replace("'", ""));
                 fieldSet.add(StrUtil.format("{}", aliasName));
             } else {
                 fieldSet.add(StrUtil.format("{}", key));
@@ -151,8 +151,8 @@ public interface GXBaseService<T> extends IService<T> {
      * @param path   路径
      * @return R
      */
-    default <R> R getSingleJSONFieldValueByEntity(T entity, String path, Class<R> type) {
-        return getSingleJSONFieldValueByEntity(entity, path, type, GXCommonUtils.getClassDefaultValue(type));
+    default <R> R getSingleJSONFieldValueByEntity(T entity, String path, Class<R> type, int coreModelId) {
+        return getSingleJSONFieldValueByEntity(entity, path, type, GXCommonUtils.getClassDefaultValue(type), coreModelId);
     }
 
     /**
@@ -173,12 +173,34 @@ public interface GXBaseService<T> extends IService<T> {
      * @param defaultValue 默认值
      * @return R
      */
-    default <R> R getSingleJSONFieldValueByEntity(T entity, String path, Class<R> type, R defaultValue) {
+    default <R> R getSingleJSONFieldValueByEntity(T entity, String path, Class<R> type, R defaultValue, int coreModelId) {
+        GXCoreModelAttributePermissionService permissionService = GXSpringContextUtils.getBean(GXCoreModelAttributePermissionService.class);
+        assert permissionService != null;
+        Dict permissions = permissionService.getModelAttributePermissionByCoreModelId(coreModelId, Dict.create());
+        Dict jsonField = Convert.convert(Dict.class, permissions.getObj("json_field"));
+        Dict dbField = Convert.convert(Dict.class, permissions.getObj("db_field"));
         JSON json = JSONUtil.parse(JSONUtil.toJsonStr(entity));
-        int index = StrUtil.indexOf(path, '.');
+        int index = StrUtil.indexOfIgnoreCase(path, "::");
         if (index == -1) {
+            if (null != dbField.get(path)) {
+                GXCommonUtils.getLogger(GXBaseService.class).error("当前用户无权访问{}字段的数据...", path);
+                return null;
+            }
             if (null == json.getByPath(path)) {
                 return defaultValue;
+            }
+            if (JSONUtil.isJson(json.getByPath(path).toString())) {
+                Dict data = Dict.create();
+                Dict dict = JSONUtil.toBean(json.getByPath(path).toString(), Dict.class);
+                Dict obj = Convert.convert(Dict.class, Optional.ofNullable(jsonField.getObj(path)).orElse(Dict.class));
+                if (!dict.isEmpty()) {
+                    for (Map.Entry<String, Object> entry : dict.entrySet()) {
+                        if (null == obj.get(entry.getKey())) {
+                            data.set(entry.getKey(), entry.getValue());
+                        }
+                    }
+                }
+                return Convert.convert(type, data);
             }
             return Convert.convert(type, json.getByPath(path));
         }
@@ -186,7 +208,12 @@ public interface GXBaseService<T> extends IService<T> {
         if (null == json.getByPath(mainField)) {
             throw new GXException(StrUtil.format("实体的主字段{}不存在!", mainField));
         }
-        String subField = StrUtil.sub(path, index + 1, path.length());
+        String subField = StrUtil.sub(path, index + 2, path.length());
+        Dict dict = Convert.convert(Dict.class, Optional.ofNullable(jsonField.getObj(mainField)).orElse(Dict.create()));
+        if (!dict.isEmpty() && null != dict.get(subField)) {
+            GXCommonUtils.getLogger(GXBaseService.class).error("当前用户无权访问{}.{}字段的数据...", mainField, subField);
+            return null;
+        }
         JSON parse = JSONUtil.parse(json.getByPath(mainField));
         if (null == parse) {
             return defaultValue;
@@ -201,13 +228,27 @@ public interface GXBaseService<T> extends IService<T> {
      * @param dict   需要获取的数据
      * @return Dict
      */
-    default Dict getMultiJSONFieldValueByEntity(T entity, Dict dict) {
+    default Dict getMultiJSONFieldValueByEntity(T entity, Dict dict, int coreModelId) {
         final Set<String> keySet = dict.keySet();
         final Dict data = Dict.create();
         for (String key : keySet) {
-            final Object value = getSingleJSONFieldValueByEntity(entity, key, (Class<?>) dict.getObj(key));
-            final String[] strings = StrUtil.split(key, StrUtil.DOT);
-            data.set(strings[strings.length - 1], value);
+            final Object value = getSingleJSONFieldValueByEntity(entity, key, (Class<?>) dict.getObj(key), coreModelId);
+            if (Objects.isNull(value)) {
+                continue;
+            }
+            final String[] strings = StrUtil.split(key, "::");
+            Object o = data.get(strings[0]);
+            if (strings.length > 1) {
+                if (null != o) {
+                    Dict convert = Convert.convert(Dict.class, o);
+                    convert.set(strings[strings.length - 1], value);
+                    data.set(strings[0], convert);
+                } else {
+                    data.set(strings[0], Dict.create().set(strings[strings.length - 1], value));
+                }
+            } else {
+                data.set(strings[strings.length - 1], value);
+            }
         }
         return data;
     }
@@ -238,7 +279,7 @@ public interface GXBaseService<T> extends IService<T> {
     @Transactional(rollbackFor = Exception.class)
     default boolean updateJSONFieldSingleValue(Class<T> clazz, String path, Object value, Dict condition) {
         GXBaseMapper<T> baseMapper = (GXBaseMapper<T>) getBaseMapper();
-        int index = StrUtil.indexOf(path, '.');
+        int index = StrUtil.indexOfIgnoreCase(path, "::");
         String mainPath = StrUtil.sub(path, 0, index);
         String subPath = StrUtil.sub(path, index + 1, path.length());
         final Dict data = Dict.create().set(mainPath, Dict.create().set(subPath, value));
@@ -541,6 +582,17 @@ public interface GXBaseService<T> extends IService<T> {
         tableValues.set("created_at", DateUtil.currentSeconds());
         final Integer insert = baseMapper.batchInsertBySQL(historyTableName, lastTableField, CollUtil.newArrayList(tableValues));
         return insert > 0;
+    }
+
+    /**
+     * 通过表明获取模型ID
+     *
+     * @param clazz 实体的Class
+     * @return int
+     */
+    default int getCoreModelIdByTableName(Class<T> clazz) {
+        String tableName = getTableName(clazz);
+        return getSingleJSONFieldValueByDB(clazz, "model_id", Integer.class, Dict.create().set("table_name", tableName));
     }
 
     /**
