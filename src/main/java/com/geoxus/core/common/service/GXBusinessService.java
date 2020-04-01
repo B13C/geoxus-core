@@ -273,7 +273,23 @@ public interface GXBusinessService<T> extends GXBaseService<T>, GXValidateDBExis
         Map<String, Object> removeField = CollUtil.newHashMap();
         if (StrUtil.isNotBlank(removeStr)) {
             String[] split = StrUtil.split(removeStr, ",");
-            removeField = Arrays.stream(split).collect(Collectors.toMap(key -> key, key -> key));
+            for (int i = 0; i < split.length; i++) {
+                final String s = split[i];
+                if (StrUtil.contains(s, "::")) {
+                    final String[] strings = StrUtil.split(s, "::");
+                    String mainKey = strings[0];
+                    String subKey = strings[1];
+                    final Object o = removeField.get(mainKey);
+                    if (null != o) {
+                        final Dict dict = Convert.convert(Dict.class, o).set(subKey, subKey);
+                        removeField.put(mainKey, dict);
+                    } else {
+                        removeField.put(mainKey, Dict.create().set(subKey, subKey));
+                    }
+                } else {
+                    removeField.put(s, s);
+                }
+            }
         }
         return generatePage(param, Convert.convert(Dict.class, removeField));
     }
@@ -298,8 +314,22 @@ public interface GXBusinessService<T> extends GXBaseService<T>, GXValidateDBExis
             final Dict retDict = Dict.create();
             for (Map.Entry<String, Object> entry : entries) {
                 final String key = entry.getKey();
-                if (null == removeField.get(key)) {
-                    retDict.set(key, entry.getValue());
+                final Object value = entry.getValue();
+                final Object o = removeField.get(key);
+                if (null == o) {
+                    retDict.set(key, value);
+                } else {
+                    if (o instanceof Dict) {
+                        final Dict convert = Convert.convert(Dict.class, o);
+                        final Set<Map.Entry<String, Object>> entrySet = Convert.convert(Dict.class, value).entrySet();
+                        final Dict tmpDict = Dict.create();
+                        for (Map.Entry<String, Object> en : entrySet) {
+                            if (null == convert.get(en.getKey())) {
+                                tmpDict.set(en.getKey(), en.getValue());
+                            }
+                        }
+                        retDict.set(key, tmpDict);
+                    }
                 }
             }
             retList.add(handleSamePrefixDict(retDict));

@@ -158,9 +158,11 @@ public class GXDBSchemaServiceImpl implements GXDBSchemaService {
     @Override
     @Cacheable(value = "__DEFAULT__", key = "targetClass + methodName + #tableName + #targetSet + #tableAlias")
     public String getSelectFieldStr(String tableName, Set<String> targetSet, String tableAlias, boolean remove, boolean saveJSONField) {
-        if (remove && targetSet.size() == 1 && targetSet.contains("*")) {
-            log.error("删除字段不能为'*' , 请指定需要删除的具体字段...");
-            return "";
+        if (targetSet.size() == 1 && targetSet.contains("*")) {
+            if (remove) {
+                log.error("删除字段不能为'*' , 请指定需要删除的具体字段...");
+            }
+            return "*";
         }
         int coreModelId = gxCoreModelService.getCoreModelIdByTableName(tableName);
         final List<TableField> tableFields = getTableColumn(tableName);
