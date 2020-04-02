@@ -1,114 +1,81 @@
 package com.geoxus.core.common.util;
 
-import cn.hutool.json.JSONUtil;
+import cn.hutool.core.convert.Convert;
 import com.geoxus.core.common.annotation.GXFieldCommentAnnotation;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.redis.core.*;
+import org.redisson.api.RAtomicLong;
+import org.redisson.api.RMap;
+import org.redisson.api.RedissonClient;
+import org.slf4j.Logger;
 import org.springframework.stereotype.Component;
 
 import java.util.concurrent.TimeUnit;
 
 @Component
-@Slf4j
 public class GXRedisUtils {
-    @GXFieldCommentAnnotation(zh = "默认过期时长,单位: 秒")
-    private static final long DEFAULT_EXPIRE = 86400;
+    @GXFieldCommentAnnotation(zh = "RedissonClient对象")
+    private static RedissonClient redissonClient;
 
-    @GXFieldCommentAnnotation(zh = "不设置过期时长")
-    private static final long NOT_EXPIRE = -1;
+    @GXFieldCommentAnnotation(zh = "Logger对象")
+    private static Logger logger;
 
-    @Autowired
-    private RedisTemplate<String, Object> redisTemplate;
-
-    @Autowired
-    private ValueOperations<String, String> valueOperations;
-
-    @Autowired
-    private HashOperations<String, String, Object> hashOperations;
-
-    @Autowired
-    private ListOperations<String, Object> listOperations;
-
-    @Autowired
-    private SetOperations<String, Object> setOperations;
-
-    @Autowired
-    private ZSetOperations<String, Object> zSetOperations;
-
-    public void set(String key, Object value, long expire) {
-        valueOperations.set(key, toJson(value));
-        if (expire != NOT_EXPIRE) {
-            redisTemplate.expire(key, expire, TimeUnit.SECONDS);
-        }
+    static {
+        redissonClient = GXSpringContextUtils.getBean(RedissonClient.class);
+        logger = GXCommonUtils.getLogger(GXRedisUtils.class);
     }
 
-    public void set(String key, Object value) {
-        set(key, value, DEFAULT_EXPIRE);
-    }
-
-    public <T> T get(String key, Class<T> clazz, long expire) {
-        String value = valueOperations.get(key);
-        if (expire != NOT_EXPIRE) {
-            redisTemplate.expire(key, expire, TimeUnit.SECONDS);
-        }
-        return value == null ? null : fromJson(value, clazz);
-    }
-
-    public <T> T get(String key, Class<T> clazz) {
-        return get(key, clazz, NOT_EXPIRE);
-    }
-
-    public String get(String key, long expire) {
-        String value = valueOperations.get(key);
-        if (expire != NOT_EXPIRE) {
-            redisTemplate.expire(key, expire, TimeUnit.SECONDS);
-        }
-        return value;
-    }
-
-    public String get(String key) {
-        return get(key, NOT_EXPIRE);
-    }
-
-    public boolean delete(String key) {
-        return redisTemplate.delete(key);
+    private GXRedisUtils() {
     }
 
     /**
-     * Object转成JSON数据
-     */
-    private String toJson(Object object) {
-        if (object instanceof Integer || object instanceof Long || object instanceof Float ||
-                object instanceof Double || object instanceof Boolean || object instanceof String) {
-            return String.valueOf(object);
-        }
-        return JSONUtil.toJsonStr(object);
-    }
-
-    /**
-     * JSON数据，转成Object
-     */
-    private <T> T fromJson(String json, Class<T> clazz) {
-        return JSONUtil.toBean(json, clazz);
-    }
-
-    /**
-     * push数据
+     * 设置数据
      *
-     * @param key
-     * @param v
-     * @return
+     * @param key      KEY
+     * @param value    数据
+     * @param expire   过期时间
+     * @param timeUnit 时间单位
+     * @return Object
      */
-    public Long push(String key, Object v) {
-        return redisTemplate.opsForList().rightPush(key, v);
+    public static Object set(String key, String value, int expire, TimeUnit timeUnit) {
+        final RMap<Object, Object> rMap = redissonClient.getMap(key);
+        if (expire > 0) {
+            rMap.expire(expire, timeUnit);
+        }
+        return rMap.put(key, value);
     }
 
-    public Long increment(String key) {
-        return valueOperations.increment(key);
+    /**
+     * 获取数据
+     *
+     * @param key   数据key
+     * @param clazz 返回数据的类型
+     * @return Object
+     */
+    public static <R> R get(String key, Class<R> clazz) {
+        final RMap<Object, Object> rMap = redissonClient.getMap(key);
+        return Convert.convert(clazz, rMap.get(key));
     }
 
-    public Long increment(String key, long v) {
-        return valueOperations.increment(key, v);
+    /**
+     * 删除数据
+     *
+     * @param key 数据key
+     * @return boolean
+     */
+    public static boolean delete(String key) {
+        final RMap<Object, Object> rMap = redissonClient.getMap(key);
+        return null != rMap.remove(key);
+    }
+
+    /**
+     * 计数器
+     *
+     * @param key      数据key
+     * @param expire   过期时间
+     * @param timeUnit 时间单位
+     * @return long
+     */
+    public static long getCounter(String key, int expire, TimeUnit timeUnit) {
+        final RAtomicLong rAtomicLong = redissonClient.getAtomicLong(key);
+        return rAtomicLong.getAndIncrement();
     }
 }

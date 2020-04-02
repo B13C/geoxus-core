@@ -9,11 +9,10 @@ import com.geoxus.core.common.util.GXRedisUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.concurrent.TimeUnit;
+
 @Service
 public class GXEMailServiceImpl implements GXEMailService {
-    @Autowired
-    private GXRedisUtils gxRedisUtils;
-
     @Autowired
     private GXCacheKeysUtils gxCacheKeysUtils;
 
@@ -24,7 +23,7 @@ public class GXEMailServiceImpl implements GXEMailService {
         final String redisKey = gxCacheKeysUtils.getCacheKey("sys.email.verify.code", email);
         final String sendResult = MailUtil.send(email, "修改密码验证码", format, false);
         if (StrUtil.isNotBlank(sendResult)) {
-            gxRedisUtils.set(redisKey, code, 300);
+            GXRedisUtils.set(redisKey, code, 300, TimeUnit.SECONDS);
             return true;
         }
         return false;
@@ -33,12 +32,12 @@ public class GXEMailServiceImpl implements GXEMailService {
     @Override
     public boolean verification(String email, String code) {
         final String redisKey = gxCacheKeysUtils.getCacheKey("sys.email.verify.code", email);
-        final String value = gxRedisUtils.get(redisKey);
+        final String value = GXRedisUtils.get(redisKey, String.class);
         if (null != value) {
             if (!StrUtil.equalsAnyIgnoreCase(code, value)) {
                 return false;
             }
-            return gxRedisUtils.delete(redisKey);
+            return GXRedisUtils.delete(redisKey);
         }
         return false;
     }

@@ -10,7 +10,7 @@ import org.springframework.data.redis.serializer.StringRedisSerializer;
 
 import java.time.Duration;
 
-@Configuration
+
 public class GXRedisConfig {
     @Autowired
     private RedisConnectionFactory factory;

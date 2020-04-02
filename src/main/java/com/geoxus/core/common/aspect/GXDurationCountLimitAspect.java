@@ -1,6 +1,5 @@
 package com.geoxus.core.common.aspect;
 
-import cn.hutool.core.convert.Convert;
 import com.geoxus.core.common.annotation.GXDurationCountLimitAnnotation;
 import com.geoxus.core.common.annotation.GXFieldCommentAnnotation;
 import com.geoxus.core.common.exception.GXException;
@@ -11,10 +10,10 @@ import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Pointcut;
 import org.aspectj.lang.reflect.MethodSignature;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.lang.reflect.Method;
+import java.util.concurrent.TimeUnit;
 
 @Aspect
 @Component
@@ -22,16 +21,12 @@ public class GXDurationCountLimitAspect {
     @GXFieldCommentAnnotation(zh = "缓存前缀")
     private static final String CACHE_KEY_PFEFIX = "duration:count:limit:";
 
-    @Autowired
-    private GXRedisUtils gxRedisUtils;
-
     @Pointcut("@annotation(com.geoxus.core.common.annotation.GXDurationCountLimitAnnotation)")
     public void durationCountLimitPointCut() {
     }
 
     @Around("durationCountLimitPointCut()")
     public Object around(ProceedingJoinPoint point) throws Throwable {
-        int actualCount;
         MethodSignature signature = (MethodSignature) point.getSignature();
         Method method = signature.getMethod();
         final GXDurationCountLimitAnnotation durationCountLimitAnnotation = method.getAnnotation(GXDurationCountLimitAnnotation.class);
@@ -42,15 +37,9 @@ public class GXDurationCountLimitAspect {
         if (scene.equals("ip")) {
             key = key.concat(GXHttpContextUtils.getIP());
         }
-        final String s = gxRedisUtils.get(key);
-        if (null != s) {
-            actualCount = Convert.convert(Integer.class, s);
-            if (actualCount >= count) {
-                throw new GXException("操作频繁,请稍后在试......");
-            }
-            gxRedisUtils.increment(key);
-        } else {
-            gxRedisUtils.set(key, 1, expire);
+        final long actualCount = GXRedisUtils.getCounter(key, expire, TimeUnit.SECONDS);
+        if (actualCount >= count) {
+            throw new GXException("操作频繁,请稍后在试......");
         }
         return point.proceed(point.getArgs());
     }
