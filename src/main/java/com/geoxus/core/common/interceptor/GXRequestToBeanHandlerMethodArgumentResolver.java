@@ -10,6 +10,8 @@ import com.geoxus.core.common.annotation.GXFieldCommentAnnotation;
 import com.geoxus.core.common.annotation.GXRequestBodyToEntityAnnotation;
 import com.geoxus.core.common.constant.GXCommonConstants;
 import com.geoxus.core.common.exception.GXException;
+import com.geoxus.core.common.service.GXSAdminService;
+import com.geoxus.core.common.util.GXSpringContextUtils;
 import com.geoxus.core.common.validator.impl.GXValidatorUtils;
 import com.geoxus.core.common.vo.GXResultCode;
 import com.geoxus.core.framework.service.GXCoreModelAttributesService;
@@ -60,11 +62,20 @@ public class GXRequestToBeanHandlerMethodArgumentResolver implements HandlerMeth
         final String[] jsonFields = gxRequestBodyToEntityAnnotation.jsonFields();
         boolean fillJSONField = gxRequestBodyToEntityAnnotation.fillJSONField();
         boolean validateEntity = gxRequestBodyToEntityAnnotation.validateEntity();
+        final boolean isValidatePhone = gxRequestBodyToEntityAnnotation.isValidatePhone();
+        final String phoneFieldName = gxRequestBodyToEntityAnnotation.phoneFieldName();
         final Integer coreModelId = dict.getInt(GXCommonConstants.CORE_MODEL_PRIMARY_NAME);
         for (String jsonField : jsonFields) {
             final String json = Optional.ofNullable(dict.getStr(jsonField)).orElse("{}");
             final Dict targetDict = gxCoreModelAttributesService.getModelAttributesDefaultValue(coreModelId, jsonField, json);
             Dict tmpDict = JSONUtil.toBean(json, Dict.class);
+            if (isValidatePhone && tmpDict.containsKey(phoneFieldName)) {
+                final String phoneNumber = tmpDict.getStr(phoneFieldName);
+                final GXSAdminService<?> service = GXSpringContextUtils.getBean(GXSAdminService.class);
+                if (null != service) {
+                    tmpDict.set(phoneFieldName, service.encryptedPhoneNumber(phoneNumber));
+                }
+            }
             final Set<String> tmpDictKey = tmpDict.keySet();
             if (!tmpDict.isEmpty() && !CollUtil.containsAll(targetDict.keySet(), tmpDictKey)) {
                 throw new GXException(StrUtil.format("{}字段参数不匹配(系统预置: {} , 实际请求: {})", jsonField, targetDict.keySet(), tmpDictKey), GXResultCode.PARSE_REQUEST_JSON_ERROR.getCode());
@@ -74,6 +85,13 @@ public class GXRequestToBeanHandlerMethodArgumentResolver implements HandlerMeth
                 dict.set(jsonField, JSONUtil.toJsonStr(targetDict));
             } else if (!filter.isEmpty()) {
                 dict.set(jsonField, JSONUtil.toJsonStr(filter));
+            }
+        }
+        if (isValidatePhone && dict.containsKey(phoneFieldName)) {
+            final String phoneNumber = dict.getStr(phoneFieldName);
+            final GXSAdminService<?> service = GXSpringContextUtils.getBean(GXSAdminService.class);
+            if (null != service) {
+                dict.set(phoneFieldName, service.encryptedPhoneNumber(phoneNumber));
             }
         }
         Object bean = Convert.convert(parameterType, dict);

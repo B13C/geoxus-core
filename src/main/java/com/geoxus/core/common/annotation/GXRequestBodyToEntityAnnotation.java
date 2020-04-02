@@ -18,5 +18,9 @@ public @interface GXRequestBodyToEntityAnnotation {
 
     boolean validateEntity() default true;
 
+    String phoneFieldName() default "phone";
+
+    boolean isValidatePhone() default false;
+
     String primaryKey() default "id";
 }
