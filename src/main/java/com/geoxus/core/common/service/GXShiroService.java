@@ -37,7 +37,7 @@ public interface GXShiroService {
      * 判断是否时超级管理员
      *
      * @param adminData admin的信息
-     * @return
+     * @return boolean
      */
     boolean isSuperAdmin(Dict adminData);
 }
