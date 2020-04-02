@@ -606,28 +606,6 @@ public interface GXBaseService<T> extends IService<T> {
     }
 
     /**
-     * 加密手机号码
-     *
-     * @param phoneNumber 明文手机号
-     * @param key         加密KEY
-     * @return String
-     */
-    default String encryptedPhoneNumber(String phoneNumber, String key) {
-        return GXAuthCodeUtils.authCodeEncode(phoneNumber, key);
-    }
-
-    /**
-     * 解密手机号码
-     *
-     * @param encryptPhoneNumber 加密手机号
-     * @param key                解密KEY
-     * @return String
-     */
-    default String decryptedPhoneNumber(String encryptPhoneNumber, String key) {
-        return GXAuthCodeUtils.authCodeDecode(encryptPhoneNumber, key);
-    }
-
-    /**
      * 获取 Primary Key
      *
      * @return String

@@ -391,10 +391,7 @@ public interface GXBusinessService<T> extends GXBaseService<T>, GXValidateDBExis
      * @return String
      */
     default String encryptedPhoneNumber(String phoneNumber) {
-        final String prefix = GXCommonUtils.getEnvironmentValue("encrypted.phone.prefix", String.class);
-        final String suffix = GXCommonUtils.getEnvironmentValue("encrypted.phone.suffix", String.class);
-        final String key = prefix + GXCommonConstants.PHONE_ENCRYPT_KEY + suffix;
-        return this.encryptedPhoneNumber(phoneNumber, key);
+        return GXCommonUtils.encryptedPhoneNumber(phoneNumber);
     }
 
     /**
@@ -404,9 +401,19 @@ public interface GXBusinessService<T> extends GXBaseService<T>, GXValidateDBExis
      * @return String
      */
     default String decryptedPhoneNumber(String encryptPhoneNumber) {
-        final String prefix = GXCommonUtils.getEnvironmentValue("encrypted.phone.prefix", String.class);
-        final String suffix = GXCommonUtils.getEnvironmentValue("encrypted.phone.suffix", String.class);
-        final String key = prefix + GXCommonConstants.PHONE_ENCRYPT_KEY + suffix;
-        return this.decryptedPhoneNumber(encryptPhoneNumber, key);
+        return GXCommonUtils.decryptedPhoneNumber(encryptPhoneNumber);
+    }
+
+    /**
+     * 隐藏手机号码的指定几位为指定的字符
+     *
+     * @param phoneNumber  手机号码
+     * @param startInclude 开始字符位置(包含,从0开始)
+     * @param endExclude   结束字符位置
+     * @param replacedChar 替换为的字符
+     * @return String
+     */
+    default String hiddenPhoneNumber(CharSequence phoneNumber, int startInclude, int endExclude, char replacedChar) {
+        return GXCommonUtils.hiddenPhoneNumber(phoneNumber, startInclude, endExclude, replacedChar);
     }
 }

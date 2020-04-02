@@ -10,7 +10,6 @@ import com.geoxus.core.common.annotation.GXFieldCommentAnnotation;
 import com.geoxus.core.common.annotation.GXRequestBodyToEntityAnnotation;
 import com.geoxus.core.common.constant.GXCommonConstants;
 import com.geoxus.core.common.exception.GXException;
-import com.geoxus.core.common.util.GXAuthCodeUtils;
 import com.geoxus.core.common.util.GXCommonUtils;
 import com.geoxus.core.common.validator.impl.GXValidatorUtils;
 import com.geoxus.core.common.vo.GXResultCode;
@@ -71,7 +70,7 @@ public class GXRequestToBeanHandlerMethodArgumentResolver implements HandlerMeth
             Dict tmpDict = JSONUtil.toBean(json, Dict.class);
             if (isValidatePhone && tmpDict.containsKey(phoneFieldName)) {
                 final String phoneNumber = tmpDict.getStr(phoneFieldName);
-                tmpDict.set(phoneFieldName, encryptedPhoneNumber(phoneNumber));
+                tmpDict.set(phoneFieldName, GXCommonUtils.encryptedPhoneNumber(phoneNumber));
             }
             final Set<String> tmpDictKey = tmpDict.keySet();
             if (!tmpDict.isEmpty() && !CollUtil.containsAll(targetDict.keySet(), tmpDictKey)) {
@@ -86,7 +85,7 @@ public class GXRequestToBeanHandlerMethodArgumentResolver implements HandlerMeth
         }
         if (isValidatePhone && dict.containsKey(phoneFieldName)) {
             final String phoneNumber = dict.getStr(phoneFieldName);
-            dict.set(phoneFieldName, encryptedPhoneNumber(phoneNumber));
+            dict.set(phoneFieldName, GXCommonUtils.encryptedPhoneNumber(phoneNumber));
         }
         Object bean = Convert.convert(parameterType, dict);
         Class<?>[] groups = gxRequestBodyToEntityAnnotation.groups();
@@ -117,12 +116,5 @@ public class GXRequestToBeanHandlerMethodArgumentResolver implements HandlerMeth
             throw new GXException(GXResultCode.REQUEST_JSON_NOT_BODY);
         }
         return jsonBody;
-    }
-
-    private String encryptedPhoneNumber(String phoneNumber) {
-        final String prefix = GXCommonUtils.getEnvironmentValue("encrypted.phone.prefix", String.class);
-        final String suffix = GXCommonUtils.getEnvironmentValue("encrypted.phone.suffix", String.class);
-        final String key = prefix + GXCommonConstants.PHONE_ENCRYPT_KEY + suffix;
-        return GXAuthCodeUtils.authCodeEncode(phoneNumber, key);
     }
 }

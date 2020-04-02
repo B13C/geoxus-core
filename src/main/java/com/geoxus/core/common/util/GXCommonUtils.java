@@ -3,6 +3,7 @@ package com.geoxus.core.common.util;
 import cn.hutool.core.annotation.AnnotationUtil;
 import cn.hutool.core.convert.Convert;
 import cn.hutool.core.lang.Dict;
+import cn.hutool.core.lang.Validator;
 import cn.hutool.core.util.*;
 import cn.hutool.json.JSON;
 import cn.hutool.json.JSONArray;
@@ -14,6 +15,7 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.geoxus.core.common.annotation.GXFieldCommentAnnotation;
 import com.geoxus.core.common.constant.GXBaseBuilderConstants;
+import com.geoxus.core.common.constant.GXCommonConstants;
 import com.geoxus.core.common.event.GXBaseEvent;
 import com.geoxus.core.rpc.config.GXRabbitMQRPCRemoteServersConfig;
 import com.geoxus.core.rpc.service.GXRabbitMQRPCClientService;
@@ -719,6 +721,71 @@ public class GXCommonUtils {
             return annotation.value();
         }
         return "";
+    }
+
+    /**
+     * 隐藏手机号码的指定几位为指定的字符
+     *
+     * @param phoneNumber  手机号码
+     * @param startInclude 开始字符位置(包含,从0开始)
+     * @param endExclude   结束字符位置
+     * @param replacedChar 替换为的字符
+     * @return String
+     */
+    public static String hiddenPhoneNumber(CharSequence phoneNumber, int startInclude, int endExclude, char replacedChar) {
+        if (Validator.isMobile(phoneNumber)) {
+            return StrUtil.replace(phoneNumber, startInclude, endExclude, replacedChar);
+        }
+        return "";
+    }
+
+    /**
+     * 加密手机号码
+     *
+     * @param phoneNumber 明文手机号
+     * @return String
+     */
+    public static String encryptedPhoneNumber(String phoneNumber) {
+        final String prefix = GXCommonUtils.getEnvironmentValue("encrypted.phone.prefix", String.class);
+        final String suffix = GXCommonUtils.getEnvironmentValue("encrypted.phone.suffix", String.class);
+        final String key = prefix + GXCommonConstants.PHONE_ENCRYPT_KEY + suffix;
+        return encryptedPhoneNumber(phoneNumber, key);
+    }
+
+    /**
+     * 解密手机号码
+     *
+     * @param encryptPhoneNumber 加密手机号
+     * @return String
+     */
+    public static String decryptedPhoneNumber(String encryptPhoneNumber) {
+        final String prefix = GXCommonUtils.getEnvironmentValue("encrypted.phone.prefix", String.class);
+        final String suffix = GXCommonUtils.getEnvironmentValue("encrypted.phone.suffix", String.class);
+        final String key = prefix + GXCommonConstants.PHONE_ENCRYPT_KEY + suffix;
+        return decryptedPhoneNumber(encryptPhoneNumber, key);
+    }
+
+
+    /**
+     * 加密手机号码
+     *
+     * @param phoneNumber 明文手机号
+     * @param key         加密KEY
+     * @return String
+     */
+    public static String encryptedPhoneNumber(String phoneNumber, String key) {
+        return GXAuthCodeUtils.authCodeEncode(phoneNumber, key);
+    }
+
+    /**
+     * 解密手机号码
+     *
+     * @param encryptPhoneNumber 加密手机号
+     * @param key                解密KEY
+     * @return String
+     */
+    public static String decryptedPhoneNumber(String encryptPhoneNumber, String key) {
+        return GXAuthCodeUtils.authCodeDecode(encryptPhoneNumber, key);
     }
 
     /**
