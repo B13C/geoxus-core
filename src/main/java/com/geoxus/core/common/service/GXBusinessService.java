@@ -13,6 +13,7 @@ import com.geoxus.core.common.constant.GXBaseBuilderConstants;
 import com.geoxus.core.common.constant.GXCommonConstants;
 import com.geoxus.core.common.exception.GXException;
 import com.geoxus.core.common.mapper.GXBaseMapper;
+import com.geoxus.core.common.util.GXCommonUtils;
 import com.geoxus.core.common.util.GXSpringContextUtils;
 import com.geoxus.core.common.validator.GXValidateDBExists;
 import com.geoxus.core.common.validator.GXValidateDBUnique;
@@ -381,5 +382,31 @@ public interface GXBusinessService<T> extends GXBaseService<T>, GXValidateDBExis
             return StrUtil.format("{}-{}", dict.getStr("path"), parentId);
         }
         return dict.getStr("path");
+    }
+
+    /**
+     * 加密手机号码
+     *
+     * @param phoneNumber 明文手机号
+     * @return String
+     */
+    default String encryptedPhoneNumber(String phoneNumber) {
+        final String prefix = GXCommonUtils.getEnvironmentValue("encrypted.phone.prefix", String.class);
+        final String suffix = GXCommonUtils.getEnvironmentValue("encrypted.phone.suffix", String.class);
+        final String key = prefix + "B78D32BTR1CHEN15AC1F19C46A9B533986" + suffix;
+        return this.encryptedPhoneNumber(phoneNumber, key);
+    }
+
+    /**
+     * 解密手机号码
+     *
+     * @param encryptPhoneNumber 加密手机号
+     * @return String
+     */
+    default String decryptedPhoneNumber(String encryptPhoneNumber) {
+        final String prefix = GXCommonUtils.getEnvironmentValue("encrypted.phone.prefix", String.class);
+        final String suffix = GXCommonUtils.getEnvironmentValue("encrypted.phone.suffix", String.class);
+        final String key = prefix + "B78D32BTR1CHEN15AC1F19C46A9B533986" + suffix;
+        return this.decryptedPhoneNumber(encryptPhoneNumber, key);
     }
 }

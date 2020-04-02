@@ -15,6 +15,7 @@ import com.geoxus.core.common.event.GXBaseEvent;
 import com.geoxus.core.common.event.GXMediaLibraryEvent;
 import com.geoxus.core.common.exception.GXException;
 import com.geoxus.core.common.mapper.GXBaseMapper;
+import com.geoxus.core.common.util.GXAuthCodeUtils;
 import com.geoxus.core.common.util.GXCommonUtils;
 import com.geoxus.core.common.util.GXSpringContextUtils;
 import com.geoxus.core.framework.entity.GXCoreMediaLibraryEntity;
@@ -602,6 +603,28 @@ public interface GXBaseService<T> extends IService<T> {
      */
     default <R> void publishEvent(GXBaseEvent<R> event) {
         GXCommonUtils.publishEvent(event);
+    }
+
+    /**
+     * 加密手机号码
+     *
+     * @param phoneNumber 明文手机号
+     * @param key         加密KEY
+     * @return String
+     */
+    default String encryptedPhoneNumber(String phoneNumber, String key) {
+        return GXAuthCodeUtils.authCodeEncode(phoneNumber, key);
+    }
+
+    /**
+     * 解密手机号码
+     *
+     * @param encryptPhoneNumber 加密手机号
+     * @param key                解密KEY
+     * @return String
+     */
+    default String decryptedPhoneNumber(String encryptPhoneNumber, String key) {
+        return GXAuthCodeUtils.authCodeDecode(encryptPhoneNumber, key);
     }
 
     /**
