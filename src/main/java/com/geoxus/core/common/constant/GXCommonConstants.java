@@ -27,6 +27,9 @@ public class GXCommonConstants {
     @GXFieldCommentAnnotation(zh = "验证数字的正则表达式")
     public static final String DIGITAL_REGULAR_EXPRESSION = "^[+-]?(0|([1-9]\\d*))(\\.\\d+)?$";
 
+    @GXFieldCommentAnnotation(zh = "手机号码加密的KEY")
+    public static final String PHONE_ENCRYPT_KEY = "B78D32BTR1CHEN15AC1F19C46A9B533986";
+
     private GXCommonConstants() {
     }
 }

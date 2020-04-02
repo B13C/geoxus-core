@@ -393,7 +393,7 @@ public interface GXBusinessService<T> extends GXBaseService<T>, GXValidateDBExis
     default String encryptedPhoneNumber(String phoneNumber) {
         final String prefix = GXCommonUtils.getEnvironmentValue("encrypted.phone.prefix", String.class);
         final String suffix = GXCommonUtils.getEnvironmentValue("encrypted.phone.suffix", String.class);
-        final String key = prefix + "B78D32BTR1CHEN15AC1F19C46A9B533986" + suffix;
+        final String key = prefix + GXCommonConstants.PHONE_ENCRYPT_KEY + suffix;
         return this.encryptedPhoneNumber(phoneNumber, key);
     }
 
@@ -406,7 +406,7 @@ public interface GXBusinessService<T> extends GXBaseService<T>, GXValidateDBExis
     default String decryptedPhoneNumber(String encryptPhoneNumber) {
         final String prefix = GXCommonUtils.getEnvironmentValue("encrypted.phone.prefix", String.class);
         final String suffix = GXCommonUtils.getEnvironmentValue("encrypted.phone.suffix", String.class);
-        final String key = prefix + "B78D32BTR1CHEN15AC1F19C46A9B533986" + suffix;
+        final String key = prefix + GXCommonConstants.PHONE_ENCRYPT_KEY + suffix;
         return this.decryptedPhoneNumber(encryptPhoneNumber, key);
     }
 }

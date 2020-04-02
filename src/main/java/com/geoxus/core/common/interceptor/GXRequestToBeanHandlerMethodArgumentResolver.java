@@ -10,8 +10,8 @@ import com.geoxus.core.common.annotation.GXFieldCommentAnnotation;
 import com.geoxus.core.common.annotation.GXRequestBodyToEntityAnnotation;
 import com.geoxus.core.common.constant.GXCommonConstants;
 import com.geoxus.core.common.exception.GXException;
-import com.geoxus.core.common.service.GXSAdminService;
-import com.geoxus.core.common.util.GXSpringContextUtils;
+import com.geoxus.core.common.util.GXAuthCodeUtils;
+import com.geoxus.core.common.util.GXCommonUtils;
 import com.geoxus.core.common.validator.impl.GXValidatorUtils;
 import com.geoxus.core.common.vo.GXResultCode;
 import com.geoxus.core.framework.service.GXCoreModelAttributesService;
@@ -71,10 +71,7 @@ public class GXRequestToBeanHandlerMethodArgumentResolver implements HandlerMeth
             Dict tmpDict = JSONUtil.toBean(json, Dict.class);
             if (isValidatePhone && tmpDict.containsKey(phoneFieldName)) {
                 final String phoneNumber = tmpDict.getStr(phoneFieldName);
-                final GXSAdminService<?> service = GXSpringContextUtils.getBean(GXSAdminService.class);
-                if (null != service) {
-                    tmpDict.set(phoneFieldName, service.encryptedPhoneNumber(phoneNumber));
-                }
+                tmpDict.set(phoneFieldName, encryptedPhoneNumber(phoneNumber));
             }
             final Set<String> tmpDictKey = tmpDict.keySet();
             if (!tmpDict.isEmpty() && !CollUtil.containsAll(targetDict.keySet(), tmpDictKey)) {
@@ -89,10 +86,7 @@ public class GXRequestToBeanHandlerMethodArgumentResolver implements HandlerMeth
         }
         if (isValidatePhone && dict.containsKey(phoneFieldName)) {
             final String phoneNumber = dict.getStr(phoneFieldName);
-            final GXSAdminService<?> service = GXSpringContextUtils.getBean(GXSAdminService.class);
-            if (null != service) {
-                dict.set(phoneFieldName, service.encryptedPhoneNumber(phoneNumber));
-            }
+            dict.set(phoneFieldName, encryptedPhoneNumber(phoneNumber));
         }
         Object bean = Convert.convert(parameterType, dict);
         Class<?>[] groups = gxRequestBodyToEntityAnnotation.groups();
@@ -123,5 +117,12 @@ public class GXRequestToBeanHandlerMethodArgumentResolver implements HandlerMeth
             throw new GXException(GXResultCode.REQUEST_JSON_NOT_BODY);
         }
         return jsonBody;
+    }
+
+    private String encryptedPhoneNumber(String phoneNumber) {
+        final String prefix = GXCommonUtils.getEnvironmentValue("encrypted.phone.prefix", String.class);
+        final String suffix = GXCommonUtils.getEnvironmentValue("encrypted.phone.suffix", String.class);
+        final String key = prefix + GXCommonConstants.PHONE_ENCRYPT_KEY + suffix;
+        return GXAuthCodeUtils.authCodeEncode(phoneNumber, key);
     }
 }
