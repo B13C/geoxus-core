@@ -274,8 +274,7 @@ public interface GXBusinessService<T> extends GXBaseService<T>, GXValidateDBExis
         Map<String, Object> removeField = CollUtil.newHashMap();
         if (StrUtil.isNotBlank(removeStr)) {
             String[] split = StrUtil.split(removeStr, ",");
-            for (int i = 0; i < split.length; i++) {
-                final String s = split[i];
+            for (final String s : split) {
                 if (StrUtil.contains(s, "::")) {
                     final String[] strings = StrUtil.split(s, "::");
                     String mainKey = strings[0];
@@ -311,31 +310,73 @@ public interface GXBusinessService<T> extends GXBaseService<T>, GXValidateDBExis
         }
         final List<Dict> retList = CollUtil.newArrayList();
         for (Dict dict : list) {
-            final Set<Map.Entry<String, Object>> entries = dict.entrySet();
-            final Dict retDict = Dict.create();
-            for (Map.Entry<String, Object> entry : entries) {
-                final String key = entry.getKey();
-                final Object value = entry.getValue();
-                final Object o = removeField.get(key);
-                if (null == o) {
-                    retDict.set(key, value);
-                } else {
-                    if (o instanceof Dict) {
-                        final Dict convert = Convert.convert(Dict.class, o);
-                        final Set<Map.Entry<String, Object>> entrySet = Convert.convert(Dict.class, value).entrySet();
-                        final Dict tmpDict = Dict.create();
-                        for (Map.Entry<String, Object> en : entrySet) {
-                            if (null == convert.get(en.getKey())) {
-                                tmpDict.set(en.getKey(), en.getValue());
-                            }
-                        }
-                        retDict.set(key, tmpDict);
-                    }
-                }
-            }
-            retList.add(handleSamePrefixDict(retDict));
+            retList.add(handleSamePrefixDict(handleDict(dict, removeField)));
         }
         return retList;
+    }
+
+    /**
+     * 处理Dict数据，主要用于解密数据，去掉当前用户不能访问的数据
+     *
+     * @param dict        待处理的Dict
+     * @param removeField 需要移除的数据
+     * @return Dict
+     */
+    default Dict handleDict(Dict dict, Dict removeField) {
+        final HashSet<String> phoneNumberFields = CollUtil.newHashSet("phone", "moile");
+        final Set<Map.Entry<String, Object>> entries = dict.entrySet();
+        final Dict retDict = Dict.create();
+        for (Map.Entry<String, Object> entry : entries) {
+            final String key = entry.getKey();
+            Object value = entry.getValue();
+            final Object o = removeField.get(key);
+            if (null == o) {
+                if (!(value instanceof Dict)) {
+                    if (CollUtil.contains(phoneNumberFields, key)) {
+                        String str = decryptedPhoneNumber(value.toString());
+                        if (!str.equals("{}")) {
+                            value = str;
+                        }
+                    }
+                    retDict.set(key, value);
+                    continue;
+                }
+                final Dict convert = Convert.convert(Dict.class, value);
+                final Set<Map.Entry<String, Object>> entrySet = Convert.convert(Dict.class, value).entrySet();
+                final Dict tmpDict = Dict.create();
+                for (Map.Entry<String, Object> en : entrySet) {
+                    final String enKey = en.getKey();
+                    Object enValue = en.getValue();
+                    if (null != convert.get(enKey) && CollUtil.contains(phoneNumberFields, enKey)) {
+                        String str = decryptedPhoneNumber(enValue.toString());
+                        if (!str.equals("{}")) {
+                            enValue = str;
+                        }
+                    }
+                    tmpDict.set(enKey, enValue);
+                }
+                retDict.set(key, tmpDict);
+            } else {
+                if (value instanceof Dict) {
+                    final Dict convert = Convert.convert(Dict.class, o);
+                    final Set<Map.Entry<String, Object>> entrySet = Convert.convert(Dict.class, value).entrySet();
+                    final Dict tmpDict = Dict.create();
+                    for (Map.Entry<String, Object> en : entrySet) {
+                        final String enKey = en.getKey();
+                        Object enValue = en.getValue();
+                        if (null == convert.get(enKey) && CollUtil.contains(phoneNumberFields, enKey)) {
+                            String str = decryptedPhoneNumber(enValue.toString());
+                            if (!str.equals("{}")) {
+                                enValue = str;
+                            }
+                            tmpDict.set(enKey, enValue);
+                        }
+                    }
+                    retDict.set(key, tmpDict);
+                }
+            }
+        }
+        return retDict;
     }
 
     /**

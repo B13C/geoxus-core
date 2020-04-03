@@ -71,6 +71,7 @@ public class GXRequestToBeanHandlerMethodArgumentResolver implements HandlerMeth
             if (isValidatePhone && tmpDict.containsKey(phoneFieldName)) {
                 final String phoneNumber = tmpDict.getStr(phoneFieldName);
                 tmpDict.set(phoneFieldName, GXCommonUtils.encryptedPhoneNumber(phoneNumber));
+                targetDict.set(phoneFieldName, GXCommonUtils.encryptedPhoneNumber(phoneNumber));
             }
             final Set<String> tmpDictKey = tmpDict.keySet();
             if (!tmpDict.isEmpty() && !CollUtil.containsAll(targetDict.keySet(), tmpDictKey)) {

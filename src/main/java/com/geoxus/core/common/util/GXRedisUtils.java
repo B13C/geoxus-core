@@ -12,14 +12,10 @@ import java.util.concurrent.TimeUnit;
 
 @Component
 public class GXRedisUtils {
-    @GXFieldCommentAnnotation(zh = "RedissonClient对象")
-    private static RedissonClient redissonClient;
-
     @GXFieldCommentAnnotation(zh = "Logger对象")
     private static Logger logger;
 
     static {
-        redissonClient = GXSpringContextUtils.getBean(RedissonClient.class);
         logger = GXCommonUtils.getLogger(GXRedisUtils.class);
     }
 
@@ -36,7 +32,7 @@ public class GXRedisUtils {
      * @return Object
      */
     public static Object set(String key, String value, int expire, TimeUnit timeUnit) {
-        final RMap<Object, Object> rMap = redissonClient.getMap(key);
+        final RMap<Object, Object> rMap = getRedissonClient().getMap(key);
         if (expire > 0) {
             rMap.expire(expire, timeUnit);
         }
@@ -51,7 +47,7 @@ public class GXRedisUtils {
      * @return Object
      */
     public static <R> R get(String key, Class<R> clazz) {
-        final RMap<Object, Object> rMap = redissonClient.getMap(key);
+        final RMap<Object, Object> rMap = getRedissonClient().getMap(key);
         return Convert.convert(clazz, rMap.get(key));
     }
 
@@ -62,7 +58,7 @@ public class GXRedisUtils {
      * @return boolean
      */
     public static boolean delete(String key) {
-        final RMap<Object, Object> rMap = redissonClient.getMap(key);
+        final RMap<Object, Object> rMap = getRedissonClient().getMap(key);
         return null != rMap.remove(key);
     }
 
@@ -75,7 +71,16 @@ public class GXRedisUtils {
      * @return long
      */
     public static long getCounter(String key, int expire, TimeUnit timeUnit) {
-        final RAtomicLong rAtomicLong = redissonClient.getAtomicLong(key);
+        final RAtomicLong rAtomicLong = getRedissonClient().getAtomicLong(key);
         return rAtomicLong.getAndIncrement();
+    }
+
+    /**
+     * 获取RedissonClient对象
+     *
+     * @return RedissonClient
+     */
+    private static RedissonClient getRedissonClient() {
+        return GXSpringContextUtils.getBean(RedissonClient.class);
     }
 }
