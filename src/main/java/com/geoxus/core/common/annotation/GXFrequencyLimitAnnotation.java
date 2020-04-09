@@ -12,7 +12,7 @@ import java.lang.annotation.*;
 @Documented
 @Target({ElementType.METHOD})
 @Retention(RetentionPolicy.RUNTIME)
-public @interface GXDurationCountLimitAnnotation {
+public @interface GXFrequencyLimitAnnotation {
     @GXFieldCommentAnnotation(zh = "值")
     @AliasFor("count")
     int value() default 10;

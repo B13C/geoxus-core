@@ -1,7 +1,7 @@
 package com.geoxus.core.common.aspect;
 
-import com.geoxus.core.common.annotation.GXDurationCountLimitAnnotation;
 import com.geoxus.core.common.annotation.GXFieldCommentAnnotation;
+import com.geoxus.core.common.annotation.GXFrequencyLimitAnnotation;
 import com.geoxus.core.common.exception.GXException;
 import com.geoxus.core.common.util.GXHttpContextUtils;
 import com.geoxus.core.common.util.GXRedisUtils;
@@ -21,15 +21,15 @@ public class GXDurationCountLimitAspect {
     @GXFieldCommentAnnotation(zh = "缓存前缀")
     private static final String CACHE_KEY_PFEFIX = "duration:count:limit:";
 
-    @Pointcut("@annotation(com.geoxus.core.common.annotation.GXDurationCountLimitAnnotation)")
-    public void durationCountLimitPointCut() {
+    @Pointcut("@annotation(com.geoxus.core.common.annotation.GXFrequencyLimitAnnotation)")
+    public void frequencyLimitPointCut() {
     }
 
-    @Around("durationCountLimitPointCut()")
+    @Around("frequencyLimitPointCut()")
     public Object around(ProceedingJoinPoint point) throws Throwable {
         MethodSignature signature = (MethodSignature) point.getSignature();
         Method method = signature.getMethod();
-        final GXDurationCountLimitAnnotation durationCountLimitAnnotation = method.getAnnotation(GXDurationCountLimitAnnotation.class);
+        final GXFrequencyLimitAnnotation durationCountLimitAnnotation = method.getAnnotation(GXFrequencyLimitAnnotation.class);
         final int count = durationCountLimitAnnotation.count();
         String key = CACHE_KEY_PFEFIX.concat(durationCountLimitAnnotation.key());
         final int expire = durationCountLimitAnnotation.expire();

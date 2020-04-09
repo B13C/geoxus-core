@@ -1,5 +1,7 @@
 package com.geoxus.core.common.annotation;
 
+import com.geoxus.core.common.constant.GXCommonConstants;
+
 import java.lang.annotation.*;
 
 /**
@@ -9,6 +11,8 @@ import java.lang.annotation.*;
 @Documented
 @Target({ElementType.METHOD})
 @Retention(RetentionPolicy.RUNTIME)
-public @interface GXCheckRequestVerifyCodeAnnotation {
+public @interface GXCheckCaptchaAnnotation {
     boolean value() default true;
+
+    int verifyType() default GXCommonConstants.CAPTCHA_VERIFY;
 }
