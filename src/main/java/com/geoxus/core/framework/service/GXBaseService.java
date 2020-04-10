@@ -70,8 +70,8 @@ public interface GXBaseService<T> extends IService<T> {
      * @param condition 条件
      * @return R
      */
-    default <R> R getSingleJSONFieldValueByDB(Class<T> clazz, String path, Class<R> type, Dict condition) {
-        return getSingleJSONFieldValueByDB(clazz, path, condition, type, GXCommonUtils.getClassDefaultValue(type));
+    default <R> R getSingleFieldValueByDB(Class<T> clazz, String path, Class<R> type, Dict condition) {
+        return getSingleFieldValueByDB(clazz, path, condition, type, GXCommonUtils.getClassDefaultValue(type));
     }
 
     /**
@@ -83,7 +83,7 @@ public interface GXBaseService<T> extends IService<T> {
      * @param defaultValue 默认值
      * @return R
      */
-    default <R> R getSingleJSONFieldValueByDB(Class<T> clazz, String path, Dict condition, Class<R> type, R defaultValue) {
+    default <R> R getSingleFieldValueByDB(Class<T> clazz, String path, Dict condition, Class<R> type, R defaultValue) {
         if (StrUtil.contains(path, "::")) {
             String[] fields = StrUtil.split(path, "::");
             path = StrUtil.format("{}::{}", fields[0].replace("'", ""), fields[1].replace("'", ""));
@@ -112,7 +112,7 @@ public interface GXBaseService<T> extends IService<T> {
      * @return Dict
      */
     @SuppressWarnings("unused")
-    default Dict getMultiJSONFieldValueByDB(Class<T> clazz, Dict fields, Dict condition) {
+    default Dict getMultiFieldsValueByDB(Class<T> clazz, Dict fields, Dict condition) {
         GXBaseMapper<T> baseMapper = (GXBaseMapper<T>) getBaseMapper();
         final Set<String> fieldSet = CollUtil.newHashSet();
         final Dict dataKey = Dict.create();
@@ -151,8 +151,8 @@ public interface GXBaseService<T> extends IService<T> {
      * @param path   路径
      * @return R
      */
-    default <R> R getSingleJSONFieldValueByEntity(T entity, String path, Class<R> type, int coreModelId) {
-        return getSingleJSONFieldValueByEntity(entity, path, type, GXCommonUtils.getClassDefaultValue(type), coreModelId);
+    default <R> R getSingleFieldValueByEntity(T entity, String path, Class<R> type, int coreModelId) {
+        return getSingleFieldValueByEntity(entity, path, type, GXCommonUtils.getClassDefaultValue(type), coreModelId);
     }
 
     /**
@@ -173,7 +173,7 @@ public interface GXBaseService<T> extends IService<T> {
      * @param defaultValue 默认值
      * @return R
      */
-    default <R> R getSingleJSONFieldValueByEntity(T entity, String path, Class<R> type, R defaultValue, int coreModelId) {
+    default <R> R getSingleFieldValueByEntity(T entity, String path, Class<R> type, R defaultValue, int coreModelId) {
         GXCoreModelAttributePermissionService permissionService = GXSpringContextUtils.getBean(GXCoreModelAttributePermissionService.class);
         assert permissionService != null;
         Dict permissions = permissionService.getModelAttributePermissionByCoreModelId(coreModelId, Dict.create());
@@ -228,11 +228,11 @@ public interface GXBaseService<T> extends IService<T> {
      * @param dict   需要获取的数据
      * @return Dict
      */
-    default Dict getMultiJSONFieldValueByEntity(T entity, Dict dict, int coreModelId) {
+    default Dict getMultiFieldsValueByEntity(T entity, Dict dict, int coreModelId) {
         final Set<String> keySet = dict.keySet();
         final Dict data = Dict.create();
         for (String key : keySet) {
-            final Object value = getSingleJSONFieldValueByEntity(entity, key, (Class<?>) dict.getObj(key), coreModelId);
+            final Object value = getSingleFieldValueByEntity(entity, key, (Class<?>) dict.getObj(key), coreModelId);
             if (Objects.isNull(value)) {
                 continue;
             }
@@ -277,7 +277,7 @@ public interface GXBaseService<T> extends IService<T> {
      * @return boolean
      */
     @Transactional(rollbackFor = Exception.class)
-    default boolean updateJSONFieldSingleValue(Class<T> clazz, String path, Object value, Dict condition) {
+    default boolean updateSingleField(Class<T> clazz, String path, Object value, Dict condition) {
         GXBaseMapper<T> baseMapper = (GXBaseMapper<T>) getBaseMapper();
         int index = StrUtil.indexOfIgnoreCase(path, "::");
         String mainPath = StrUtil.sub(path, 0, index);
@@ -295,7 +295,7 @@ public interface GXBaseService<T> extends IService<T> {
      * @return boolean
      */
     @Transactional(rollbackFor = Exception.class)
-    default boolean updateJSONFieldMultiValue(Class<T> clazz, Dict data, Dict condition) {
+    default boolean updateMultiFields(Class<T> clazz, Dict data, Dict condition) {
         GXBaseMapper<T> baseMapper = (GXBaseMapper<T>) getBaseMapper();
         return baseMapper.updateFieldByCondition(getTableName(clazz), data, condition);
     }
@@ -592,7 +592,7 @@ public interface GXBaseService<T> extends IService<T> {
      */
     default int getCoreModelIdByTableName(Class<T> clazz) {
         String tableName = getTableName(clazz);
-        return getSingleJSONFieldValueByDB(clazz, "model_id", Integer.class, Dict.create().set("table_name", tableName));
+        return getSingleFieldValueByDB(clazz, "model_id", Integer.class, Dict.create().set("table_name", tableName));
     }
 
     /**
