@@ -77,16 +77,17 @@ public class GXWebMvcInterceptorConfig implements WebMvcConfigurer {
     @Override
     public void addResourceHandlers(ResourceHandlerRegistry registry) {
         try {
+            final String resourceLocationsPrefix = "file:";
             final List<String> list = webMvcConfig.getResourcePatterns();
             String[] array = new String[list.size()];
             list.toArray(array);
             registry.addResourceHandler(array)
-                    .addResourceLocations("file:" + ResourceUtils.getURL(gxUploadConfig.getDepositPath()).getPath())
+                    .addResourceLocations(resourceLocationsPrefix + ResourceUtils.getURL(gxUploadConfig.getDepositPath()).getPath())
                     //PHP图片地址
-                    .addResourceLocations("file:" + ResourceUtils.getURL(gxUploadConfig.getDepositPath() + File.separator + "media").getPath());
+                    .addResourceLocations(resourceLocationsPrefix + ResourceUtils.getURL(gxUploadConfig.getDepositPath() + File.separator + "media").getPath());
             //编辑器上传路径
             registry.addResourceHandler(properties.getLocal().getUrlPrefix() + "**")
-                    .addResourceLocations("file:" + ResourceUtils.getURL(properties.getLocal().getPhysicalPath()).getPath())
+                    .addResourceLocations(resourceLocationsPrefix + ResourceUtils.getURL(properties.getLocal().getPhysicalPath()).getPath())
                     .setCacheControl(CacheControl.maxAge(20, TimeUnit.DAYS));
         } catch (Exception e) {
             log.error("虚拟路径配置错误", e);
