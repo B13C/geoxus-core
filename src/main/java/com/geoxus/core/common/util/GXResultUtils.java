@@ -1,5 +1,6 @@
 package com.geoxus.core.common.util;
 
+import cn.hutool.core.convert.Convert;
 import cn.hutool.core.lang.Dict;
 import com.geoxus.core.common.vo.GXResultCode;
 import org.apache.http.HttpStatus;
@@ -94,7 +95,13 @@ public class GXResultUtils extends HashMap<String, Object> {
     }
 
     public GXResultUtils addKeyValue(String key, Object value) {
-        super.put("data", Dict.create().set(key, value));
+        Object o = get("data");
+        Dict data = Dict.create().set(key, value);
+        if (null != o) {
+            Dict dict = Convert.convert(Dict.class, o);
+            data.putAll(dict);
+        }
+        super.put("data", data);
         return this;
     }
 }

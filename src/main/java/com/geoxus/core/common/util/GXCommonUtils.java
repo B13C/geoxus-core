@@ -670,7 +670,6 @@ public class GXCommonUtils {
         return data;
     }
 
-
     /**
      * 给现有查询条件新增查询条件
      *
@@ -765,7 +764,6 @@ public class GXCommonUtils {
         return decryptedPhoneNumber(encryptPhoneNumber, key);
     }
 
-
     /**
      * 加密手机号码
      *
@@ -796,5 +794,37 @@ public class GXCommonUtils {
      */
     public static Logger getLogger(Class<?> clazz) {
         return LoggerFactory.getLogger(clazz);
+    }
+
+    /**
+     * 获取指定缓存中的值
+     *
+     * @param cacheName 缓存名字
+     * @param key       缓存key
+     * @param clazz     返回值的类型
+     * @param <R>       泛型的类型
+     * @return R
+     */
+    public <R> R getSpringCacheValue(String cacheName, String key, Class<R> clazz) {
+        Cache cache = getSpringCache(cacheName);
+        return cache.get(key, clazz);
+    }
+
+    /**
+     * 获取指定缓存中的值
+     *
+     * @param cacheName    缓存名字
+     * @param key          缓存key
+     * @param clazz        返回值的类型
+     * @param <R>          泛型的类型
+     * @param defaultValue 默认值
+     * @return R
+     */
+    public <R> R getSpringCacheValue(String cacheName, String key, Class<R> clazz, R defaultValue) {
+        Cache cache = getSpringCache(cacheName);
+        if (cache.get(key) == null) {
+            return defaultValue;
+        }
+        return getSpringCacheValue(cacheName, key, clazz);
     }
 }

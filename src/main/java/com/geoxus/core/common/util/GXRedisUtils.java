@@ -3,6 +3,7 @@ package com.geoxus.core.common.util;
 import cn.hutool.core.convert.Convert;
 import com.geoxus.core.common.annotation.GXFieldCommentAnnotation;
 import org.redisson.api.RAtomicLong;
+import org.redisson.api.RLock;
 import org.redisson.api.RMap;
 import org.redisson.api.RedissonClient;
 import org.slf4j.Logger;
@@ -13,7 +14,7 @@ import java.util.concurrent.TimeUnit;
 @Component
 public class GXRedisUtils {
     @GXFieldCommentAnnotation(zh = "Logger对象")
-    private static Logger logger;
+    private static final Logger logger;
 
     static {
         logger = GXCommonUtils.getLogger(GXRedisUtils.class);
@@ -73,6 +74,16 @@ public class GXRedisUtils {
     public static long getCounter(String key, int expire, TimeUnit timeUnit) {
         final RAtomicLong rAtomicLong = getRedissonClient().getAtomicLong(key);
         return rAtomicLong.getAndIncrement();
+    }
+
+    /**
+     * 获取Redis锁
+     *
+     * @param lockName 锁的名字
+     * @return RLock
+     */
+    public static RLock getLock(String lockName) {
+        return getRedissonClient().getLock("lock:" + lockName);
     }
 
     /**
