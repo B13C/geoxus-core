@@ -6,6 +6,7 @@ import org.redisson.config.Config;
 import org.redisson.spring.cache.RedissonSpringCacheManager;
 import org.redisson.spring.data.connection.RedissonConnectionFactory;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;
 import org.springframework.cache.CacheManager;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -27,6 +28,7 @@ public class GXRedissonSpringDataConfig {
     }
 
     @Bean
+    @ConditionalOnExpression("'${spring.cache.type}'.equals('redis')")
     public CacheManager cacheManager(RedissonClient redissonClient) {
         return new RedissonSpringCacheManager(redissonClient, "classpath:/redisson-cache-config.yml");
     }

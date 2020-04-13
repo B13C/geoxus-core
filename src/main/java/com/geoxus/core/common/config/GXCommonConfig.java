@@ -65,7 +65,7 @@ public class GXCommonConfig {
     }
 
     @Bean("ehCacheCacheManager")
-    @ConditionalOnExpression("!'${spring.cache.type}'.equals('ehcache') && !'${spring.profiles.active}'.equals('local')")
+    @ConditionalOnExpression("'${spring.cache.type}'.equals('ehcache')")
     public EhCacheCacheManager ehCacheCacheManager() {
         EhCacheManagerFactoryBean ehCacheManagerFactoryBean = new EhCacheManagerFactoryBean();
         ehCacheManagerFactoryBean.setConfigLocation(new ClassPathResource("ehcache.xml"));

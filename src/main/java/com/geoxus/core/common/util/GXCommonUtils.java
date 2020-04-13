@@ -19,11 +19,15 @@ import com.geoxus.core.common.constant.GXCommonConstants;
 import com.geoxus.core.common.event.GXBaseEvent;
 import com.geoxus.core.rpc.config.GXRabbitMQRPCRemoteServersConfig;
 import com.geoxus.core.rpc.service.GXRabbitMQRPCClientService;
+import org.redisson.api.RedissonClient;
+import org.redisson.spring.cache.RedissonSpringCacheManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.cache.Cache;
 import org.springframework.cache.CacheManager;
 import org.springframework.cache.ehcache.EhCacheCacheManager;
+import org.springframework.cache.ehcache.EhCacheManagerFactoryBean;
+import org.springframework.core.io.ClassPathResource;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Type;
@@ -644,7 +648,35 @@ public class GXCommonUtils {
      * @return EhCacheCacheManager
      */
     public static EhCacheCacheManager getEhCacheCacheManager() {
-        return GXSpringContextUtils.getBean(EhCacheCacheManager.class);
+        EhCacheCacheManager ehCacheCacheManager = GXSpringContextUtils.getBean(EhCacheCacheManager.class);
+        if (null != ehCacheCacheManager) {
+            return ehCacheCacheManager;
+        }
+        EhCacheManagerFactoryBean ehCacheManagerFactoryBean = new EhCacheManagerFactoryBean();
+        ehCacheManagerFactoryBean.setConfigLocation(new ClassPathResource("ehcache.xml"));
+        ehCacheManagerFactoryBean.setShared(true);
+        net.sf.ehcache.CacheManager cacheManager = ehCacheManagerFactoryBean.getObject();
+        if (null == cacheManager) {
+            cacheManager = new net.sf.ehcache.CacheManager();
+        }
+        return new EhCacheCacheManager(cacheManager);
+    }
+
+    /**
+     * 获取RedissonSpringCacheManager
+     *
+     * @return RedissonSpringCacheManager
+     */
+    public static RedissonSpringCacheManager getRedissonCacheManager() {
+        final CacheManager cacheManager = GXSpringContextUtils.getBean(CacheManager.class);
+        if (cacheManager instanceof RedissonSpringCacheManager) {
+            return (RedissonSpringCacheManager) cacheManager;
+        }
+        RedissonClient redissonClient = GXSpringContextUtils.getBean(RedissonClient.class);
+        if (null == redissonClient) {
+            return null;
+        }
+        return new RedissonSpringCacheManager(redissonClient, "classpath:/redisson-cache-config.yml");
     }
 
     /**
@@ -805,7 +837,7 @@ public class GXCommonUtils {
      * @param <R>       泛型的类型
      * @return R
      */
-    public <R> R getSpringCacheValue(String cacheName, String key, Class<R> clazz) {
+    public static <R> R getSpringCacheValue(String cacheName, String key, Class<R> clazz) {
         Cache cache = getSpringCache(cacheName);
         return cache.get(key, clazz);
     }
@@ -820,11 +852,23 @@ public class GXCommonUtils {
      * @param defaultValue 默认值
      * @return R
      */
-    public <R> R getSpringCacheValue(String cacheName, String key, Class<R> clazz, R defaultValue) {
+    public static <R> R getSpringCacheValue(String cacheName, String key, Class<R> clazz, R defaultValue) {
         Cache cache = getSpringCache(cacheName);
         if (cache.get(key) == null) {
             return defaultValue;
         }
         return getSpringCacheValue(cacheName, key, clazz);
+    }
+
+    /**
+     * 设置缓存的值
+     *
+     * @param cacheName 缓存的名字
+     * @param key       缓存的键
+     * @param value     缓存的值
+     */
+    public static void setSpringCacheValue(String cacheName, String key, Object value) {
+        Cache springCache = getSpringCache(cacheName);
+        springCache.put(key, value);
     }
 }
