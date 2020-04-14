@@ -11,9 +11,6 @@ import org.springframework.stereotype.Component;
 
 import java.util.Map;
 
-/**
- * Spring Context 工具类
- */
 @Component
 public class GXSpringContextUtils implements ApplicationContextAware {
     private static final Logger log = GXCommonUtils.getLogger(GXSpringContextUtils.class);
