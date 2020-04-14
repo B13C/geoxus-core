@@ -11,12 +11,13 @@ import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.DefaultResourceLoader;
 
 import java.net.URL;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 
 public class GXSingletonUtils {
-    private final Map<String, Object> singles = new ConcurrentHashMap<>();
-
+    /**
+     * 获取EhCacheCacheManager
+     *
+     * @return EhCacheCacheManager
+     */
     public static EhCacheCacheManager getEhCacheCacheManager() {
         final String beanName = "a1cddb7233521d";
         EhCacheCacheManager ehCacheCacheManager = GXSpringContextUtils.getBean(EhCacheCacheManager.class);
@@ -39,6 +40,11 @@ public class GXSingletonUtils {
         return manager;
     }
 
+    /**
+     * 获取RedissonSpringCacheManager
+     *
+     * @return RedissonSpringCacheManager
+     */
     public static RedissonSpringCacheManager getRedissonSpringCacheManager() {
         final String beanName = "9372fd46c598a";
         final CacheManager cacheManager = GXSpringContextUtils.getBean(CacheManager.class);
@@ -64,6 +70,11 @@ public class GXSingletonUtils {
         return null;
     }
 
+    /**
+     * 获取Spring的DefaultResourceLoader
+     *
+     * @return DefaultResourceLoader
+     */
     public static DefaultResourceLoader getDefaultResourceLoader() {
         final String beanName = "6C598A1CDDB7233";
         DefaultResourceLoader bean = GXSpringContextUtils.getBean(beanName, DefaultResourceLoader.class);
