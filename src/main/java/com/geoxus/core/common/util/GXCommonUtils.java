@@ -22,6 +22,7 @@ import com.geoxus.core.rpc.service.GXRabbitMQRPCClientService;
 import org.redisson.spring.cache.RedissonSpringCacheManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.boot.web.servlet.context.AnnotationConfigServletWebServerApplicationContext;
 import org.springframework.cache.Cache;
 import org.springframework.cache.CacheManager;
 import org.springframework.cache.ehcache.EhCacheCacheManager;
@@ -645,9 +646,9 @@ public class GXCommonUtils {
      * @return EhCacheCacheManager
      */
     public static EhCacheCacheManager getEhCacheCacheManager() {
-        Object instance = GXSingletonUtils.EH_CACHE_CACHE_MANAGER_INSTANCE.getInstance();
+        EhCacheCacheManager instance = GXSingletonUtils.getEhCacheCacheManager();
         assert null != instance;
-        return (EhCacheCacheManager) instance;
+        return instance;
     }
 
     /**
@@ -656,9 +657,20 @@ public class GXCommonUtils {
      * @return RedissonSpringCacheManager
      */
     public static RedissonSpringCacheManager getRedissonCacheManager() {
-        Object instance = GXSingletonUtils.REDISSON_SPRING_CACHE_MANAGER.getInstance();
+        RedissonSpringCacheManager instance = GXSingletonUtils.getRedissonSpringCacheManager();
         assert null != instance;
-        return (RedissonSpringCacheManager) instance;
+        return instance;
+    }
+
+    /**
+     * 向Spring IOC容器中新增单列对象
+     *
+     * @param beanName        bean的名字
+     * @param singletonObject 需要存储的对象
+     */
+    public static void registerSingleton(String beanName, Object singletonObject) {
+        AnnotationConfigServletWebServerApplicationContext applicationContext = (AnnotationConfigServletWebServerApplicationContext) GXSpringContextUtils.getApplicationContext();
+        applicationContext.getBeanFactory().registerSingleton(beanName, singletonObject);
     }
 
     /**
