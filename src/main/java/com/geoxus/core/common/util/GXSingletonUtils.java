@@ -4,7 +4,6 @@ import org.redisson.Redisson;
 import org.redisson.api.RedissonClient;
 import org.redisson.config.Config;
 import org.redisson.spring.cache.RedissonSpringCacheManager;
-import org.springframework.cache.CacheManager;
 import org.springframework.cache.ehcache.EhCacheCacheManager;
 import org.springframework.cache.ehcache.EhCacheManagerFactoryBean;
 import org.springframework.core.io.ClassPathResource;
@@ -47,13 +46,13 @@ public class GXSingletonUtils {
      */
     public static RedissonSpringCacheManager getRedissonSpringCacheManager() {
         final String beanName = "9372fd46c598a";
-        final CacheManager cacheManager = GXSpringContextUtils.getBean(CacheManager.class);
-        if (cacheManager instanceof org.redisson.spring.cache.RedissonSpringCacheManager) {
-            return (RedissonSpringCacheManager) cacheManager;
+        RedissonSpringCacheManager cacheManager = GXSpringContextUtils.getBean(RedissonSpringCacheManager.class);
+        if (cacheManager != null) {
+            return cacheManager;
         }
-        RedissonSpringCacheManager bean = GXSpringContextUtils.getBean(beanName, RedissonSpringCacheManager.class);
-        if (null != bean) {
-            return bean;
+        cacheManager = GXSpringContextUtils.getBean(beanName, RedissonSpringCacheManager.class);
+        if (null != cacheManager) {
+            return cacheManager;
         }
         try {
             URL resource = GXCommonUtils.class.getClassLoader().getResource("redisson.yml");

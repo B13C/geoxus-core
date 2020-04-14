@@ -2,7 +2,6 @@ package com.geoxus.core.common.util;
 
 import org.slf4j.Logger;
 import org.springframework.beans.BeansException;
-import org.springframework.beans.factory.NoSuchBeanDefinitionException;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 import org.springframework.context.support.AbstractApplicationContext;
@@ -33,8 +32,8 @@ public class GXSpringContextUtils implements ApplicationContextAware {
     public static <T> T getBean(Class<T> clazz) {
         try {
             return applicationContext.getBean(clazz);
-        } catch (NoSuchBeanDefinitionException e) {
-            log.error(e.getMessage(), e);
+        } catch (Exception e) {
+            log.error("Bean获取出错 : " + e.getMessage(), e);
         }
         return null;
     }
@@ -69,7 +68,9 @@ public class GXSpringContextUtils implements ApplicationContextAware {
     }
 
     public static void registerSingleton(String beanName, Object singletonObject) {
-        ((AbstractApplicationContext) applicationContext).getBeanFactory().registerSingleton(beanName, singletonObject);
+        if (null == getBean(singletonObject.getClass())) {
+            ((AbstractApplicationContext) applicationContext).getBeanFactory().registerSingleton(beanName, singletonObject);
+        }
     }
 
     public static ApplicationContext getApplicationContext() {
