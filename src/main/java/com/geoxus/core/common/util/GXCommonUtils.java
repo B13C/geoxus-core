@@ -19,22 +19,15 @@ import com.geoxus.core.common.constant.GXCommonConstants;
 import com.geoxus.core.common.event.GXBaseEvent;
 import com.geoxus.core.rpc.config.GXRabbitMQRPCRemoteServersConfig;
 import com.geoxus.core.rpc.service.GXRabbitMQRPCClientService;
-import org.redisson.Redisson;
-import org.redisson.api.RedissonClient;
-import org.redisson.config.Config;
 import org.redisson.spring.cache.RedissonSpringCacheManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.cache.Cache;
 import org.springframework.cache.CacheManager;
 import org.springframework.cache.ehcache.EhCacheCacheManager;
-import org.springframework.cache.ehcache.EhCacheManagerFactoryBean;
-import org.springframework.core.io.ClassPathResource;
 
-import java.io.IOException;
 import java.lang.reflect.Field;
 import java.lang.reflect.Type;
-import java.net.URL;
 import java.util.*;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -652,18 +645,9 @@ public class GXCommonUtils {
      * @return EhCacheCacheManager
      */
     public static EhCacheCacheManager getEhCacheCacheManager() {
-        EhCacheCacheManager ehCacheCacheManager = GXSpringContextUtils.getBean(EhCacheCacheManager.class);
-        if (null != ehCacheCacheManager) {
-            return ehCacheCacheManager;
-        }
-        EhCacheManagerFactoryBean ehCacheManagerFactoryBean = new EhCacheManagerFactoryBean();
-        ehCacheManagerFactoryBean.setConfigLocation(new ClassPathResource("ehcache.xml"));
-        ehCacheManagerFactoryBean.setShared(true);
-        net.sf.ehcache.CacheManager cacheManager = ehCacheManagerFactoryBean.getObject();
-        if (null == cacheManager) {
-            cacheManager = new net.sf.ehcache.CacheManager();
-        }
-        return new EhCacheCacheManager(cacheManager);
+        Object instance = GXSingletonUtils.EH_CACHE_CACHE_MANAGER_INSTANCE.getInstance();
+        assert null != instance;
+        return (EhCacheCacheManager) instance;
     }
 
     /**
@@ -672,19 +656,9 @@ public class GXCommonUtils {
      * @return RedissonSpringCacheManager
      */
     public static RedissonSpringCacheManager getRedissonCacheManager() {
-        final CacheManager cacheManager = GXSpringContextUtils.getBean(CacheManager.class);
-        if (cacheManager instanceof RedissonSpringCacheManager) {
-            return (RedissonSpringCacheManager) cacheManager;
-        }
-        try {
-            URL resource = GXCommonUtils.class.getClassLoader().getResource("redisson.yml");
-            Config config = Config.fromYAML(resource);
-            RedissonClient redissonClient = Redisson.create(config);
-            return new RedissonSpringCacheManager(redissonClient, "classpath:/redisson-cache-config.yml");
-        } catch (IOException e) {
-            getLogger(GXCommonUtils.class).error("读取redisson.yml文件失败...");
-        }
-        return null;
+        Object instance = GXSingletonUtils.REDISSON_SPRING_CACHE_MANAGER.getInstance();
+        assert null != instance;
+        return (RedissonSpringCacheManager) instance;
     }
 
     /**
