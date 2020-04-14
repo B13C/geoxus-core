@@ -7,10 +7,10 @@ import cn.hutool.json.JSONObject;
 import com.geoxus.core.common.constant.GXCommonConstants;
 import com.geoxus.core.common.event.GXMediaLibraryEvent;
 import com.geoxus.core.framework.service.GXCoreMediaLibraryService;
-import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationListener;
+import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
@@ -31,8 +31,12 @@ public class GXMediaLibraryListener<T> implements ApplicationListener<GXMediaLib
         final long coreModelId = param.getInt(GXCommonConstants.CORE_MODEL_PRIMARY_NAME);
         final long objectId = param.getLong("object_id");
         if (objectId > 0) {
+            Dict condition = Dict.create();
+            if (null != param.getObj("condition")) {
+                condition = Convert.convert(Dict.class, param.getObj("condition"));
+            }
             coreMediaLibraryService.updateOwner(objectId, coreModelId, Convert.convert(new TypeReference<List<JSONObject>>() {
-            }, param.getObj("media")));
+            }, param.getObj("media")), condition);
         }
     }
 }

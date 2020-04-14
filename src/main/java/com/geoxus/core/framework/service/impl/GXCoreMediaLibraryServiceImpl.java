@@ -1,7 +1,9 @@
 package com.geoxus.core.framework.service.impl;
 
 import cn.hutool.core.collection.CollUtil;
+import cn.hutool.core.convert.Convert;
 import cn.hutool.core.lang.Dict;
+import cn.hutool.core.lang.TypeReference;
 import cn.hutool.json.JSONObject;
 import cn.hutool.json.JSONUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
@@ -21,9 +23,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -45,12 +45,17 @@ public class GXCoreMediaLibraryServiceImpl extends ServiceImpl<GXCoreMediaLibrar
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public boolean updateOwner(long objectId, long coreModelId, List<JSONObject> param) {
+    public void updateOwner(long objectId, long coreModelId, List<JSONObject> param, Dict condition) {
         if (param.isEmpty()) {
-            return true;
+            return;
         }
         final ArrayList<GXCoreMediaLibraryEntity> newMediaList = new ArrayList<>();
-        final List<GXCoreMediaLibraryEntity> oldMediaList = list(new QueryWrapper<GXCoreMediaLibraryEntity>().allEq(Dict.create().set("object_id", objectId).set(GXCommonConstants.CORE_MODEL_PRIMARY_NAME, coreModelId)));
+        QueryWrapper<GXCoreMediaLibraryEntity> oldConditionQuery = new QueryWrapper<>();
+        Dict oldCondition = Dict.create().set("object_id", objectId).set(GXCommonConstants.CORE_MODEL_PRIMARY_NAME, coreModelId);
+        if (null != condition.getObj("resource_type")) {
+            oldCondition.set("resource_type", condition.getStr("resource_type"));
+        }
+        final List<GXCoreMediaLibraryEntity> oldMediaList = list(oldConditionQuery.allEq(oldCondition));
         Set<Integer> saveOldData = CollUtil.newHashSet();
         for (JSONObject dict : param) {
             Integer mediaId = dict.getInt("id");
@@ -62,12 +67,12 @@ public class GXCoreMediaLibraryServiceImpl extends ServiceImpl<GXCoreMediaLibrar
                 final String resourceType = dict.getStr("resource_type", "");
                 final GXCoreMediaLibraryEntity entity = getOne(new QueryWrapper<GXCoreMediaLibraryEntity>().eq("id", mediaId));
                 String customProperties = dict.getStr("custom_properties", "{}");
-                Integer saveOld = dict.getInt("save_old");
-                if (null != saveOld) {
+                Integer updateOld = dict.getInt("update_old");
+                if (null != updateOld) {
                     saveOldData.add(mediaId);
                     if (JSONUtil.isJson(customProperties)) {
                         Dict bean = JSONUtil.toBean(customProperties, Dict.class);
-                        bean.put("save_old", saveOld);
+                        bean.put("update_old", updateOld);
                         customProperties = JSONUtil.toJsonStr(bean);
                     }
                 }
@@ -81,17 +86,16 @@ public class GXCoreMediaLibraryServiceImpl extends ServiceImpl<GXCoreMediaLibrar
                 }
             }
         }
-        List<GXCoreMediaLibraryEntity> deleteMedia = CollUtil.filter(oldMediaList, (GXCoreMediaLibraryEntity t) -> !saveOldData.contains(t.getId()) && !newMediaList.contains(t));
-        if (!newMediaList.isEmpty()) {
-            boolean b = true;
-            if (!deleteMedia.isEmpty()) {
-                // TODO : 此处可以加入删除策略
-                // TODO : 例如 : 软删除  硬删除等...
-                b = removeByIds(deleteMedia.stream().map(GXCoreMediaLibraryEntity::getId).collect(Collectors.toList()));
-            }
-            return updateBatchById(newMediaList) && b;
+        List<GXCoreMediaLibraryEntity> deleteMedia = CollUtil.filter(oldMediaList,
+                (GXCoreMediaLibraryEntity t) -> !saveOldData.contains(t.getId()) && !newMediaList.contains(t));
+        if (!deleteMedia.isEmpty()) {
+            // TODO : 此处可以加入删除策略
+            // TODO : 例如 : 软删除  硬删除等...
+            removeByIds(deleteMedia.stream().map(GXCoreMediaLibraryEntity::getId).collect(Collectors.toList()));
         }
-        return true;
+        if (!newMediaList.isEmpty()) {
+            updateBatchById(newMediaList);
+        }
     }
 
     @Override
@@ -130,5 +134,16 @@ public class GXCoreMediaLibraryServiceImpl extends ServiceImpl<GXCoreMediaLibrar
     @Override
     public List<Dict> getMediaByCondition(Dict param) {
         return baseMapper.getMediaByCondition(param);
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public void updateOldFile(Dict param) {
+        Long objectId = Optional.ofNullable(param.getLong("object_id")).orElse(0L);
+        Long coreModelId = Optional.ofNullable(param.getLong(GXCommonConstants.CORE_MODEL_PRIMARY_NAME)).orElse(0L);
+        Dict condition = Convert.convert(Dict.class, Optional.ofNullable(param.getObj("condition")).orElse(Dict.create()));
+        List<JSONObject> objectList = Convert.convert(new TypeReference<List<JSONObject>>() {
+        }, Optional.ofNullable(param.getObj("data")).orElse(Collections.emptyList()));
+        updateOwner(objectId, coreModelId, objectList, condition);
     }
 }

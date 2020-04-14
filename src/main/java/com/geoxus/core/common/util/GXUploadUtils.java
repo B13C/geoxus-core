@@ -15,16 +15,19 @@ import java.util.Collections;
 import java.util.List;
 
 public class GXUploadUtils {
+    private GXUploadUtils() {
+    }
+
     /**
      * 单文件上传
      *
-     * @param file
-     * @param path
-     * @return
+     * @param file 文件
+     * @param path 路径
+     * @return String
      * @throws IOException
      */
     public static String singleUpload(MultipartFile file, String path) throws IOException {
-        if (!mkdirs(path)) {
+        if (mkdirs(path)) {
             return "";
         }
         String fileName;
@@ -43,13 +46,13 @@ public class GXUploadUtils {
     /**
      * 多文件上传
      *
-     * @param files
-     * @param path
-     * @return
+     * @param files 文件
+     * @param path  路径
+     * @return List
      * @throws IOException
      */
     public static List<Dict> multiUpload(MultipartFile[] files, String path) throws IOException {
-        if (!mkdirs(path)) {
+        if (mkdirs(path)) {
             return Collections.emptyList();
         }
         String fileName;
@@ -72,15 +75,15 @@ public class GXUploadUtils {
     /**
      * 创建上传目录
      *
-     * @param path
-     * @return
+     * @param path 路径
+     * @return boolean
      */
     private static boolean mkdirs(String path) {
         File dirFile = new File(path);
         if (!dirFile.exists() && !dirFile.isDirectory()) {
-            return dirFile.mkdirs();
+            return !dirFile.mkdirs();
         }
-        return true;
+        return false;
     }
 
     /**
@@ -88,17 +91,19 @@ public class GXUploadUtils {
      *
      * @param base64 文件base64编码信息
      * @param path   文件存放路径
-     * @return
+     * @return String
      * @throws IOException
      */
     public static String base64Upload(String base64, String path) throws IOException {
-        if (!mkdirs(path)) {
+        if (mkdirs(path)) {
             return "";
         }
-        String imgData = base64.substring(base64.indexOf(";base64,") + ";base64,".length());
+        String base64Prefix = ";base64,";
+        int endIndex = base64.indexOf(base64Prefix) + base64Prefix.length();
+        String imgData = base64.substring(endIndex);
         byte[] bytes = Base64.decodeBase64(imgData);
-        String suffix = base64.substring(0, base64.indexOf(";base64,") + ";base64,".length())
-                .replaceAll("data:image/", "").replaceAll(";base64,", "");
+        String suffix = base64.substring(0, endIndex)
+                .replace("data:image/", "").replace(base64Prefix, "");
         String fileName = IdUtil.randomUUID() + "." + suffix;
         File file = new File(path, fileName);
         FileUtils.writeByteArrayToFile(file, bytes);
