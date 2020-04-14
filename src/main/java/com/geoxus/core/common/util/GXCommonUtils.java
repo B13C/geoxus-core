@@ -25,7 +25,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.cache.Cache;
 import org.springframework.cache.CacheManager;
 import org.springframework.cache.ehcache.EhCacheCacheManager;
-import org.springframework.context.support.AbstractApplicationContext;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Type;
@@ -669,8 +668,7 @@ public class GXCommonUtils {
      * @param singletonObject 需要存储的对象
      */
     public static void registerSingleton(String beanName, Object singletonObject) {
-        AbstractApplicationContext applicationContext = (AbstractApplicationContext) GXSpringContextUtils.getApplicationContext();
-        applicationContext.getBeanFactory().registerSingleton(beanName, singletonObject);
+        GXSpringContextUtils.registerSingleton(beanName, singletonObject);
     }
 
     /**

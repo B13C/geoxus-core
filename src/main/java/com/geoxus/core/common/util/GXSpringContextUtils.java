@@ -5,6 +5,7 @@ import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.NoSuchBeanDefinitionException;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
+import org.springframework.context.support.AbstractApplicationContext;
 import org.springframework.core.env.Environment;
 import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Component;
@@ -65,6 +66,10 @@ public class GXSpringContextUtils implements ApplicationContextAware {
 
     public static Environment getEnvironment() {
         return applicationContext.getEnvironment();
+    }
+
+    public static void registerSingleton(String beanName, Object singletonObject) {
+        ((AbstractApplicationContext) applicationContext).getBeanFactory().registerSingleton(beanName, singletonObject);
     }
 
     public static ApplicationContext getApplicationContext() {
