@@ -97,7 +97,7 @@ public class GXResultUtils extends HashMap<String, Object> {
     public GXResultUtils addKeyValue(String key, Object value) {
         Object o = get("data");
         Dict data = Dict.create().set(key, value);
-        if (null != o) {
+        if (o instanceof Map) {
             Dict dict = Convert.convert(Dict.class, o);
             data.putAll(dict);
         }
