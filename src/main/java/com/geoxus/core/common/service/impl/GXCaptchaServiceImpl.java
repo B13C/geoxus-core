@@ -4,6 +4,7 @@ import cn.hutool.captcha.CaptchaUtil;
 import cn.hutool.captcha.LineCaptcha;
 import cn.hutool.core.lang.Dict;
 import cn.hutool.core.util.IdUtil;
+import cn.hutool.core.util.StrUtil;
 import com.geoxus.core.common.annotation.GXFieldCommentAnnotation;
 import com.geoxus.core.common.service.GXCaptchaService;
 import com.geoxus.core.common.util.GXCacheKeysUtils;
@@ -37,6 +38,9 @@ public class GXCaptchaServiceImpl implements GXCaptchaService {
 
     @Override
     public boolean checkCaptcha(String uuid, String code) {
+        if (StrUtil.isBlank(uuid) || StrUtil.isBlank(code)) {
+            return false;
+        }
         String cacheKey = cacheKeysUtils.getCaptchaConfigKey(uuid);
         if (code.equalsIgnoreCase(CAPTCHA_CACHE.getIfPresent(cacheKey))) {
             CAPTCHA_CACHE.invalidate(cacheKey);
