@@ -490,7 +490,8 @@ public interface GXBaseService<T> extends IService<T> {
         GXBaseMapper<T> baseMapper = (GXBaseMapper<T>) getBaseMapper();
         final Dict dict = baseMapper.getFieldValueBySQL(tableName, fieldSet, condition, remove);
         if (null == dict) {
-            throw new GXException("数据不存在...");
+            GXCommonUtils.getLogger(GXBaseService.class).error("在{}获取{}字段的数据不存在...", tableName, fieldSet);
+            return Dict.create();
         }
         return handleSamePrefixDict(dict);
     }
