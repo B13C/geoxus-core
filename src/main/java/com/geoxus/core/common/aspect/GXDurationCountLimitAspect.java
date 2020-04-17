@@ -38,7 +38,7 @@ public class GXDurationCountLimitAspect {
             key = key.concat(GXHttpContextUtils.getIP());
         }
         final long actualCount = GXRedisUtils.getCounter(key, expire, TimeUnit.SECONDS);
-        if (actualCount >= count) {
+        if (actualCount > count) {
             throw new GXException("操作频繁,请稍后在试......");
         }
         return point.proceed(point.getArgs());

@@ -2,9 +2,9 @@ package com.geoxus.core.common.util;
 
 import cn.hutool.core.convert.Convert;
 import com.geoxus.core.common.annotation.GXFieldCommentAnnotation;
-import org.redisson.api.RAtomicLong;
 import org.redisson.api.RLock;
 import org.redisson.api.RMap;
+import org.redisson.api.RMapCache;
 import org.redisson.api.RedissonClient;
 import org.slf4j.Logger;
 import org.springframework.stereotype.Component;
@@ -72,8 +72,17 @@ public class GXRedisUtils {
      * @return long
      */
     public static long getCounter(String key, int expire, TimeUnit timeUnit) {
-        final RAtomicLong rAtomicLong = getRedissonClient().getAtomicLong(key);
-        return rAtomicLong.getAndIncrement();
+        final String MAP_CACHE_NAME = "counter_key";
+        RMapCache<Object, Object> rMapCache = getRedissonClient().getMapCache(MAP_CACHE_NAME);
+        Object oldCount = rMapCache.get(key);
+        if (null == oldCount) {
+            int counter = 1;
+            rMapCache.put(key, counter, expire, timeUnit);
+            return counter;
+        }
+        int counter = (int) oldCount + 1;
+        rMapCache.put(key, counter);
+        return counter;
     }
 
     /**

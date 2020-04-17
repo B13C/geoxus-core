@@ -7,6 +7,8 @@ import com.geoxus.core.common.constant.GXCommonConstants;
 import com.geoxus.core.common.exception.GXException;
 import com.geoxus.core.common.service.GXCaptchaService;
 import com.geoxus.core.common.service.GXSendSMSService;
+import com.geoxus.core.common.util.GXCommonUtils;
+import com.geoxus.core.common.util.GXHttpContextUtils;
 import com.geoxus.core.common.util.GXSpringContextUtils;
 import com.geoxus.core.common.vo.GXResultCode;
 import org.aspectj.lang.ProceedingJoinPoint;
@@ -39,7 +41,10 @@ public class GXCheckCaptchaAspect {
         if (verifyType == 0) {
             throw new GXException(GXResultCode.NEED_CAPTCHA);
         }
-        final String verifyCode = param.getStr("verify_code");
+        String verifyCode = param.getStr("verify_code");
+        if (null == verifyCode) {
+            verifyCode = GXHttpContextUtils.getHttpParam("verify_code", String.class);
+        }
         if (null == verifyCode) {
             String msg = "请传递手机验证码";
             if (verifyType == GXCommonConstants.CAPTCHA_VERIFY) {
@@ -52,11 +57,15 @@ public class GXCheckCaptchaAspect {
             if (null == phone) {
                 throw new GXException("请传递手机号码");
             }
-            if (!getSendSMSService().verification(phone, verifyCode)) {
+            String phoneNumber = GXCommonUtils.decryptedPhoneNumber(phone);
+            if (!getSendSMSService().verification(phoneNumber, verifyCode)) {
                 throw new GXException(GXResultCode.NEED_CAPTCHA);
             }
         } else if (verifyType == GXCommonConstants.CAPTCHA_VERIFY) {
-            final String uuid = param.getStr("uuid");
+            String uuid = param.getStr("uuid");
+            if (null == uuid) {
+                uuid = GXHttpContextUtils.getHttpParam("uuid", String.class);
+            }
             if (null == uuid) {
                 throw new GXException("请传递图形验证码标识uuid");
             }
