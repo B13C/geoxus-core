@@ -14,7 +14,7 @@ public interface GXCoreMediaLibraryService extends GXBaseService<GXCoreMediaLibr
      * @param dict 参数
      * @return int
      */
-    int save(Dict dict) throws Exception;
+    int save(Dict dict);
 
     /**
      * 更新条目所关联的模块ID
