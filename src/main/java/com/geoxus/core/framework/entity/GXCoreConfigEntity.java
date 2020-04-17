@@ -3,7 +3,6 @@ package com.geoxus.core.framework.entity;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.geoxus.core.common.annotation.GXValidateDBExistsAnnotation;
-import com.geoxus.core.common.annotation.GXValidateExtDataAnnotation;
 import com.geoxus.core.common.entity.GXBaseEntity;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -27,9 +26,6 @@ public class GXCoreConfigEntity extends GXBaseEntity {
 
     @NotBlank()
     private String paramValue;
-
-    @GXValidateExtDataAnnotation(tableName = "core_config")
-    private String ext;
 
     private int status;
 

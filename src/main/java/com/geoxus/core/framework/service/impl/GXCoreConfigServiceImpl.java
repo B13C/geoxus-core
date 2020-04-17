@@ -47,9 +47,9 @@ public class GXCoreConfigServiceImpl extends ServiceImpl<GXCoreConfigMapper, GXC
         QueryWrapper<GXCoreConfigEntity> conditionWrapper = new QueryWrapper<GXCoreConfigEntity>().allEq(Dict.create().set("param_key", key));
         GXCoreConfigEntity entity = getOne(conditionWrapper);
         if (null != entity) {
-            String ext = entity.getExt();
-            if (null != ext && JSONUtil.isJson(ext)) {
-                return JSONUtil.toBean(ext, clazz);
+            String paramValue = entity.getParamValue();
+            if (null != paramValue && JSONUtil.isJson(paramValue)) {
+                return JSONUtil.toBean(paramValue, clazz);
             }
         }
         return GXCommonUtils.getClassDefaultValue(clazz);
