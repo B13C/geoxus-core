@@ -1,6 +1,8 @@
 package com.geoxus.core.framework.service.impl;
 
 import cn.hutool.core.lang.Dict;
+import cn.hutool.json.JSONUtil;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.geoxus.core.common.util.GXCommonUtils;
 import com.geoxus.core.common.vo.GXBusinessStatusCode;
@@ -42,6 +44,14 @@ public class GXCoreConfigServiceImpl extends ServiceImpl<GXCoreConfigMapper, GXC
 
     @Override
     public <T> T getConfigObject(String key, Class<T> clazz) {
+        QueryWrapper<GXCoreConfigEntity> conditionWrapper = new QueryWrapper<GXCoreConfigEntity>().allEq(Dict.create().set("param_key", key));
+        GXCoreConfigEntity entity = getOne(conditionWrapper);
+        if (null != entity) {
+            String ext = entity.getExt();
+            if (null != ext && JSONUtil.isJson(ext)) {
+                return JSONUtil.toBean(ext, clazz);
+            }
+        }
         return GXCommonUtils.getClassDefaultValue(clazz);
     }
 

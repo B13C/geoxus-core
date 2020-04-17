@@ -63,6 +63,9 @@ public class GXCoreMediaLibraryEntity extends GXBaseEntity implements Serializab
     @GXFieldCommentAnnotation(zh = "资源类型")
     private String resourceType = "";
 
+    @GXFieldCommentAnnotation(zh = "OSS的URL地址")
+    private String ossUrl;
+
     @TableField(exist = false)
     @GXFieldCommentAnnotation(zh = "文件存放物理地址")
     private String filePath = "";
