@@ -10,6 +10,7 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;
 import org.springframework.cache.CacheManager;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Profile;
 import org.springframework.core.io.Resource;
 
 import java.io.IOException;
@@ -22,6 +23,14 @@ public class GXRedissonSpringDataConfig {
     }
 
     @Bean(destroyMethod = "shutdown")
+    @Profile("local")
+    public RedissonClient redissonClient(@Value("classpath:/redisson-local.yml") Resource configFile) throws IOException {
+        Config config = Config.fromYAML(configFile.getInputStream());
+        return Redisson.create(config);
+    }
+
+    @Bean(destroyMethod = "shutdown")
+    @Profile("dev")
     public RedissonClient redisson(@Value("classpath:/redisson.yml") Resource configFile) throws IOException {
         Config config = Config.fromYAML(configFile.getInputStream());
         return Redisson.create(config);
