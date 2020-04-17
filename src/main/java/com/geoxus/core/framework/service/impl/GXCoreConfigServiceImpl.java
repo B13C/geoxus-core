@@ -34,8 +34,8 @@ public class GXCoreConfigServiceImpl extends ServiceImpl<GXCoreConfigMapper, GXC
         return false;
     }
 
-    public GXPagination listOrSearchPage(Dict param) {
-        return new GXPagination(Collections.emptyList());
+    public GXPagination<Dict> listOrSearchPage(Dict param) {
+        return new GXPagination<>(Collections.emptyList());
     }
 
     public Dict detail(Dict param) {
