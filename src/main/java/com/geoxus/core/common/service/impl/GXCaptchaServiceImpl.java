@@ -1,7 +1,7 @@
 package com.geoxus.core.common.service.impl;
 
+import cn.hutool.captcha.AbstractCaptcha;
 import cn.hutool.captcha.CaptchaUtil;
-import cn.hutool.captcha.LineCaptcha;
 import cn.hutool.core.lang.Dict;
 import cn.hutool.core.util.IdUtil;
 import cn.hutool.core.util.StrUtil;
@@ -65,9 +65,9 @@ public class GXCaptchaServiceImpl implements GXCaptchaService {
         }
         Map<String, Object> result = new HashMap<>();
         String uuid = IdUtil.randomUUID();
-        LineCaptcha lineCaptcha = CaptchaUtil.createLineCaptcha(width, height);
-        final String base64Img = lineCaptcha.getImageBase64();
-        final String code = lineCaptcha.getCode();
+        final AbstractCaptcha captcha = CaptchaUtil.createCircleCaptcha(width, height);
+        final String base64Img = captcha.getImageBase64();
+        final String code = captcha.getCode();
         final String cacheKey = cacheKeysUtils.getCaptchaConfigKey(uuid);
         CAPTCHA_CACHE.put(cacheKey, code);
         result.put("uuid", uuid);
