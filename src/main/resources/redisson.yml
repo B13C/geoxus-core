@@ -1,2 +1,4 @@
 singleServerConfig:
-  address: "redis://192.168.56.103:6379"
+  address: "redis://127.0.0.1:6379"
+  password: 74BA7A86272C79
+  database: 10
