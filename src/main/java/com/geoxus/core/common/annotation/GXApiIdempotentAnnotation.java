@@ -9,5 +9,5 @@ import java.lang.annotation.*;
 @Target({ElementType.METHOD})
 @Retention(RetentionPolicy.RUNTIME)
 public @interface GXApiIdempotentAnnotation {
-    int expires() default 70;
+    int expires() default 60;
 }
