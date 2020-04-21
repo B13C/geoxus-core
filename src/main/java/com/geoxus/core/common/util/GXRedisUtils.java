@@ -2,10 +2,7 @@ package com.geoxus.core.common.util;
 
 import cn.hutool.core.convert.Convert;
 import com.geoxus.core.common.annotation.GXFieldCommentAnnotation;
-import org.redisson.api.RLock;
-import org.redisson.api.RMap;
-import org.redisson.api.RMapCache;
-import org.redisson.api.RedissonClient;
+import org.redisson.api.*;
 import org.slf4j.Logger;
 import org.springframework.stereotype.Component;
 
@@ -117,6 +114,20 @@ public class GXRedisUtils {
      */
     public static RLock getLock(String lockName) {
         return getRedissonClient().getLock("lock:" + lockName);
+    }
+
+    /**
+     * API请求限流,在单位时间内只能请求多少次
+     *
+     * @param name             限流器的名字
+     * @param rate             频率
+     * @param rateInterval     时间
+     * @param rateIntervalUnit 时间单位
+     * @return boolean
+     */
+    public static boolean throttling(String name, int rate, int rateInterval, RateIntervalUnit rateIntervalUnit) {
+        final RRateLimiter rateLimiter = getRedissonClient().getRateLimiter(name);
+        return rateLimiter.trySetRate(RateType.OVERALL, rate, rateInterval, rateIntervalUnit);
     }
 
     /**
