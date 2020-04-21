@@ -116,7 +116,7 @@ public class GXHttpContextUtils {
      *
      * @return
      */
-    public static String getIP(HttpServletRequest httpServletRequest) {
+    public static String getClientIP(HttpServletRequest httpServletRequest) {
         String ip = "";
         if (null != httpServletRequest) {
             ip = ServletUtil.getClientIP(httpServletRequest);
@@ -129,7 +129,7 @@ public class GXHttpContextUtils {
      *
      * @return
      */
-    public static String getIP() {
+    public static String getClientIP() {
         String ip = "";
         if (null != GXHttpContextUtils.getHttpServletRequest()) {
             ip = ServletUtil.getClientIP(GXHttpContextUtils.getHttpServletRequest());

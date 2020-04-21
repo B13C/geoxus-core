@@ -70,7 +70,7 @@ public class GXRequestToBeanHandlerMethodArgumentResolver implements HandlerMeth
             Dict tmpDict = JSONUtil.toBean(json, Dict.class);
             if (isValidatePhone && tmpDict.containsKey(phoneFieldName)) {
                 final String phoneNumber = tmpDict.getStr(phoneFieldName);
-                if (!GXCommonUtils.checkPhone(phoneNumber)) {
+                if (GXCommonUtils.checkPhone(phoneNumber)) {
                     throw new GXException(GXResultCode.WRONG_PHONE.getMsg(), GXResultCode.WRONG_PHONE.getCode());
                 }
                 tmpDict.set(phoneFieldName, GXCommonUtils.encryptedPhoneNumber(phoneNumber));
@@ -89,7 +89,7 @@ public class GXRequestToBeanHandlerMethodArgumentResolver implements HandlerMeth
         }
         if (isValidatePhone && dict.containsKey(phoneFieldName)) {
             final String phoneNumber = dict.getStr(phoneFieldName);
-            if (!GXCommonUtils.checkPhone(phoneNumber)) {
+            if (GXCommonUtils.checkPhone(phoneNumber)) {
                 throw new GXException(GXResultCode.WRONG_PHONE.getMsg(), GXResultCode.WRONG_PHONE.getCode());
             }
             dict.set(phoneFieldName, GXCommonUtils.encryptedPhoneNumber(phoneNumber));

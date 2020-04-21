@@ -5,7 +5,7 @@ import org.springframework.core.annotation.AliasFor;
 import java.lang.annotation.*;
 
 /**
- * 限制功能在某段时间内只能服务的次数
+ * 限制功能在某段时间内只能被请求的次数
  * 比如: 发送短信的方法
  * 在一个小时内同一个IP地址只能发送5次......
  */
@@ -22,7 +22,7 @@ public @interface GXFrequencyLimitAnnotation {
     int count() default 10;
 
     @GXFieldCommentAnnotation(zh = "限制的key")
-    String key();
+    String key() default "";
 
     @GXFieldCommentAnnotation(zh = "过期时间, 单位: 秒")
     int expire() default 3600;

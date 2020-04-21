@@ -16,6 +16,9 @@ public class GXRedisUtils {
     @GXFieldCommentAnnotation(zh = "Logger对象")
     private static final Logger logger;
 
+    @GXFieldCommentAnnotation("计数器缓存的名字")
+    private static final String COUNTER_MAP_CACHE_NAME = "counter_map_cache_name";
+
     static {
         logger = GXCommonUtils.getLogger(GXRedisUtils.class);
     }
@@ -64,7 +67,8 @@ public class GXRedisUtils {
     }
 
     /**
-     * 计数器
+     * 获取并操作计数器的值
+     * 返回+1后的计数器的值
      *
      * @param key      数据key
      * @param expire   过期时间
@@ -72,17 +76,37 @@ public class GXRedisUtils {
      * @return long
      */
     public static long getCounter(String key, int expire, TimeUnit timeUnit) {
-        final String MAP_CACHE_NAME = "counter_key";
-        RMapCache<Object, Object> rMapCache = getRedissonClient().getMapCache(MAP_CACHE_NAME);
-        Object oldCount = rMapCache.get(key);
-        if (null == oldCount) {
-            int counter = 1;
-            rMapCache.put(key, counter, expire, timeUnit);
+        final RLock rLock = getLock(key);
+        RMapCache<Object, Object> rMapCache = getRedissonClient().getMapCache(COUNTER_MAP_CACHE_NAME);
+        try {
+            rLock.lock();
+            Object oldCount = rMapCache.get(key);
+            if (null == oldCount) {
+                long counter = 1;
+                rMapCache.put(key, counter, expire, timeUnit);
+                return counter;
+            }
+            long counter = (long) oldCount + 1L;
+            rMapCache.put(key, counter);
             return counter;
+        } finally {
+            rLock.unlock();
         }
-        int counter = (int) oldCount + 1;
-        rMapCache.put(key, counter);
-        return counter;
+    }
+
+    /**
+     * 获当前计数器的值,不会修改旧值
+     *
+     * @param key 计数器的key
+     * @return long
+     */
+    public static long getCounter(String key) {
+        RMapCache<Object, Object> rMapCache = getRedissonClient().getMapCache(COUNTER_MAP_CACHE_NAME);
+        final Object o = rMapCache.get(key);
+        if (null == o) {
+            return -1;
+        }
+        return Convert.convert(Long.class, o);
     }
 
     /**

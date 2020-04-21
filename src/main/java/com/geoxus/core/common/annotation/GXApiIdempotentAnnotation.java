@@ -4,6 +4,7 @@ import java.lang.annotation.*;
 
 /**
  * API幂等注解
+ * 可以防止同一表单提交多次的情况
  */
 @Documented
 @Target({ElementType.METHOD})

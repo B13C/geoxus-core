@@ -1,5 +1,7 @@
 package com.geoxus.core.common.aspect;
 
+import cn.hutool.core.util.RandomUtil;
+import cn.hutool.core.util.StrUtil;
 import com.geoxus.core.common.annotation.GXFieldCommentAnnotation;
 import com.geoxus.core.common.annotation.GXFrequencyLimitAnnotation;
 import com.geoxus.core.common.exception.GXException;
@@ -31,12 +33,18 @@ public class GXDurationCountLimitAspect {
         Method method = signature.getMethod();
         final GXFrequencyLimitAnnotation durationCountLimitAnnotation = method.getAnnotation(GXFrequencyLimitAnnotation.class);
         final int count = durationCountLimitAnnotation.count();
-        String key = CACHE_KEY_PFEFIX.concat(durationCountLimitAnnotation.key());
+        String s = durationCountLimitAnnotation.key();
+        if (StrUtil.isBlank(s)) {
+            s = RandomUtil.randomString(8);
+        }
+        String key = CACHE_KEY_PFEFIX.concat(s);
         final int expire = durationCountLimitAnnotation.expire();
         final String scene = durationCountLimitAnnotation.scene();
-        if (scene.equals("ip")) {
-            key = key.concat(GXHttpContextUtils.getIP());
+        String sceneValue = scene;
+        if ("ip".equals(scene)) {
+            sceneValue = GXHttpContextUtils.getClientIP();
         }
+        key = key.concat(sceneValue);
         final long actualCount = GXRedisUtils.getCounter(key, expire, TimeUnit.SECONDS);
         if (actualCount > count) {
             throw new GXException("操作频繁,请稍后在试......");

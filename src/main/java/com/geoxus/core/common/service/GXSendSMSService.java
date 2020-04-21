@@ -5,11 +5,6 @@ import com.geoxus.core.common.util.GXResultUtils;
 
 public interface GXSendSMSService {
     /**
-     * 短信验证码
-     */
-    int SMS_TYPE = 1;
-
-    /**
      * 发送短信验证码
      *
      * @param phone        用户手机号码
