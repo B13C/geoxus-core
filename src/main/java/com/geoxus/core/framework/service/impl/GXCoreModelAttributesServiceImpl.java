@@ -110,7 +110,7 @@ public class GXCoreModelAttributesServiceImpl extends ServiceImpl<GXCoreModelAtt
             for (Dict dict : list) {
                 final String attributeName = dict.getStr("attribute_name");
                 Integer required = dict.getInt("required");
-                if (required == 1 && null == sourceDict.getObj(attributeName)) {
+                if (required == 1 && null == sourceDict.getObj(attributeName) && null == dict.getObj("default_value")) {
                     String errorTips = dict.getStr("error_tips");
                     if (StrUtil.isBlank(errorTips)) {
                         errorTips = StrUtil.format("{}.{}是必填项", modelAttributeField, attributeName);
