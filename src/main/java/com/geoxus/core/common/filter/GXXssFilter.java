@@ -16,7 +16,10 @@ public class GXXssFilter implements Filter {
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException, ServletException {
         GXXssHttpServletRequestWrapper xssRequest = new GXXssHttpServletRequestWrapper((HttpServletRequest) request);
         final String uri = xssRequest.getRequestURI();
-        if (uri.contains("contents") || uri.contains("/activiti/editor/model") || uri.contains("save-model.html")) {
+        if (uri.contains("contents")
+                || uri.contains("/activiti/editor/model")
+                || uri.contains("save-model.html")
+                || uri.contains("/cftf-loan-products/backend/create")) {
             chain.doFilter(request, response);
         } else {
             chain.doFilter(xssRequest, response);
