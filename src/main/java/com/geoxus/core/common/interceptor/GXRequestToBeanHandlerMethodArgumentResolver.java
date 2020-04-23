@@ -63,18 +63,22 @@ public class GXRequestToBeanHandlerMethodArgumentResolver implements HandlerMeth
         boolean validateEntity = gxRequestBodyToEntityAnnotation.validateEntity();
         final boolean isValidatePhone = gxRequestBodyToEntityAnnotation.isValidatePhone();
         final String phoneFieldName = gxRequestBodyToEntityAnnotation.phoneFieldName();
+        final boolean encryptedPhoneFlag = gxRequestBodyToEntityAnnotation.encryptedPhone();
         final Integer coreModelId = dict.getInt(GXCommonConstants.CORE_MODEL_PRIMARY_NAME);
         for (String jsonField : jsonFields) {
             final String json = Optional.ofNullable(dict.getStr(jsonField)).orElse("{}");
             final Dict targetDict = gxCoreModelAttributesService.getModelAttributesDefaultValue(coreModelId, jsonField, json);
             Dict tmpDict = JSONUtil.toBean(json, Dict.class);
             if (isValidatePhone && tmpDict.containsKey(phoneFieldName)) {
-                final String phoneNumber = tmpDict.getStr(phoneFieldName);
+                String phoneNumber = tmpDict.getStr(phoneFieldName);
                 if (GXCommonUtils.checkPhone(phoneNumber)) {
                     throw new GXException(GXResultCode.WRONG_PHONE.getMsg(), GXResultCode.WRONG_PHONE.getCode());
                 }
-                tmpDict.set(phoneFieldName, GXCommonUtils.encryptedPhoneNumber(phoneNumber));
-                targetDict.set(phoneFieldName, GXCommonUtils.encryptedPhoneNumber(phoneNumber));
+                if (encryptedPhoneFlag) {
+                    phoneNumber = GXCommonUtils.encryptedPhoneNumber(phoneNumber);
+                }
+                tmpDict.set(phoneFieldName, phoneNumber);
+                targetDict.set(phoneFieldName, phoneNumber);
             }
             final Set<String> tmpDictKey = tmpDict.keySet();
             if (!tmpDict.isEmpty() && !CollUtil.containsAll(targetDict.keySet(), tmpDictKey)) {
@@ -88,11 +92,14 @@ public class GXRequestToBeanHandlerMethodArgumentResolver implements HandlerMeth
             }
         }
         if (isValidatePhone && dict.containsKey(phoneFieldName)) {
-            final String phoneNumber = dict.getStr(phoneFieldName);
+            String phoneNumber = dict.getStr(phoneFieldName);
             if (GXCommonUtils.checkPhone(phoneNumber)) {
                 throw new GXException(GXResultCode.WRONG_PHONE.getMsg(), GXResultCode.WRONG_PHONE.getCode());
             }
-            dict.set(phoneFieldName, GXCommonUtils.encryptedPhoneNumber(phoneNumber));
+            if (encryptedPhoneFlag) {
+                phoneNumber = GXCommonUtils.encryptedPhoneNumber(phoneNumber);
+            }
+            dict.set(phoneFieldName, phoneNumber);
         }
         Object bean = Convert.convert(parameterType, dict);
         Class<?>[] groups = gxRequestBodyToEntityAnnotation.groups();
