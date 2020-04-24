@@ -19,7 +19,8 @@ public class GXXssFilter implements Filter {
         if (uri.contains("contents")
                 || uri.contains("/activiti/editor/model")
                 || uri.contains("save-model.html")
-                || uri.contains("/cftf-loan-products/backend/create")) {
+                || uri.contains("/cftf-loan-products/backend/create")
+                || uri.contains("/content/backend/create")) {
             chain.doFilter(request, response);
         } else {
             chain.doFilter(xssRequest, response);
