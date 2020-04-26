@@ -66,11 +66,7 @@ public interface GXBusinessService<T> extends GXBaseService<T>, GXValidateDBExis
      * @return GXPagination
      */
     default GXPagination<Dict> listOrSearchPage(Dict param) {
-        final String profile = GXCommonUtils.getActiveProfile();
-        if ("prod".equals(profile)) {
-            return new GXPagination<>(Collections.emptyList());
-        }
-        throw new GXException("请实现自定义的listOrSearchPage方法");
+        return generatePage(param);
     }
 
     /**
