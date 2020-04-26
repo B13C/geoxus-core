@@ -105,6 +105,15 @@ public class GXCommonUtils {
     }
 
     /**
+     * 获取激活的Profile
+     *
+     * @return String
+     */
+    public static String getActiveProfile() {
+        return GXSpringContextUtils.getEnvironment().getActiveProfiles()[0];
+    }
+
+    /**
      * JSON字符串转Dict
      *
      * @param jsonStr JSON字符串

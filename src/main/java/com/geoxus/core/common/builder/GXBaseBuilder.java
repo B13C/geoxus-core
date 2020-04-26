@@ -219,7 +219,7 @@ public interface GXBaseBuilder {
      * @return Dict
      */
     default Dict getRequestSearchCondition(Dict param) {
-        return Optional.ofNullable(Convert.convert(Dict.class, param.getObj(GXBaseBuilderConstants.SEARCH_CONDITION_NAME))).orElse(param);
+        return Optional.ofNullable(Convert.convert(Dict.class, param.getObj(GXBaseBuilderConstants.SEARCH_CONDITION_NAME))).orElse(Dict.create());
     }
 
     /**
