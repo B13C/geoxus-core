@@ -296,6 +296,7 @@ public interface GXBaseBuilder {
                     GXCommonUtils.getLogger(GXBaseBuilder.class).warn("{}字段没有配置搜索条件", key);
                     continue;
                 }
+                assert null != operator;
                 if (value instanceof Collection) {
                     value = CollUtil.join((Collection<?>) value, ",");
                 }
