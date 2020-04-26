@@ -12,6 +12,7 @@ import cn.hutool.json.JSONUtil;
 import com.geoxus.core.common.constant.GXBaseBuilderConstants;
 import com.geoxus.core.common.constant.GXCommonConstants;
 import com.geoxus.core.common.entity.GXBaseEntity;
+import com.geoxus.core.common.exception.GXException;
 import com.geoxus.core.common.util.GXCommonUtils;
 import com.geoxus.core.common.util.GXSpringContextUtils;
 import com.geoxus.core.framework.service.GXCoreModelService;
@@ -58,12 +59,11 @@ public interface GXBaseBuilder {
                     } else {
                         if (ReUtil.isMatch(GXCommonConstants.DIGITAL_REGULAR_EXPRESSION, entryValue.toString())) {
                             sql.SET(StrUtil.format("{} = JSON_SET({} , '$.{}' , {})", dataKey, dataKey, entryKey, entryValue));
-                        } else {
-                            if (!ClassUtil.isPrimitiveWrapper(entryValue.getClass())
-                                    && !ClassUtil.equals(entryValue.getClass(), "String", true)
-                                    && (entryValue instanceof Map || entryValue instanceof GXBaseEntity)) {
-                                entryValue = JSONUtil.toJsonStr(entryValue);
-                            }
+                        }
+                        if (!ClassUtil.isPrimitiveWrapper(entryValue.getClass())
+                                && !ClassUtil.equals(entryValue.getClass(), "String", true)
+                                && (entryValue instanceof Map || entryValue instanceof GXBaseEntity)) {
+                            entryValue = JSONUtil.toJsonStr(entryValue);
                             sql.SET(StrUtil.format("{} = JSON_SET({} , '$.{}' , '{}')", dataKey, dataKey, entryKey, entryValue));
                         }
                     }
@@ -266,7 +266,7 @@ public interface GXBaseBuilder {
     default Dict mergeSearchConditionToSQL(SQL sql, Dict requestParam, String aliasPrefix) {
         final String modelIdentificationValue = getModelIdentificationValue();
         if (StrUtil.isBlank(modelIdentificationValue)) {
-            GXCommonUtils.getLogger(GXBaseBuilder.class).error("请配置{}.{}的模型标识", getClass().getSimpleName(), GXBaseBuilderConstants.MODEL_IDENTIFICATION_NAME);
+            throw new GXException(StrUtil.format("请配置{}.{}的模型标识", getClass().getSimpleName(), GXBaseBuilderConstants.MODEL_IDENTIFICATION_NAME));
         }
         final Dict condition = Dict.create().set(GXBaseBuilderConstants.MODEL_IDENTIFICATION_NAME, modelIdentificationValue);
         Dict searchField = Objects.requireNonNull(GXSpringContextUtils.getBean(GXCoreModelService.class)).getSearchCondition(condition);
@@ -279,24 +279,27 @@ public interface GXBaseBuilder {
             String lastKey = ReUtil.replaceAll(key, "[!<>*^$@#%&]", "");
             if (null != value) {
                 String operator = searchField.getStr(key);
-                if (null == operator && StrUtil.isNotBlank(aliasPrefix)) {
-                    operator = searchField.getStr(StrUtil.concat(true, aliasPrefix, ".", key));
+                if (null == operator) {
+                    if (StrUtil.isNotBlank(aliasPrefix)) {
+                        key = StrUtil.concat(true, aliasPrefix, ".", key);
+                        operator = searchField.getStr(key);
+                    }
+                    if (null == operator && StrUtil.isNotBlank(timeFields.getStr(key))) {
+                        operator = timeFields.getStr(key);
+                        if (null == operator && StrUtil.isNotBlank(aliasPrefix)) {
+                            key = StrUtil.concat(true, aliasPrefix, ".", key);
+                            operator = timeFields.getStr(key);
+                        }
+                    }
+                }
+                if (null == operator) {
+                    throw new GXException(StrUtil.format("{}字段没有配置搜索条件", key));
                 }
                 if (StrUtil.isNotBlank(timeFields.getStr(key))) {
-                    if (null == operator) {
-                        operator = timeFields.getStr(key);
-                    }
                     final String s = processTimeField(key, operator, value, aliasPrefix);
-                    if (null != s) {
-                        sql.WHERE(s);
-                    }
+                    sql.WHERE(s);
                     continue;
                 }
-                if (!"paging_info".equals(key) && null == operator) {
-                    GXCommonUtils.getLogger(GXBaseBuilder.class).warn("{}字段没有配置搜索条件", key);
-                    continue;
-                }
-                assert null != operator;
                 if (value instanceof Collection) {
                     value = CollUtil.join((Collection<?>) value, ",");
                 }
