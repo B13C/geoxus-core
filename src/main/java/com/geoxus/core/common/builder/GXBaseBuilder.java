@@ -294,7 +294,8 @@ public interface GXBaseBuilder {
                     }
                 }
                 if (null == operator) {
-                    throw new GXException(StrUtil.format("{}字段没有配置搜索条件", key));
+                    GXCommonUtils.getLogger(GXBaseBuilder.class).warn("{}字段没有配置搜索条件", key);
+                    continue;
                 }
                 if (StrUtil.isNotBlank(timeFields.getStr(key))) {
                     final String s = processTimeField(key, operator, value, aliasPrefix);
