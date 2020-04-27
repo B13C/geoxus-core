@@ -28,7 +28,7 @@ public class GXHttpContextUtils {
     /**
      * 获取HttpRequest
      *
-     * @return
+     * @return HttpServletRequest
      */
     public static HttpServletRequest getHttpServletRequest() {
         if (null != RequestContextHolder.getRequestAttributes()) {
@@ -40,7 +40,7 @@ public class GXHttpContextUtils {
     /**
      * 获取Http请求中的URL
      *
-     * @return
+     * @return String
      */
     public static String getDomain() {
         HttpServletRequest request = getHttpServletRequest();
@@ -51,7 +51,7 @@ public class GXHttpContextUtils {
     /**
      * 获取Http头中的Origin
      *
-     * @return
+     * @return String
      */
     public static String getOrigin() {
         HttpServletRequest request = getHttpServletRequest();
@@ -61,11 +61,11 @@ public class GXHttpContextUtils {
     /**
      * 获取Http请求中的数据
      *
-     * @param paramName
-     * @param resultType
-     * @return
+     * @param paramName  参数名字
+     * @param clazz 结果类型
+     * @return T
      */
-    public static <T> T getHttpParam(String paramName, Class<T> resultType) {
+    public static <T> T getHttpParam(String paramName, Class<T> clazz) {
         Object jsonRequestBody = "{}";
         final HttpServletRequest httpServletRequest = getHttpServletRequest();
         if (null != httpServletRequest) {
@@ -74,13 +74,20 @@ public class GXHttpContextUtils {
         final JSONObject jsonObject = JSONUtil.toBean(jsonRequestBody.toString(), JSONObject.class);
         final T value;
         if (!jsonObject.isEmpty()) {
-            value = jsonObject.getByPath(paramName, resultType);
+            value = jsonObject.getByPath(paramName, clazz);
         } else {
             assert httpServletRequest != null;
-            value = Convert.convert(resultType, httpServletRequest.getParameter(paramName));
+            String requestParameter = httpServletRequest.getParameter(paramName);
+            if (null == requestParameter) {
+                final Object requestAttribute = httpServletRequest.getAttribute(paramName);
+                if (null != requestAttribute) {
+                    requestParameter = requestAttribute.toString();
+                }
+            }
+            value = Convert.convert(clazz, requestParameter);
         }
         if (null == value) {
-            return ReflectUtil.newInstanceIfPossible(resultType);
+            return GXCommonUtils.getClassDefaultValue(clazz);
         }
         return value;
     }
@@ -88,7 +95,7 @@ public class GXHttpContextUtils {
     /**
      * 获取Http头中的header
      *
-     * @return
+     * @return String
      */
     public static String getHeader(String headerName) {
         HttpServletRequest request = getHttpServletRequest();
@@ -98,9 +105,9 @@ public class GXHttpContextUtils {
     /**
      * 从token中获取用户ID
      *
-     * @param tokenName
-     * @param tokenIdName
-     * @return
+     * @param tokenName   Token的名字
+     * @param tokenIdName Token中包含的ID名字
+     * @return Long
      */
     public static long getUserIdFromToken(String tokenName, String tokenIdName) {
         final String token = ServletUtil.getHeader(Objects.requireNonNull(getHttpServletRequest()), tokenName, CharsetUtil.UTF_8);
@@ -114,7 +121,7 @@ public class GXHttpContextUtils {
     /**
      * 获取客户端IP
      *
-     * @return
+     * @return String
      */
     public static String getClientIP(HttpServletRequest httpServletRequest) {
         String ip = "";
@@ -127,7 +134,7 @@ public class GXHttpContextUtils {
     /**
      * 获取客户端IP
      *
-     * @return
+     * @return String
      */
     public static String getClientIP() {
         String ip = "";
@@ -135,5 +142,35 @@ public class GXHttpContextUtils {
             ip = ServletUtil.getClientIP(GXHttpContextUtils.getHttpServletRequest());
         }
         return ip;
+    }
+
+    /**
+     * 向HttpServletRequest中设置属性值
+     *
+     * @param attributeName  属性的名字
+     * @param attributeValue 属性的值
+     * @return HttpServletRequest
+     */
+    public static HttpServletRequest setHttpServletRequestAttribute(String attributeName, String attributeValue) {
+        final HttpServletRequest servletRequest = getHttpServletRequest();
+        assert servletRequest != null;
+        servletRequest.setAttribute(attributeName, attributeValue);
+        return servletRequest;
+    }
+
+    /**
+     * 获取HttpServletRequest中设置的属性值
+     *
+     * @param attributeName 属性的名字
+     * @return T
+     */
+    public static <T> T getHttpServletRequestAttribute(String attributeName, Class<T> clazz) {
+        final HttpServletRequest servletRequest = getHttpServletRequest();
+        assert servletRequest != null;
+        final Object attributeValue = servletRequest.getAttribute(attributeName);
+        if (null == attributeValue) {
+            return GXCommonUtils.getClassDefaultValue(clazz);
+        }
+        return Convert.convert(clazz, attributeValue);
     }
 }

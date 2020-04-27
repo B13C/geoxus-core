@@ -1,10 +1,14 @@
 package com.geoxus.core.common.aspect;
 
+import cn.hutool.core.collection.CollUtil;
+import cn.hutool.core.convert.Convert;
+import cn.hutool.core.lang.TypeReference;
 import cn.hutool.core.util.RandomUtil;
 import cn.hutool.core.util.StrUtil;
 import com.geoxus.core.common.annotation.GXFieldCommentAnnotation;
 import com.geoxus.core.common.annotation.GXFrequencyLimitAnnotation;
 import com.geoxus.core.common.exception.GXException;
+import com.geoxus.core.common.util.GXCommonUtils;
 import com.geoxus.core.common.util.GXHttpContextUtils;
 import com.geoxus.core.common.util.GXRedisUtils;
 import org.aspectj.lang.ProceedingJoinPoint;
@@ -15,6 +19,9 @@ import org.aspectj.lang.reflect.MethodSignature;
 import org.springframework.stereotype.Component;
 
 import java.lang.reflect.Method;
+import java.util.Collections;
+import java.util.List;
+import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 
 @Aspect
@@ -29,6 +36,9 @@ public class GXDurationCountLimitAspect {
 
     @Around("frequencyLimitPointCut()")
     public Object around(ProceedingJoinPoint point) throws Throwable {
+        if (passagePhone()) {
+            return point.proceed(point.getArgs());
+        }
         MethodSignature signature = (MethodSignature) point.getSignature();
         Method method = signature.getMethod();
         final GXFrequencyLimitAnnotation durationCountLimitAnnotation = method.getAnnotation(GXFrequencyLimitAnnotation.class);
@@ -50,5 +60,17 @@ public class GXDurationCountLimitAspect {
             throw new GXException("操作频繁,请稍后在试......");
         }
         return point.proceed(point.getArgs());
+    }
+
+    /**
+     * 放行指定的电话号码 指定的电话号码不需要次数限制  用于测试使用
+     *
+     * @return boolean
+     */
+    private boolean passagePhone() {
+        String phone = GXHttpContextUtils.getHttpParam("phone", String.class);
+        final List<String> specialPhone = Convert.convert(new TypeReference<List<String>>() {
+        }, Optional.ofNullable(GXCommonUtils.getEnvironmentValue("special.phone", Object.class)).orElse(Collections.emptyList()));
+        return StrUtil.isNotBlank(phone) && CollUtil.contains(specialPhone, phone);
     }
 }
