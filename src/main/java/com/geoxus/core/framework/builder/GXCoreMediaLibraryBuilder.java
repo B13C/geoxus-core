@@ -43,8 +43,8 @@ public class GXCoreMediaLibraryBuilder implements GXBaseBuilder {
 
     public String getMediaByCondition(Dict param) {
         final SQL sql = new SQL().SELECT(DB_FIELDS).FROM("core_media_library");
-        if (null != param.getLong("model_id")) {
-            sql.WHERE(StrUtil.format("model_id = {}", param.getLong("model_id")));
+        if (null != param.getLong("object_id")) {
+            sql.WHERE(StrUtil.format("object_id = {}", param.getLong("object_id")));
         }
         if (null != param.getLong(GXCommonConstants.CORE_MODEL_PRIMARY_NAME)) {
             sql.WHERE(StrUtil.format("core_model_id = {}", param.getLong(GXCommonConstants.CORE_MODEL_PRIMARY_NAME)));

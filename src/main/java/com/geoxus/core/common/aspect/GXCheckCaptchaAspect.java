@@ -4,6 +4,7 @@ import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.convert.Convert;
 import cn.hutool.core.lang.Dict;
 import cn.hutool.core.lang.TypeReference;
+import cn.hutool.core.util.StrUtil;
 import com.geoxus.core.common.annotation.GXCheckCaptchaAnnotation;
 import com.geoxus.core.common.constant.GXCommonConstants;
 import com.geoxus.core.common.exception.GXException;
@@ -13,6 +14,7 @@ import com.geoxus.core.common.util.GXCommonUtils;
 import com.geoxus.core.common.util.GXHttpContextUtils;
 import com.geoxus.core.common.util.GXSpringContextUtils;
 import com.geoxus.core.common.vo.GXResultCode;
+import lombok.extern.slf4j.Slf4j;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
@@ -27,6 +29,7 @@ import java.util.Optional;
 
 @Aspect
 @Component
+@Slf4j
 public class GXCheckCaptchaAspect {
     @Pointcut("@annotation(com.geoxus.core.common.annotation.GXCheckCaptchaAnnotation)")
     public void checkCaptchaPointCut() {
@@ -67,6 +70,7 @@ public class GXCheckCaptchaAspect {
             String phoneNumber = GXCommonUtils.decryptedPhoneNumber(phone);
             final String specialVerifyCode = GXCommonUtils.getEnvironmentValue("special.verify_code", String.class, "");
             if (CollUtil.contains(specialPhone, phoneNumber) && verifyCode.equals(specialVerifyCode)) {
+                log.info(StrUtil.format("正在使用特殊号码进行验证 : {}-{}", phoneNumber, specialVerifyCode));
                 return point.proceed(point.getArgs());
             }
             if (!getSendSMSService().verification(phoneNumber, verifyCode)) {
