@@ -278,40 +278,41 @@ public interface GXBaseBuilder {
         for (String key : keySet) {
             Object value = requestSearchCondition.getObj(key);
             String lastKey = ReUtil.replaceAll(key, "[!<>*^$@#%&]", "");
-            if (null != value) {
-                String operator = searchField.getStr(key);
-                if (null == operator) {
-                    if (StrUtil.isNotBlank(aliasPrefix)) {
+            if (null == value) {
+                continue;
+            }
+            String operator = searchField.getStr(key);
+            if (null == operator) {
+                if (StrUtil.isNotBlank(aliasPrefix)) {
+                    key = StrUtil.concat(true, aliasPrefix, ".", key);
+                    operator = searchField.getStr(key);
+                }
+                if (null == operator && StrUtil.isNotBlank(timeFields.getStr(key))) {
+                    operator = timeFields.getStr(key);
+                    if (null == operator && StrUtil.isNotBlank(aliasPrefix)) {
                         key = StrUtil.concat(true, aliasPrefix, ".", key);
-                        operator = searchField.getStr(key);
-                    }
-                    if (null == operator && StrUtil.isNotBlank(timeFields.getStr(key))) {
                         operator = timeFields.getStr(key);
-                        if (null == operator && StrUtil.isNotBlank(aliasPrefix)) {
-                            key = StrUtil.concat(true, aliasPrefix, ".", key);
-                            operator = timeFields.getStr(key);
-                        }
                     }
                 }
-                if (null == operator) {
-                    GXCommonUtils.getLogger(GXBaseBuilder.class).warn("{}字段没有配置搜索条件", key);
-                    continue;
-                }
+            }
+            if (null == operator) {
+                GXCommonUtils.getLogger(GXBaseBuilder.class).warn("{}字段没有配置搜索条件", key);
+            } else {
                 if (StrUtil.isNotBlank(timeFields.getStr(key))) {
                     final String s = processTimeField(key, operator, value, aliasPrefix);
                     sql.WHERE(s);
-                    continue;
-                }
-                if (value instanceof Collection) {
-                    value = CollUtil.join((Collection<?>) value, ",");
-                }
-                if (StrUtil.isNotBlank(aliasPrefix) && !StrUtil.contains(key, ".")) {
-                    sql.WHERE(StrUtil.format("`{}`.`{}` ".concat(operator), aliasPrefix, lastKey, value));
                 } else {
-                    if (StrUtil.contains(key, ".")) {
-                        sql.WHERE(StrUtil.format("{} ".concat(operator), lastKey, value));
+                    if (value instanceof Collection) {
+                        value = CollUtil.join((Collection<?>) value, ",");
+                    }
+                    if (StrUtil.isNotBlank(aliasPrefix) && !StrUtil.contains(key, ".")) {
+                        sql.WHERE(StrUtil.format("`{}`.`{}` ".concat(operator), aliasPrefix, lastKey, value));
                     } else {
-                        sql.WHERE(StrUtil.format("`{}` ".concat(operator), lastKey, value));
+                        if (StrUtil.contains(key, ".")) {
+                            sql.WHERE(StrUtil.format("{} ".concat(operator), lastKey, value));
+                        } else {
+                            sql.WHERE(StrUtil.format("`{}` ".concat(operator), lastKey, value));
+                        }
                     }
                 }
             }
