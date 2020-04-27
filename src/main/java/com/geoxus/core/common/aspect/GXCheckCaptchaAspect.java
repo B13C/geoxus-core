@@ -63,17 +63,19 @@ public class GXCheckCaptchaAspect {
             throw new GXException(msg);
         }
         if (verifyType == GXCommonConstants.SMS_VERIFY) {
-            final String phone = param.getStr("phone");
+            String phone = param.getStr("phone");
             if (null == phone) {
                 throw new GXException("请传递手机号码");
             }
-            String phoneNumber = GXCommonUtils.decryptedPhoneNumber(phone);
+            if (GXCommonUtils.checkPhone(phone)) {
+                phone = GXCommonUtils.decryptedPhoneNumber(phone);
+            }
             final String specialVerifyCode = GXCommonUtils.getEnvironmentValue("special.verify_code", String.class, "");
-            if (CollUtil.contains(specialPhone, phoneNumber) && verifyCode.equals(specialVerifyCode)) {
-                log.info(StrUtil.format("正在使用特殊号码进行验证 : {}-{}", phoneNumber, specialVerifyCode));
+            if (CollUtil.contains(specialPhone, phone) && verifyCode.equals(specialVerifyCode)) {
+                log.info(StrUtil.format("正在使用特殊号码进行验证 : {}-{}", phone, specialVerifyCode));
                 return point.proceed(point.getArgs());
             }
-            if (!getSendSMSService().verification(phoneNumber, verifyCode)) {
+            if (!getSendSMSService().verification(phone, verifyCode)) {
                 throw new GXException(GXResultCode.SMS_CAPTCHA_ERROR);
             }
         } else if (verifyType == GXCommonConstants.CAPTCHA_VERIFY) {
