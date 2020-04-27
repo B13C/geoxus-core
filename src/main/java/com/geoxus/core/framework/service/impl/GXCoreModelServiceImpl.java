@@ -95,6 +95,25 @@ public class GXCoreModelServiceImpl extends ServiceImpl<GXCoreModelMapper, GXCor
     }
 
     @Override
+    public Dict getSearchCondition(Dict condition, String aliasPrefix) {
+        final Dict searchFields = getSearchCondition(condition);
+        if (StrUtil.isBlank(aliasPrefix)) {
+            return searchFields;
+        }
+        final Set<Map.Entry<String, Object>> entrySet = searchFields.entrySet();
+        final Dict dict = Dict.create();
+        for (Map.Entry<String, Object> entry : entrySet) {
+            String key = entry.getKey();
+            final Object value = entry.getValue();
+            if (!StrUtil.contains(key, '.')) {
+                key = StrUtil.format("{}.{}", aliasPrefix, key);
+            }
+            dict.set(key, value);
+        }
+        return dict;
+    }
+
+    @Override
     @Cacheable(value = "__DEFAULT__", key = "targetClass + methodName + #tableName")
     public int getCoreModelIdByTableName(String tableName) {
         final Dict condition = Dict.create().set("table_name", tableName);

@@ -61,6 +61,14 @@ public interface GXCoreModelService extends GXBaseService<GXCoreModelEntity>, GX
     Dict getSearchCondition(Dict condition);
 
     /**
+     * 获取模型配置的搜索条件
+     *
+     * @param condition 条件
+     * @return Dict
+     */
+    Dict getSearchCondition(Dict condition, String aliasPrefix);
+
+    /**
      * 通过表名获取核心模型ID
      *
      * @param tableName 真实表名
