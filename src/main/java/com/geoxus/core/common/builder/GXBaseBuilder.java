@@ -59,11 +59,12 @@ public interface GXBaseBuilder {
                     } else {
                         if (ReUtil.isMatch(GXCommonConstants.DIGITAL_REGULAR_EXPRESSION, entryValue.toString())) {
                             sql.SET(StrUtil.format("{} = JSON_SET({} , '$.{}' , {})", dataKey, dataKey, entryKey, entryValue));
-                        }
-                        if (!ClassUtil.isPrimitiveWrapper(entryValue.getClass())
-                                && !ClassUtil.equals(entryValue.getClass(), "String", true)
-                                && (entryValue instanceof Map || entryValue instanceof GXBaseEntity)) {
-                            entryValue = JSONUtil.toJsonStr(entryValue);
+                        } else {
+                            if (!ClassUtil.isPrimitiveWrapper(entryValue.getClass())
+                                    && !ClassUtil.equals(entryValue.getClass(), "String", true)
+                                    && (entryValue instanceof Map || entryValue instanceof GXBaseEntity)) {
+                                entryValue = JSONUtil.toJsonStr(entryValue);
+                            }
                             sql.SET(StrUtil.format("{} = JSON_SET({} , '$.{}' , '{}')", dataKey, dataKey, entryKey, entryValue));
                         }
                     }
