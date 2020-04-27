@@ -25,7 +25,7 @@ public @interface GXFrequencyLimitAnnotation {
     String key() default "";
 
     @GXFieldCommentAnnotation(zh = "过期时间, 单位: 秒")
-    int expire() default 3600;
+    int expire() default 600;
 
     @GXFieldCommentAnnotation(zh = "场景值 使用IP限制还是使用其他的限制")
     String scene() default "ip";

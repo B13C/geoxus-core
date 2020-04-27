@@ -67,9 +67,7 @@ public class GXCheckCaptchaAspect {
             if (null == phone) {
                 throw new GXException("请传递手机号码");
             }
-            if (GXCommonUtils.checkPhone(phone)) {
-                phone = GXCommonUtils.decryptedPhoneNumber(phone);
-            }
+            phone = GXCommonUtils.decryptedPhoneNumber(phone);
             final String specialVerifyCode = GXCommonUtils.getEnvironmentValue("special.verify_code", String.class, "");
             if (CollUtil.contains(specialPhone, phone) && verifyCode.equals(specialVerifyCode)) {
                 log.info(StrUtil.format("正在使用特殊号码进行验证 : {}-{}", phone, specialVerifyCode));

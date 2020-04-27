@@ -816,7 +816,11 @@ public class GXCommonUtils {
      * @return String
      */
     public static String decryptedPhoneNumber(String encryptPhoneNumber, String key) {
-        return GXAuthCodeUtils.authCodeDecode(encryptPhoneNumber, key);
+        final String s = GXAuthCodeUtils.authCodeDecode(encryptPhoneNumber, key);
+        if ("{}".equals(s)) {
+            return encryptPhoneNumber;
+        }
+        return s;
     }
 
     /**
