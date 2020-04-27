@@ -53,7 +53,7 @@ public class GXRequestToBeanHandlerMethodArgumentResolver implements HandlerMeth
         final String body = getRequestBody(webRequest);
         final Dict dict = Convert.convert(Dict.class, JSONUtil.toBean(body, Dict.class));
         if (null == dict.getInt(GXCommonConstants.CORE_MODEL_PRIMARY_NAME)) {
-            throw new GXException(StrUtil.format("{}参数必传...", GXCommonConstants.CORE_MODEL_PRIMARY_NAME));
+            throw new GXException(StrUtil.format("请传递{}参数", GXCommonConstants.CORE_MODEL_PRIMARY_NAME));
         }
         final Class<?> parameterType = parameter.getParameterType();
         final GXRequestBodyToEntityAnnotation gxRequestBodyToEntityAnnotation = parameter.getParameterAnnotation(GXRequestBodyToEntityAnnotation.class);

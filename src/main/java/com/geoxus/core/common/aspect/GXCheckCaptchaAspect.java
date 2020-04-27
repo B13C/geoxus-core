@@ -39,7 +39,7 @@ public class GXCheckCaptchaAspect {
             return point.proceed(point.getArgs());
         }
         if (verifyType == 0) {
-            throw new GXException(GXResultCode.NEED_CAPTCHA);
+            throw new GXException("请传递验证码类型");
         }
         String verifyCode = param.getStr("verify_code");
         if (null == verifyCode) {
@@ -59,7 +59,7 @@ public class GXCheckCaptchaAspect {
             }
             String phoneNumber = GXCommonUtils.decryptedPhoneNumber(phone);
             if (!getSendSMSService().verification(phoneNumber, verifyCode)) {
-                throw new GXException(GXResultCode.NEED_CAPTCHA);
+                throw new GXException(GXResultCode.SMS_CAPTCHA_ERROR);
             }
         } else if (verifyType == GXCommonConstants.CAPTCHA_VERIFY) {
             String uuid = param.getStr("uuid");
@@ -70,7 +70,7 @@ public class GXCheckCaptchaAspect {
                 throw new GXException("请传递图形验证码标识uuid");
             }
             if (!getCaptchaService().checkCaptcha(uuid, verifyCode)) {
-                throw new GXException(GXResultCode.NEED_CAPTCHA);
+                throw new GXException(GXResultCode.GRAPH_CAPTCHA_ERROR);
             }
         }
         return point.proceed(point.getArgs());
