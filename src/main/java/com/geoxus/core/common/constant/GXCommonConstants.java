@@ -30,6 +30,9 @@ public class GXCommonConstants {
     @GXFieldCommentAnnotation(zh = "手机号码加密的KEY")
     public static final String PHONE_ENCRYPT_KEY = "B78D32BTR1CHEN15AC1F19C46A9B533986";
 
+    @GXFieldCommentAnnotation(zh = "永久存储缓存的KEY")
+    public static final String PERMANENT_CACHE_MAP_KEY = "permanent_cache_map";
+
     private GXCommonConstants() {
     }
 }

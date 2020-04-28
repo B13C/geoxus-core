@@ -135,7 +135,7 @@ public class GXRedisUtils {
      *
      * @return RedissonClient
      */
-    private static RedissonClient getRedissonClient() {
+    public static RedissonClient getRedissonClient() {
         return GXSpringContextUtils.getBean(RedissonClient.class);
     }
 }
