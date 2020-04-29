@@ -362,16 +362,18 @@ public interface GXBusinessService<T> extends GXBaseService<T>, GXValidateDBExis
                 retDict.set(key, tmpDict);
             } else {
                 if (value instanceof Dict) {
-                    final Dict convert = Convert.convert(Dict.class, o);
+                    final Dict removeDict = Convert.convert(Dict.class, o);
                     final Set<Map.Entry<String, Object>> entrySet = Convert.convert(Dict.class, value).entrySet();
                     final Dict tmpDict = Dict.create();
                     for (Map.Entry<String, Object> en : entrySet) {
                         final String enKey = en.getKey();
                         Object enValue = en.getValue();
-                        if (null == convert.get(enKey) && CollUtil.contains(phoneNumberFields, enKey)) {
-                            String str = decryptedPhoneNumber(enValue.toString());
-                            if (!str.equals("{}")) {
-                                enValue = str;
+                        if (null == removeDict.get(enKey)) {
+                            if (CollUtil.contains(phoneNumberFields, enKey)) {
+                                String str = decryptedPhoneNumber(enValue.toString());
+                                if (!str.equals("{}")) {
+                                    enValue = str;
+                                }
                             }
                             tmpDict.set(enKey, enValue);
                         }
