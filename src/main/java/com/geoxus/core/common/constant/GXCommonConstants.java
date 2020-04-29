@@ -33,6 +33,9 @@ public class GXCommonConstants {
     @GXFieldCommentAnnotation(zh = "永久存储缓存的KEY")
     public static final String PERMANENT_CACHE_MAP_KEY = "permanent_cache_map";
 
+    @GXFieldCommentAnnotation(zh = "状态字段的名字")
+    public static final String STATUS_FIELD_NAME = "status";
+
     private GXCommonConstants() {
     }
 }
