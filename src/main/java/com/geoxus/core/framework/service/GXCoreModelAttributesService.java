@@ -10,16 +10,16 @@ public interface GXCoreModelAttributesService extends GXBaseService<GXCoreModelA
      * 通过模型ID获取模型的属性
      *
      * @param param 参数
-     * @return
+     * @return List
      */
     List<Dict> getModelAttributesByModelId(Dict param);
 
     /**
-     * 通过模型Id和属性Id获取模型的属性组
+     * 通过模型Id 和 属性Id获取模型的属性组
      *
-     * @param modelId
-     * @param attributeId
-     * @return
+     * @param modelId     模型ID
+     * @param attributeId 属性ID
+     * @return Dict
      */
     Dict getModelAttributeByModelIdAndAttributeId(int modelId, int attributeId);
 
@@ -34,12 +34,16 @@ public interface GXCoreModelAttributesService extends GXBaseService<GXCoreModelA
 
     /**
      * 检测指定模型的指定字段是否包含响应的字段(全部匹配相应的字段)
+     * <pre>
+     * {@code
+     *   checkCoreModelFieldAttribute(8, " ext ", JSON)
+     * }
+     * </pre>
      *
      * @param coreModelId 核心模型ID
      * @param modelField  需要检测的模型字段
      * @param json        需要验证的数据
      * @return boolean
-     * @example checkCoreModelFieldAttribute(8, " ext ", JSON)
      */
     boolean checkCoreModelFieldAttributes(Integer coreModelId, String modelField, String json);
 

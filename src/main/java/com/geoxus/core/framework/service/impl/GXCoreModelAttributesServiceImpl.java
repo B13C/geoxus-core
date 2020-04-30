@@ -109,11 +109,27 @@ public class GXCoreModelAttributesServiceImpl extends ServiceImpl<GXCoreModelAtt
             Dict errorsDict = Dict.create();
             for (Dict dict : list) {
                 final String attributeName = dict.getStr("attribute_name");
+                final String cmExt = dict.getStr("cm_ext");
+                final String cExt = dict.getStr("c_ext");
+                // 特定模型中的属性的元数据
+                Dict cmExtDict = Dict.create();
+                // 属性公共的元数据
+                Dict cExtDict = Dict.create();
+                if (JSONUtil.isJson(cmExt)) {
+                    cmExtDict = JSONUtil.toBean(cmExt, Dict.class);
+                }
+                if (JSONUtil.isJson(cExt)) {
+                    cExtDict = JSONUtil.toBean(cExt, Dict.class);
+                }
+                cExtDict.putAll(cmExtDict);
+                if (!cExtDict.isEmpty()) {
+                    // 根据属性的特定元数据处理不同的情况
+                }
                 Integer required = dict.getInt("required");
                 if (required == 1 && null == sourceDict.getObj(attributeName) && null == dict.getObj("default_value")) {
                     String errorTips = dict.getStr("error_tips");
                     if (StrUtil.isBlank(errorTips)) {
-                        errorTips = StrUtil.format("{}.{}是必填项", modelAttributeField, attributeName);
+                        errorTips = StrUtil.format("{}.{}为必填字段", modelAttributeField, attributeName);
                     }
                     errorsDict.set(attributeName, errorTips);
                     continue;
