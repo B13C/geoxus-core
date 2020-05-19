@@ -24,5 +24,7 @@ public @interface GXRequestBodyToEntityAnnotation {
 
     boolean encryptedPhone() default true;
 
+    boolean validateCoreModelId() default true;
+
     String primaryKey() default "id";
 }

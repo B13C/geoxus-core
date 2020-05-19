@@ -1,8 +1,11 @@
 package com.geoxus.core.framework.service.impl;
 
 import cn.hutool.core.lang.Dict;
+import cn.hutool.json.JSONUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.geoxus.core.common.vo.response.GXPagination;
 import com.geoxus.core.framework.entity.GXCoreAttributesEntity;
 import com.geoxus.core.framework.mapper.GXCoreAttributesMapper;
 import com.geoxus.core.framework.service.GXCoreAttributesService;
@@ -40,5 +43,41 @@ public class GXCoreAttributesServiceImpl extends ServiceImpl<GXCoreAttributesMap
     public boolean validateExists(Object value, String field, ConstraintValidatorContext constraintValidatorContext, Dict param) throws UnsupportedOperationException {
         Dict condition = Dict.create().set(field, value);
         return 1 == checkRecordIsExists(GXCoreAttributesEntity.class, condition);
+    }
+
+    @Override
+    public GXPagination<Dict> listOrSearchPage(Dict param) {
+        final IPage<Dict> riPage = constructPageObjectFromParam(param);
+        final List<Dict> list = baseMapper.listOrSearchPage(riPage, param);
+        riPage.setRecords(list);
+        return new GXPagination<>(riPage.getRecords(), riPage.getTotal(), riPage.getSize(), riPage.getCurrent());
+    }
+
+    @Override
+    public long create(GXCoreAttributesEntity target, Dict param) {
+        boolean save = save(target);
+        if (save) {
+            return target.getAttributeId();
+        }
+        return 0;
+    }
+
+    @Override
+    public long update(GXCoreAttributesEntity target, Dict param) {
+        String newExt = target.getExt();
+        if (null != newExt && JSONUtil.isJson(newExt)) {
+            String oldExt = getSingleFieldValueByDB(GXCoreAttributesEntity.class, "ext", String.class, Dict.create().set("attribute_id", target.getAttributeId()));
+            if (JSONUtil.isJson(oldExt)) {
+                Dict oldExtData = JSONUtil.toBean(oldExt, Dict.class);
+                Dict newExtData = JSONUtil.toBean(newExt, Dict.class);
+                oldExtData.putAll(newExtData);
+                target.setExt(JSONUtil.toJsonStr(oldExtData));
+            }
+        }
+        boolean update = updateById(target);
+        if (update) {
+            return target.getAttributeId();
+        }
+        return 0;
     }
 }

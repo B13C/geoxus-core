@@ -7,6 +7,7 @@ import com.geoxus.core.common.annotation.GXFieldCommentAnnotation;
 import com.geoxus.core.common.constant.GXCommonConstants;
 import com.geoxus.core.common.util.GXSpringContextUtils;
 import com.geoxus.core.framework.service.GXCoreModelAttributePermissionService;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.ibatis.type.BaseTypeHandler;
 import org.apache.ibatis.type.JdbcType;
 import org.apache.ibatis.type.MappedTypes;
@@ -16,6 +17,7 @@ import java.sql.*;
 import java.util.Map;
 
 @MappedTypes({Map.class})
+@Slf4j
 public class GXJsonToMapTypeHandler extends BaseTypeHandler<Map<String, Object>> {
     @GXFieldCommentAnnotation(zh = "标识核心模型主键名字")
     private static final String CORE_MODEL_PRIMARY_NAME = GXCommonConstants.CORE_MODEL_PRIMARY_NAME;
@@ -37,7 +39,12 @@ public class GXJsonToMapTypeHandler extends BaseTypeHandler<Map<String, Object>>
             int size = (int) clob.length();
             value = clob.getSubString(1L, size);
         }
-        final int coreModelId = rs.getInt(CORE_MODEL_PRIMARY_NAME);
+        int coreModelId = 0;
+        try {
+            coreModelId = rs.getInt(CORE_MODEL_PRIMARY_NAME);
+        } catch (SQLException e) {
+            log.info("本条记录中,字段{}不存在!", CORE_MODEL_PRIMARY_NAME);
+        }
         this.columnName = columnName;
         return jsonToMap(value, coreModelId);
     }
@@ -55,7 +62,12 @@ public class GXJsonToMapTypeHandler extends BaseTypeHandler<Map<String, Object>>
     public Map<String, Object> getNullableResult(CallableStatement cs, int columnIndex) throws SQLException {
         String value = "";
         Clob clob = cs.getClob(columnIndex);
-        final int coreModelId = cs.getInt(CORE_MODEL_PRIMARY_NAME);
+        int coreModelId = 0;
+        try {
+            coreModelId = cs.getInt(CORE_MODEL_PRIMARY_NAME);
+        } catch (SQLException e) {
+            log.info(e.getMessage());
+        }
         if (clob != null) {
             int size = (int) clob.length();
             value = clob.getSubString(1L, size);
@@ -65,6 +77,12 @@ public class GXJsonToMapTypeHandler extends BaseTypeHandler<Map<String, Object>>
 
     private Map<String, Object> jsonToMap(String from, int coreModelId) {
         from = from.isEmpty() ? "{}" : from;
+        if (coreModelId == 0) {
+            if (JSONUtil.isJson(from)) {
+                return JSONUtil.toBean(from, Dict.class);
+            }
+            return Dict.create();
+        }
         GXCoreModelAttributePermissionService coreModelAttributePermissionService = GXSpringContextUtils.getBean(GXCoreModelAttributePermissionService.class);
         assert coreModelAttributePermissionService != null;
         Dict tmpDict = coreModelAttributePermissionService.getModelAttributePermissionByCoreModelId(coreModelId, Dict.create());

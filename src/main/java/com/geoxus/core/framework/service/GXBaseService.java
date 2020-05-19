@@ -71,7 +71,7 @@ public interface GXBaseService<T> extends IService<T> {
      * @return R
      */
     default <R> R getSingleFieldValueByDB(Class<T> clazz, String path, Class<R> type, Dict condition) {
-        return getSingleFieldValueByDB(clazz, path, condition, type, GXCommonUtils.getClassDefaultValue(type));
+        return getSingleFieldValueByDB(clazz, path, type, condition, GXCommonUtils.getClassDefaultValue(type));
     }
 
     /**
@@ -83,13 +83,18 @@ public interface GXBaseService<T> extends IService<T> {
      * @param defaultValue 默认值
      * @return R
      */
-    default <R> R getSingleFieldValueByDB(Class<T> clazz, String path, Dict condition, Class<R> type, R defaultValue) {
+    default <R> R getSingleFieldValueByDB(Class<T> clazz, String path, Class<R> type, Dict condition, R defaultValue) {
+        Object removeObject = condition.remove("remove");
+        boolean remove = false;
+        if (null != removeObject) {
+            remove = true;
+        }
         if (StrUtil.contains(path, "::")) {
             String[] fields = StrUtil.split(path, "::");
             path = StrUtil.format("{}::{}", fields[0].replace("'", ""), fields[1].replace("'", ""));
         }
         GXBaseMapper<T> baseMapper = (GXBaseMapper<T>) getBaseMapper();
-        final Dict dict = baseMapper.getFieldValueBySQL(getTableName(clazz), CollUtil.newHashSet(path), condition, false);
+        final Dict dict = baseMapper.getFieldValueBySQL(getTableName(clazz), CollUtil.newHashSet(path), condition, remove);
         if (null == dict) {
             return defaultValue;
         }

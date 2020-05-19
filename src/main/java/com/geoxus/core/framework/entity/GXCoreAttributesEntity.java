@@ -27,7 +27,7 @@ public class GXCoreAttributesEntity extends GXBaseEntity implements Serializable
 
     private String ext;
 
-    private boolean isCore;
+    private Integer isCore;
 
     private String dataType;
 

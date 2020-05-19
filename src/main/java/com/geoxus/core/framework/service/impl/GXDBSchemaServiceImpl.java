@@ -182,6 +182,10 @@ public class GXDBSchemaServiceImpl implements GXDBSchemaService {
                 Dict attributeCondition = Dict.create().set(GXCommonConstants.CORE_MODEL_PRIMARY_NAME, coreModelId).set("db_field_name", columnName);
                 List<Dict> attributes = gxCoreModelAttributesService.getModelAttributesByModelId(attributeCondition);
                 String attributeFlag = "attribute_name";
+                if (attributes.isEmpty()) {
+                    tmpResult.set(columnName, columnName);
+                    continue;
+                }
                 for (Dict dict : attributes) {
                     String attributeValue = dict.getStr(attributeFlag);
                     String extFieldKey = StrUtil.format("{}::{}", columnName, attributeValue);
