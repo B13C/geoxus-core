@@ -16,7 +16,7 @@ public class GXCoreAttributesBuilder implements GXBaseBuilder {
 
     @Override
     public String detail(Dict param) {
-        final SQL sql = new SQL().SELECT("core_attributes.*").FROM("core_attributes as ca");
+        final SQL sql = new SQL().SELECT("ca.*").FROM("core_attributes as ca");
         sql.WHERE(StrUtil.format("attribute_id = {attribute_id}", param));
         return sql.toString();
     }

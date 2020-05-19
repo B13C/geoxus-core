@@ -80,4 +80,9 @@ public class GXCoreAttributesServiceImpl extends ServiceImpl<GXCoreAttributesMap
         }
         return 0;
     }
+
+    @Override
+    public Dict detail(Dict param) {
+        return baseMapper.detail(param);
+    }
 }
