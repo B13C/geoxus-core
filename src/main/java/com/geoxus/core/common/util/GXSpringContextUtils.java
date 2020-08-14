@@ -30,7 +30,7 @@ public class GXSpringContextUtils implements ApplicationContextAware {
         try {
             return applicationContext.getBean(clazz);
         } catch (Exception e) {
-            log.error("Bean获取出错 : " + e.getMessage(), e);
+            log.error(String.format("Bean获取出错 : %s / %s", clazz.getSimpleName(), e.getMessage()), e);
         }
         return null;
     }
