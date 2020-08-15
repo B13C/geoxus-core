@@ -2,8 +2,8 @@ package com.geoxus.core.common.util;
 
 import cn.hutool.core.convert.Convert;
 import cn.hutool.core.lang.Dict;
+import cn.hutool.http.HttpStatus;
 import com.geoxus.core.common.vo.GXResultCode;
-import org.apache.http.HttpStatus;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -23,11 +23,11 @@ public class GXResultUtils extends HashMap<String, Object> {
     }
 
     public static GXResultUtils error() {
-        return error(HttpStatus.SC_INTERNAL_SERVER_ERROR, "未知异常，请联系管理员");
+        return error(HttpStatus.HTTP_INTERNAL_ERROR, "未知异常，请联系管理员");
     }
 
     public static GXResultUtils error(String msg) {
-        return error(HttpStatus.SC_INTERNAL_SERVER_ERROR, msg);
+        return error(HttpStatus.HTTP_INTERNAL_ERROR, msg);
     }
 
     public static GXResultUtils error(int code) {
