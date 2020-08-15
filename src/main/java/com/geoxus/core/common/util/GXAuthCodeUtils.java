@@ -7,7 +7,6 @@ import org.springframework.util.Base64Utils;
 
 import java.io.File;
 import java.nio.charset.StandardCharsets;
-import java.security.NoSuchAlgorithmException;
 
 /**
  * 用于和PHP通信时的加解密，加解密双方的数据
@@ -43,14 +42,12 @@ public class GXAuthCodeUtils {
         } else {
             if (length < 0) {
                 return "";
-            } else {
-                if (length + startIndex > 0) {
-                    length = length + startIndex;
-                    startIndex = 0;
-                } else {
-                    return "";
-                }
             }
+            if (length + startIndex <= 0) {
+                return "";
+            }
+            length = length + startIndex;
+            startIndex = 0;
         }
         if (str.length() - startIndex < length) {
             length = str.length() - startIndex;
@@ -93,8 +90,8 @@ public class GXAuthCodeUtils {
     /**
      * 字段串是否为Null或为""(空)
      *
-     * @param str
-     * @return
+     * @param str 字符串参数
+     * @return boolean
      */
     public static boolean strIsNullOrEmpty(String str) {
         return str == null || str.trim().equals("");
@@ -103,9 +100,9 @@ public class GXAuthCodeUtils {
     /**
      * 用于 RC4 处理密码
      *
-     * @param pass
+     * @param pass byte[]参数
      * @param kLen 密钥长度，一般为256
-     * @return
+     * @return byte[]
      */
     private static byte[] getKey(byte[] pass, int kLen) {
         byte[] mBox = new byte[kLen];
@@ -128,7 +125,7 @@ public class GXAuthCodeUtils {
      * @param lens 随机字符长度
      * @return 随机字符
      */
-    private static String randomString(int lens) throws NoSuchAlgorithmException {
+    private static String randomString(int lens) {
         char[] chars = {'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'j', 'k',
                 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w',
                 'x', 'y', 'z', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9'};
@@ -202,7 +199,7 @@ public class GXAuthCodeUtils {
             if (operation == DisCuzAuthCodeMode.DECODE) {
                 byte[] temp;
                 temp = Base64Utils.decode(cutString(source, cKeyLength).getBytes());
-                result = new String(RC4(temp, cryptKey));
+                result = new String(rc4(temp, cryptKey));
                 if ((result.indexOf("0000000000") == 0
                         || Integer.parseInt(cutString(result, 0, 10)) - DateUtil.currentSeconds() > 0)
                         && cutString(result, 10, 16).equals(
@@ -213,7 +210,7 @@ public class GXAuthCodeUtils {
             } else {
                 expiry = expiry > 0 ? (int) (DateUtil.currentSeconds() + expiry) : 0;
                 source = String.format("%010d", expiry) + cutString(md5(source + keyB), 0, 16) + source;
-                byte[] temp = RC4(source.getBytes(StandardCharsets.UTF_8), cryptKey);
+                byte[] temp = rc4(source.getBytes(StandardCharsets.UTF_8), cryptKey);
                 return String.format("%s%s", keyC, Base64Utils.encodeToString(temp));
             }
         } catch (Exception e) {
@@ -228,7 +225,7 @@ public class GXAuthCodeUtils {
      * @param pass  密钥
      * @return 处理后的字串数组
      */
-    private static byte[] RC4(byte[] input, String pass) {
+    private static byte[] rc4(byte[] input, String pass) {
         if (input == null || pass == null) {
             return new byte[0];
         }
@@ -255,8 +252,8 @@ public class GXAuthCodeUtils {
     /**
      * 将字节转换为数字
      *
-     * @param b
-     * @return
+     * @param b byte参数
+     * @return int
      */
     private static int toInt(byte b) {
         return (b + 256) % 256;
