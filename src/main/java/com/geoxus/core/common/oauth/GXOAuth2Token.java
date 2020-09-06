@@ -3,7 +3,7 @@ package com.geoxus.core.common.oauth;
 import org.apache.shiro.authc.AuthenticationToken;
 
 public class GXOAuth2Token implements AuthenticationToken {
-    private String token;
+    private final String token;
 
     public GXOAuth2Token(String token) {
         this.token = token;

@@ -9,6 +9,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.core.Message;
 import org.springframework.amqp.rabbit.annotation.RabbitHandler;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.stereotype.Component;
@@ -17,8 +18,11 @@ import java.nio.charset.StandardCharsets;
 
 @Component
 @Slf4j
-@PropertySource(value = "classpath:/ymls/${spring.profiles.active}/rabbit.yml", factory = GXYamlPropertySourceFactory.class)
+@PropertySource(value = "classpath:/ymls/${spring.profiles.active}/rabbit.yml",
+        factory = GXYamlPropertySourceFactory.class,
+        ignoreResourceNotFound = true)
 @ConditionalOnExpression("'${enable-rabbitmq}'.equals('true')")
+@ConditionalOnClass(name = {"org.springframework.amqp.rabbit.connection.ConnectionFactory"})
 public class GXDefaultRabbitMQQueueServiceImpl implements GXRabbitMQQueueService {
     @Override
     @RabbitHandler

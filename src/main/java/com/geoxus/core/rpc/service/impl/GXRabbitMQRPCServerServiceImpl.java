@@ -24,9 +24,11 @@ import java.util.Optional;
 
 @Slf4j
 @Service
-@PropertySource(value = "classpath:/ymls/${spring.profiles.active}/rabbit.yml", factory = GXYamlPropertySourceFactory.class)
+@PropertySource(value = "classpath:/ymls/${spring.profiles.active}/rabbit.yml",
+        factory = GXYamlPropertySourceFactory.class,
+        ignoreResourceNotFound = true)
 @ConditionalOnExpression("'${enable-rabbitmq-rpc}'.equals('true')")
-@ConditionalOnClass(value = {GXRabbitMQConfig.class})
+@ConditionalOnClass(value = {GXRabbitMQConfig.class}, name = {"org.springframework.amqp.rabbit.connection.ConnectionFactory"})
 public class GXRabbitMQRPCServerServiceImpl implements GXRabbitMQRPCServerService {
     @Override
     @RabbitListener(queues = {"${rabbit.rpc-server.local.default-server-name}"}, containerFactory = "directRabbitListenerContainerFactory")

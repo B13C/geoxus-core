@@ -8,7 +8,7 @@ import java.util.concurrent.Executors;
 @SuppressWarnings("unused")
 public class GXAsyncEventBusCenterUtils {
 
-    private static AsyncEventBus asyncEventBus = new AsyncEventBus("async-britton", Executors.newFixedThreadPool(5));
+    private static final AsyncEventBus asyncEventBus = new AsyncEventBus("async-britton", Executors.newFixedThreadPool(5));
 
     private GXAsyncEventBusCenterUtils() {
     }

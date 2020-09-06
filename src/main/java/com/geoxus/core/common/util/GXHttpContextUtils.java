@@ -2,7 +2,6 @@ package com.geoxus.core.common.util;
 
 import cn.hutool.core.convert.Convert;
 import cn.hutool.core.util.CharsetUtil;
-import cn.hutool.core.util.ReflectUtil;
 import cn.hutool.extra.servlet.ServletUtil;
 import cn.hutool.json.JSONObject;
 import cn.hutool.json.JSONUtil;
@@ -61,8 +60,8 @@ public class GXHttpContextUtils {
     /**
      * 获取Http请求中的数据
      *
-     * @param paramName  参数名字
-     * @param clazz 结果类型
+     * @param paramName 参数名字
+     * @param clazz     结果类型
      * @return T
      */
     public static <T> T getHttpParam(String paramName, Class<T> clazz) {

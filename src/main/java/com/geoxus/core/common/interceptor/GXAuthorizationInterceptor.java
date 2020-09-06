@@ -16,6 +16,7 @@ import org.springframework.web.servlet.handler.HandlerInterceptorAdapter;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.util.Objects;
 
 /**
  * 前端用户Token验证
@@ -47,7 +48,7 @@ public class GXAuthorizationInterceptor extends HandlerInterceptorAdapter {
             throw new GXTokenEmptyException("请先进行登录", HttpStatus.UNAUTHORIZED.value());
         }
 
-        Dict dict = GXSpringContextUtils.getBean(GXUUserService.class).verifyUserToken(token);
+        Dict dict = Objects.requireNonNull(GXSpringContextUtils.getBean(GXUUserService.class)).verifyUserToken(token);
         if (dict == null || dict.isEmpty()) {
             throw new GXException(GXResultCode.TOKEN_TIMEOUT_EXIT.getMsg(), HttpStatus.UNAUTHORIZED.value());
         }

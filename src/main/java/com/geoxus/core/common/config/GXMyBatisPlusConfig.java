@@ -6,9 +6,10 @@ import com.baomidou.mybatisplus.annotation.DbType;
 import com.baomidou.mybatisplus.autoconfigure.ConfigurationCustomizer;
 import com.baomidou.mybatisplus.core.toolkit.StringUtils;
 import com.baomidou.mybatisplus.extension.handlers.MybatisMapWrapper;
-import com.baomidou.mybatisplus.extension.plugins.OptimisticLockerInterceptor;
-import com.baomidou.mybatisplus.extension.plugins.PaginationInterceptor;
 import com.baomidou.mybatisplus.extension.plugins.SqlExplainInterceptor;
+import com.baomidou.mybatisplus.extension.plugins.inner.BlockAttackInnerInterceptor;
+import com.baomidou.mybatisplus.extension.plugins.inner.OptimisticLockerInnerInterceptor;
+import com.baomidou.mybatisplus.extension.plugins.inner.PaginationInnerInterceptor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.ibatis.reflection.MetaObject;
 import org.apache.ibatis.reflection.wrapper.ObjectWrapper;
@@ -53,13 +54,15 @@ public class GXMyBatisPlusConfig {
      * 分页插件
      */
     @Bean
-    public PaginationInterceptor paginationInterceptor() {
-        return new PaginationInterceptor().setDbType(DbType.MYSQL);
+    public PaginationInnerInterceptor paginationInterceptor() {
+        PaginationInnerInterceptor interceptor = new PaginationInnerInterceptor();
+        interceptor.setDbType(DbType.MYSQL);
+        return interceptor;
     }
 
     @Bean
-    public OptimisticLockerInterceptor optimisticLockerInterceptor() {
-        return new OptimisticLockerInterceptor();
+    public OptimisticLockerInnerInterceptor optimisticLockerInterceptor() {
+        return new OptimisticLockerInnerInterceptor();
     }
 
     @Bean
@@ -69,12 +72,12 @@ public class GXMyBatisPlusConfig {
     }
 
     @Bean
-    public SqlExplainInterceptor sqlExplainInterceptor() {
-        SqlExplainInterceptor performanceInterceptor = new SqlExplainInterceptor();
+    public BlockAttackInnerInterceptor sqlExplainInterceptor() {
+        BlockAttackInnerInterceptor blockAttackInnerInterceptor = new BlockAttackInnerInterceptor();
         //格式化sql语句
         Properties properties = new Properties();
         properties.setProperty("format", "true");
-        performanceInterceptor.setProperties(properties);
-        return performanceInterceptor;
+        blockAttackInnerInterceptor.setProperties(properties);
+        return blockAttackInnerInterceptor;
     }
 }

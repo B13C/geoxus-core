@@ -4,7 +4,7 @@ import com.google.common.eventbus.EventBus;
 
 @SuppressWarnings("unused")
 public class GXSyncEventBusCenterUtils {
-    private static EventBus syncEventBus = new EventBus("sync-britton");
+    private static final EventBus syncEventBus = new EventBus("sync-britton");
 
     private GXSyncEventBusCenterUtils() {
     }

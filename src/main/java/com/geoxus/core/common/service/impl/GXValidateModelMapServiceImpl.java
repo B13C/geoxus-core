@@ -2,8 +2,8 @@ package com.geoxus.core.common.service.impl;
 
 import cn.hutool.core.lang.Dict;
 import com.geoxus.core.common.exception.GXException;
-import com.geoxus.core.common.vo.GXResultCode;
 import com.geoxus.core.common.validator.GXValidateModelMap;
+import com.geoxus.core.common.vo.GXResultCode;
 import com.geoxus.core.framework.entity.GXCoreAttributesEntity;
 import com.geoxus.core.framework.service.GXCoreAttributesService;
 import com.geoxus.core.framework.service.GXCoreModelService;
@@ -34,6 +34,6 @@ public class GXValidateModelMapServiceImpl implements GXValidateModelMap {
                 throw new GXException(GXResultCode.PARAMETER_VALIDATION_ERROR);
             }
         }
-        return false;
+        return true;
     }
 }

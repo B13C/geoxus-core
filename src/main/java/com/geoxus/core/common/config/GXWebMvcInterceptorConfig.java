@@ -97,7 +97,10 @@ public class GXWebMvcInterceptorConfig implements WebMvcConfigurer {
     @Data
     @Component
     @ConfigurationProperties(prefix = "web-mvc")
-    @PropertySource(value = {"classpath:/ymls/${spring.profiles.active}/web-mvc.yml"}, factory = GXYamlPropertySourceFactory.class, encoding = "utf-8")
+    @PropertySource(value = {"classpath:/ymls/${spring.profiles.active}/web-mvc.yml"},
+            factory = GXYamlPropertySourceFactory.class,
+            encoding = "utf-8",
+            ignoreResourceNotFound = true)
     static class WebMvcConfig {
         private List<String> urlPatterns;
 

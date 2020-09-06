@@ -5,10 +5,12 @@ import cn.hutool.json.JSONObject;
 import cn.hutool.json.JSONUtil;
 import com.geoxus.core.rpc.handler.GXRPCServerHandler;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.stereotype.Component;
 
 @Slf4j
 @Component("defaultRPCServerHandler")
+@ConditionalOnClass(name = {"org.springframework.amqp.rabbit.connection.ConnectionFactory"})
 public class GXDefaultRPCServerHandlerImpl implements GXRPCServerHandler {
     @Override
     public JSONObject rpcHandler(Dict param) {

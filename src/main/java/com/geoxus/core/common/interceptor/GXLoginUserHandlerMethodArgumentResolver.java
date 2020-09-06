@@ -14,6 +14,8 @@ import org.springframework.web.context.request.RequestAttributes;
 import org.springframework.web.method.support.HandlerMethodArgumentResolver;
 import org.springframework.web.method.support.ModelAndViewContainer;
 
+import java.util.Objects;
+
 /**
  * 有@LoginUserAnnotation注解的方法参数，注入当前登录用户
  */
@@ -41,6 +43,6 @@ public class GXLoginUserHandlerMethodArgumentResolver implements HandlerMethodAr
             }
         }
         //获取用户信息
-        return GXSpringContextUtils.getBean(GXUUserService.class).getById((Long) object);
+        return Objects.requireNonNull(GXSpringContextUtils.getBean(GXUUserService.class)).getById((Long) object);
     }
 }

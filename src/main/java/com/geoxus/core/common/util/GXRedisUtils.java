@@ -4,11 +4,9 @@ import cn.hutool.core.convert.Convert;
 import com.geoxus.core.common.annotation.GXFieldCommentAnnotation;
 import org.redisson.api.*;
 import org.slf4j.Logger;
-import org.springframework.stereotype.Component;
 
 import java.util.concurrent.TimeUnit;
 
-@Component
 public class GXRedisUtils {
     @GXFieldCommentAnnotation(zh = "Logger对象")
     private static final Logger logger;

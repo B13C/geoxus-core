@@ -10,6 +10,7 @@ import com.geoxus.core.common.util.GXSpringContextUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import java.util.Objects;
 import java.util.Set;
 
 @Service
@@ -19,9 +20,11 @@ public class GXShiroServiceImpl implements GXShiroService {
      * 获取用户权限列表
      *
      * @param adminId 管理员ID
+     * @return
      */
     public Set<String> getAdminAllPermissions(Long adminId) {
-        return GXSpringContextUtils.getBean(GXSPermissionsService.class).getAdminAllPermissions(adminId);
+        return Objects.requireNonNull(GXSpringContextUtils.getBean(GXSPermissionsService.class))
+                .getAdminAllPermissions(adminId);
     }
 
     /**
@@ -30,12 +33,12 @@ public class GXShiroServiceImpl implements GXShiroService {
      * @return
      */
     public Dict getAdminRoles(long adminId) {
-        return GXSpringContextUtils.getBean(GXSAdminHasRolesService.class).getAdminRoles(adminId);
+        return Objects.requireNonNull(GXSpringContextUtils.getBean(GXSAdminHasRolesService.class)).getAdminRoles(adminId);
     }
 
     @Override
     public Dict getAdminById(Long adminId) {
-        final Dict dict = GXSpringContextUtils.getBean(GXSAdminService.class).getStatus(adminId);
+        final Dict dict = Objects.requireNonNull(GXSpringContextUtils.getBean(GXSAdminService.class)).getStatus(adminId);
         if (null == dict) {
             return Dict.create();
         }
@@ -44,7 +47,7 @@ public class GXShiroServiceImpl implements GXShiroService {
 
     @Override
     public boolean isSuperAdmin(Dict adminData) {
-        final String primaryKey = GXSpringContextUtils.getBean(GXSAdminService.class).getPrimaryKey();
+        final String primaryKey = Objects.requireNonNull(GXSpringContextUtils.getBean(GXSAdminService.class)).getPrimaryKey();
         if (null != adminData.getLong(primaryKey)) {
             return adminData.getLong(primaryKey).equals(GXCommonUtils.getEnvironmentValue("super.admin.id", Long.class));
         }

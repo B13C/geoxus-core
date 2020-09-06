@@ -6,6 +6,7 @@ import org.springframework.web.multipart.MultipartFile;
 import javax.validation.constraints.NotNull;
 import java.io.*;
 
+@SuppressWarnings("unused")
 public class GXBase64DecodedMultipartFileUtils implements MultipartFile {
 
     private byte[] imageBytes;

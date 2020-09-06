@@ -17,6 +17,7 @@ import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.util.Objects;
 
 @Slf4j
 public class GXOAuth2Filter extends AuthenticatingFilter {
@@ -41,7 +42,9 @@ public class GXOAuth2Filter extends AuthenticatingFilter {
             HttpServletResponse httpResponse = (HttpServletResponse) response;
             httpResponse.setHeader("Access-Control-Allow-Credentials", "true");
             httpResponse.setHeader("Access-Control-Allow-Origin", GXHttpContextUtils.getOrigin());
-            String json = new Gson().toJson(GXResultUtils.error(HttpStatus.SC_UNAUTHORIZED, "invalid token").put("msg", "invalid token").put("data", new Object()));
+            String json = new Gson().toJson(Objects.requireNonNull(GXResultUtils
+                    .error(HttpStatus.SC_UNAUTHORIZED, "invalid token")
+                    .put("msg", "invalid token")).put("data", new Object()));
             httpResponse.getWriter().print(json);
             return false;
         }

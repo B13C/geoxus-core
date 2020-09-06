@@ -84,7 +84,10 @@ public class GXCacheKeysUtils {
     @Data
     @Component
     @Configuration
-    @PropertySource(value = {"classpath:/ymls/${spring.profiles.active}/cache-key.yml"}, factory = GXYamlPropertySourceFactory.class, encoding = "UTF-8")
+    @PropertySource(value = {"classpath:/ymls/${spring.profiles.active}/cache-key.yml"},
+            factory = GXYamlPropertySourceFactory.class,
+            encoding = "UTF-8",
+            ignoreResourceNotFound = true)
     @ConfigurationProperties(prefix = "cache-key")
     static class CacheKeysConfig {
         private List<Map<String, String>> keys;

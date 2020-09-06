@@ -1,5 +1,8 @@
 package com.geoxus.core.common.util;
 
+import com.geoxus.core.common.annotation.GXFieldCommentAnnotation;
+import org.slf4j.Logger;
+
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.util.Arrays;
@@ -13,6 +16,12 @@ import java.util.Set;
  * @author zj chen <britton@126.com>
  */
 public class GXSignatureUtils {
+    @GXFieldCommentAnnotation(zh = "Logger对象")
+    private static final Logger logger = GXCommonUtils.getLogger(GXSignatureUtils.class);
+
+    private GXSignatureUtils() {
+    }
+
     /**
      * 生成签名.
      *
@@ -34,9 +43,9 @@ public class GXSignatureUtils {
                 sb.append(k).append("=").append(s.trim()).append("&");
             }
         }
-        sb.append("ZerDoor_sign_key=").append(key);
-        System.out.println(sb.toString());
-        return MD5(sb.toString()).toUpperCase();
+        sb.append("geoxus_sign_key=").append(key);
+        logger.info(sb.toString());
+        return md5(sb.toString()).toUpperCase();
     }
 
     /**
@@ -45,12 +54,12 @@ public class GXSignatureUtils {
      * @param data 待处理数据
      * @return MD5结果
      */
-    private static String MD5(String data) throws Exception {
+    private static String md5(String data) throws Exception {
         MessageDigest md = MessageDigest.getInstance("MD5");
         byte[] array = md.digest(data.getBytes(StandardCharsets.UTF_8));
         StringBuilder sb = new StringBuilder();
         for (byte item : array) {
-            sb.append(Integer.toHexString((item & 0xFF) | 0x100).substring(1, 3));
+            sb.append(Integer.toHexString((item & 0xFF) | 0x100), 1, 3);
         }
         return sb.toString().toUpperCase();
     }

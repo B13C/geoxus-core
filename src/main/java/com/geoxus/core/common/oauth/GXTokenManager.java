@@ -60,7 +60,7 @@ public class GXTokenManager {
      */
     public static String generateAdminToken(long adminId, Dict param) {
         param.putIfAbsent(ADMIN_ID, adminId);
-        param.put("platform", "GEO_XUS");
+        param.putIfAbsent("platform", "GEO_XUS");
         return GXAuthCodeUtils.authCodeEncode(JSONUtil.toJsonStr(param), KEY, ADMIN_EXPIRES_REFRESH);
     }
 
