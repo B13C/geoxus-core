@@ -73,10 +73,14 @@ public class GXRequestToBeanHandlerMethodArgumentResolver implements HandlerMeth
                 continue;
             }
             String dbJSONFieldFieldName = annotation.dbJSONFieldFieldName();
+            String currentFieldName = field.getName();
             String dbFieldName = annotation.dbFieldName();
-            Object fieldValue = dict.remove(field.getName());
+            Object fieldValue = dict.remove(currentFieldName);
             if (Objects.isNull(fieldValue)) {
-                fieldValue = GXCommonUtils.getClassDefaultValue(field.getType());
+                fieldValue = dict.get(StrUtil.toSymbolCase(currentFieldName, '_'));
+                if (Objects.isNull(fieldValue)) {
+                    fieldValue = GXCommonUtils.getClassDefaultValue(field.getType());
+                }
             }
             Map<String, Object> tmpMap = new HashMap<>();
             if (!CollUtil.contains(jsonMergeFieldMap.keySet(), dbJSONFieldFieldName)) {
