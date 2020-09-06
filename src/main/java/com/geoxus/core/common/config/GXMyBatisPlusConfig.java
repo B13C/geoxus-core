@@ -6,7 +6,7 @@ import com.baomidou.mybatisplus.annotation.DbType;
 import com.baomidou.mybatisplus.autoconfigure.ConfigurationCustomizer;
 import com.baomidou.mybatisplus.core.toolkit.StringUtils;
 import com.baomidou.mybatisplus.extension.handlers.MybatisMapWrapper;
-import com.baomidou.mybatisplus.extension.plugins.SqlExplainInterceptor;
+import com.baomidou.mybatisplus.extension.plugins.MybatisPlusInterceptor;
 import com.baomidou.mybatisplus.extension.plugins.inner.BlockAttackInnerInterceptor;
 import com.baomidou.mybatisplus.extension.plugins.inner.OptimisticLockerInnerInterceptor;
 import com.baomidou.mybatisplus.extension.plugins.inner.PaginationInnerInterceptor;
@@ -20,7 +20,6 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 
 import java.util.Map;
-import java.util.Properties;
 
 @Slf4j
 @EnableTransactionManagement
@@ -50,34 +49,21 @@ public class GXMyBatisPlusConfig {
         });
     }
 
-    /**
-     * 分页插件
-     */
     @Bean
-    public PaginationInnerInterceptor paginationInterceptor() {
-        PaginationInnerInterceptor interceptor = new PaginationInnerInterceptor();
-        interceptor.setDbType(DbType.MYSQL);
+    public MybatisPlusInterceptor paginationInterceptor() {
+        MybatisPlusInterceptor interceptor = new MybatisPlusInterceptor();
+        // 分页插件
+        interceptor.addInnerInterceptor(new PaginationInnerInterceptor(DbType.MYSQL));
+        // 攻击 SQL 阻断解析器,防止全表更新与删除
+        interceptor.addInnerInterceptor(new BlockAttackInnerInterceptor());
+        // 乐观锁
+        interceptor.addInnerInterceptor(new OptimisticLockerInnerInterceptor());
         return interceptor;
-    }
-
-    @Bean
-    public OptimisticLockerInnerInterceptor optimisticLockerInterceptor() {
-        return new OptimisticLockerInnerInterceptor();
     }
 
     @Bean
     @ConditionalOnExpression("'${use-camel-case-mapping}'.equals('true')")
     public ConfigurationCustomizer configurationCustomizer() {
         return GXMyBatisPlusConfig::customize;
-    }
-
-    @Bean
-    public BlockAttackInnerInterceptor sqlExplainInterceptor() {
-        BlockAttackInnerInterceptor blockAttackInnerInterceptor = new BlockAttackInnerInterceptor();
-        //格式化sql语句
-        Properties properties = new Properties();
-        properties.setProperty("format", "true");
-        blockAttackInnerInterceptor.setProperties(properties);
-        return blockAttackInnerInterceptor;
     }
 }
