@@ -46,6 +46,7 @@
 * 44、 删除core_model、core_media_library表中与PHP相关的字段
 * 45、 核心功能的重构,将解析json参数到对应entity的功能抽离出来
 * 46、 核心功能重构,将框架本身的核心功能抽离出来做成独立的starter
+* 47、 core_model_attributes_permission中数据的存储在缓存中的存储格式为: 角色Id:{"allow":[1,2,3,4,5] , "deny":[7,8,9,10]} , 用户Id:{"allow":[4,5,6],"deny":[1,2,9]}
 * 51、 弃用RabbitMQ实现的RPC
 
 
