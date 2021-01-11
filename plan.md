@@ -38,8 +38,14 @@
 * 36、 ~~在处理请求中的附加属性时,将附加属性中包含的字段填充上相应的默认值(比如 : ext:{"name":"britton","email":"britton@126.com"})~~
 * 37、 属性分组需要有层级关系
 * 38、 模型新增的字段在查询旧数据时需要将新增字段一并显示出来
-* 39、 模型字段的删减触发相应的事件，便于后期加入统计报表功能
+* 39、 模型字段的删减触发相应的事件，便于后期加入统计报表功能,注意:如果需要直接在数据库中修改,可以配合canal使用
 * 40、 整合MongoDB，便于MySQL与MongoDB的切换与混合使用
+* 41、 core_model_attributes数据表新增字段(entity_field_name),该字段用来表示该行数据在实体表中的实际字段,新增该字段之后,需要将attribute_id关联到core_attribute数据表上
+* 42、 core_attributes表中的validate_desc字段修改为error_tips, core_attributes表中的validate_expression修改为validate_rule
+* 43、 core_attributes_enums中新增字段(frontend_input_type),表示枚举类型的前端显示类型(下拉、多选、单选....),并且新增与core_attributes的外键约束
+* 44、 删除core_model、core_media_library表中与PHP相关的字段
+* 45、 核心功能的重构,将解析json参数到对应entity的功能抽离出来
+* 46、 核心功能重构,将框架本身的核心功能抽离出来做成独立的starter
 * 51、 弃用RabbitMQ实现的RPC
 
 
